@@ -32,7 +32,6 @@ Each team member is responsible for their assigned module.
 - Password Encoder configuration
 - Role-based access implementation
 
-👤 **Assigned To:** Member 1 (Backend Lead)
 
 ---
 
@@ -66,7 +65,6 @@ Each team member is responsible for their assigned module.
 - Profile DTOs
 - Privacy handling logic
 
-👤 **Assigned To:** Member 2
 
 ---
 
@@ -94,7 +92,6 @@ Each team member is responsible for their assigned module.
 - Scheduling service
 - Pin post logic
 
-👤 **Assigned To:** Member 3
 
 ---
 
@@ -142,7 +139,6 @@ Each team member is responsible for their assigned module.
 - `NetworkController`
 - Status management logic
 
-👤 **Assigned To:** Member 5
 
 ---
 
@@ -178,7 +174,6 @@ Each team member is responsible for their assigned module.
 - Trending algorithm
 - Notification listener system
 
-👤 **Assigned To:** Member 6
 
 ---
 
