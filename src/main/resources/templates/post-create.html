@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Create Post - RevConnect</title>
+    <style>
+        body { font-family: sans-serif; margin: 50px; background-color: #f4f4f4; }
+        .container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); max-width: 500px; }
+        textarea { width: 100%; height: 100px; margin-bottom: 10px; }
+        input[type="text"] { width: 100%; margin-bottom: 10px; padding: 8px; }
+        button { background-color: #007bff; color: white; border: none; padding: 10px 20px; cursor: pointer; border-radius: 4px; }
+        button:hover { background-color: #0056b3; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Create New Post</h2>
+    <form th:action="@{/posts/save}" th:object="${postDTO}" method="post">
+        
+        <label>Post Content:</label>
+        <textarea th:field="*{content}" placeholder="What's on your mind?" required></textarea>
+        
+        <label>Hashtags:</label>
+        <input type="text" th:field="*{hashtags}" placeholder="#coding #java">
+        
+        <label>CTA Link (Optional):</label>
+        <input type="text" th:field="*{ctaLink}" placeholder="http://example.com">
+        
+        <div style="margin-bottom: 15px;">
+            <input type="checkbox" th:field="*{promotional}" id="promo">
+            <label for="promo">Mark as Promotional</label>
+        </div>
+
+        <button type="submit">Publish Post</button>
+    </form>
+</div>
+
+</body>
+</html>
