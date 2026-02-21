@@ -1,0 +1,58 @@
+package com.example.demo.entity;
+
+import jakarta.persistence.*;
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = "shares")
+public class Share {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne
+    @JoinColumn(name="user_id")
+    private User user;
+
+    @ManyToOne
+    @JoinColumn(name="post_id")
+    private Post post;
+
+    private LocalDateTime sharedAt = LocalDateTime.now();
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
+	}
+
+	public Post getPost() {
+		return post;
+	}
+
+	public void setPost(Post post) {
+		this.post = post;
+	}
+
+	public LocalDateTime getSharedAt() {
+		return sharedAt;
+	}
+
+	public void setSharedAt(LocalDateTime sharedAt) {
+		this.sharedAt = sharedAt;
+	}
+
+    // getters & setters
+    
+}
