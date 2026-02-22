@@ -53,6 +53,5 @@ public class Share {
 		this.sharedAt = sharedAt;
 	}
 
-    // getters & setters
     
 }
