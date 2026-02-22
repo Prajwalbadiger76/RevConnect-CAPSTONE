@@ -53,6 +53,6 @@ public class Like {
 		this.likedAt = likedAt;
 	}
 
-    // getters & setters
+
     
 }
