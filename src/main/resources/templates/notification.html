@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Notifications</title>
+</head>
+<body>
+
+<div th:replace="fragments/header :: header"></div>
+
+<h2>Notifications</h2>
+
+<p>Unread: <span th:text="${unreadCount}"></span></p>
+
+<hr/>
+
+<div th:each="n : ${notifications}">
+
+    <p>
+        <span th:text="${n.sender.username}"></span>
+        <span th:text="${n.type}"></span>
+    </p>
+
+    <small th:text="${#temporals.format(n.createdAt, 'dd-MM-yyyy HH:mm')}"></small>
+
+    <div th:if="${!n.read}">
+        <a th:href="@{/notifications/read/{id}(id=${n.id})}">
+            Mark as Read
+        </a>
+    </div>
+
+    <hr/>
+
+</div>
+
+<div th:replace="fragments/footer :: footer"></div>
+
+</body>
+</html>
