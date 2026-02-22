@@ -24,17 +24,39 @@ public class User {
     @Column(nullable = false)
     private Role role;
 
-    // ✅ PROFILE FIELDS
+  
+    // PROFILE FIELDS
+    
+
     private String fullName;
 
     @Column(length = 1000)
     private String bio;
 
+//    @Column(columnDefinition="LONGTEXT")
     private String profilePicture;
 
     private String location;
 
     private String website;
+
+    // =============================
+    // PROFILE_MG PART - BUSINESS FIELDS
+    // =============================
+
+    private String category;
+
+    private String contactInfo;
+
+    private String businessAddress;
+
+    private String businessHours;
+    
+    private String bannerImage;
+
+    
+    // PRIVACY
+ 
 
     @Column(nullable = false)
     private boolean isPrivate = false;
@@ -48,7 +70,9 @@ public class User {
         this.role = role;
     }
 
-    // Getters
+   
+    // GETTERS
+    
 
     public Long getId() { return id; }
     public String getUsername() { return username; }
@@ -60,9 +84,22 @@ public class User {
     public String getProfilePicture() { return profilePicture; }
     public String getLocation() { return location; }
     public String getWebsite() { return website; }
-    public boolean isPrivate() { return isPrivate; }
 
-    // Setters
+    // PROFILE_MG GETTERS
+    public String getCategory() { return category; }
+    public String getContactInfo() { return contactInfo; }
+    public String getBusinessAddress() { return businessAddress; }
+    public String getBusinessHours() { return businessHours; }
+
+    public boolean isPrivate() { return isPrivate; }
+    
+    public String getBannerImage() {
+        return bannerImage;
+    }
+
+   
+    // SETTERS
+    
 
     public void setId(Long id) { this.id = id; }
     public void setUsername(String username) { this.username = username; }
@@ -74,5 +111,18 @@ public class User {
     public void setProfilePicture(String profilePicture) { this.profilePicture = profilePicture; }
     public void setLocation(String location) { this.location = location; }
     public void setWebsite(String website) { this.website = website; }
+
+    //=======================
+    // PROFILE_MG SETTERS
+    // ======================
+    public void setCategory(String category) { this.category = category; }
+    public void setContactInfo(String contactInfo) { this.contactInfo = contactInfo; }
+    public void setBusinessAddress(String businessAddress) { this.businessAddress = businessAddress; }
+    public void setBusinessHours(String businessHours) { this.businessHours = businessHours; }
+
     public void setPrivate(boolean aPrivate) { this.isPrivate = aPrivate; }
+    
+    public void setBannerImage(String bannerImage) {
+        this.bannerImage = bannerImage;
+    }
 }

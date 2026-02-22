@@ -25,11 +25,18 @@ public class UserServiceImpl implements UserService {
         this.jwtUtil = jwtUtil;
     }
 
+    // ================= REGISTER =================
     @Override
     public void register(RegisterRequest request) {
 
+        // Check username
         if (userRepository.findByUsername(request.username()).isPresent()) {
             throw new CustomException("Username already exists");
+        }
+
+        // Check email
+        if (userRepository.findByEmail(request.email()).isPresent()) {
+            throw new CustomException("Email already exists");
         }
 
         User user = new User(
@@ -39,9 +46,13 @@ public class UserServiceImpl implements UserService {
                 request.role()
         );
 
+        // VERY IMPORTANT: make sure image is null initially
+        user.setProfilePicture(null);
+
         userRepository.save(user);
     }
 
+    // ================= LOGIN =================
     @Override
     public String login(LoginRequest request) {
 
@@ -55,5 +66,4 @@ public class UserServiceImpl implements UserService {
 
         return jwtUtil.generateToken(user);
     }
-
 }
