@@ -64,8 +64,5 @@ public class Comment {
 		this.createdAt = createdAt;
 	}
     
-    
-    
-
-    // getters & setters
+ 
 }
