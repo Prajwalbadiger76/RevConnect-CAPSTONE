@@ -1,5 +1,12 @@
 package com.example.demo.repo;
 
-public class NotificationRepository {
+import com.example.demo.entity.Notification;
+import org.springframework.data.jpa.repository.JpaRepository;
+import java.util.List;
 
+public interface NotificationRepository extends JpaRepository<Notification, Long> {
+
+    List<Notification> findByRecipientIdOrderByCreatedAtDesc(Long userId);
+
+    long countByRecipientIdAndIsReadFalse(Long userId);
 }
