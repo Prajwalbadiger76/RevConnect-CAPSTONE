@@ -5,8 +5,6 @@ import com.example.demo.entity.Post;
 import java.util.List;
 
 
-
-
 public interface PostService {
 	Post savePost(PostRequestDTO dto,Long userId);
 	void deletePost(Long postId, Long userId);

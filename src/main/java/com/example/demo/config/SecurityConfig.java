@@ -33,6 +33,7 @@ public class SecurityConfig {
                             "/login",
                             "/register",
                             "/api/auth/**",
+                            "/images/**",
                             "/css/**",
                             "/js/**"
                     ).permitAll()
