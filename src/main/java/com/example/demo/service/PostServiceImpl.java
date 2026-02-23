@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.example.demo.dto.PostRequestDTO;
 import com.example.demo.entity.*;
+import com.example.demo.entity.Post;
 import com.example.demo.repo.PostRepository;
 import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.exception.UnauthorizedActionException;

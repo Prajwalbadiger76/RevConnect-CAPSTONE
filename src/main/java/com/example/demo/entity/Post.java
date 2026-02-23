@@ -110,5 +110,6 @@ public class Post {
 		  this.createdAt=LocalDateTime.now();
 	}
 	
-	
+
 }
+

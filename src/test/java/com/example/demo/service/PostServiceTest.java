@@ -6,6 +6,8 @@ import static org.mockito.Mockito.*;
 
 import com.example.demo.dto.PostRequestDTO;
 import com.example.demo.entity.*;
+import com.example.demo.entity.Post;
+
 import com.example.demo.repo.PostRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

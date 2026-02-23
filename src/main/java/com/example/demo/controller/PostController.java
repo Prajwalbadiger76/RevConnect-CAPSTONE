@@ -30,8 +30,13 @@ public class PostController {
 	@GetMapping("/feed") // Change to GetMapping and use the actual URL
 	public String viewFeed(Model model) {
 	    Long currentUserId = 1L;
+
 	    List<Post> post = postService.getUserFeed(currentUserId);
 	    model.addAttribute("post", post);
+
+	    List<Post> posts = postService.getUserFeed(currentUserId);
+	    model.addAttribute("posts", posts);
+
 	    return "post-feed"; // This returns the post-feed.html file
 	}
 
