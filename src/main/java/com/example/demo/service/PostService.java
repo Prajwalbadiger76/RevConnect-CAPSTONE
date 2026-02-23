@@ -1,13 +1,13 @@
 package com.example.demo.service;
 
 import com.example.demo.dto.PostRequestDTO;
-import com.example.demo.entity.Posts;
+import com.example.demo.entity.Post;
 import java.util.List;
 
 
 public interface PostService {
-	Posts savePost(PostRequestDTO dto,Long userId);
+	Post savePost(PostRequestDTO dto,Long userId);
 	void deletePost(Long postId, Long userId);
-	List<Posts> getUserFeed(Long userId);
+	List<Post> getUserFeed(Long userId);
 
 }
