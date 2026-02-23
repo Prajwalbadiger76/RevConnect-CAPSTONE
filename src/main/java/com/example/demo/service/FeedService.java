@@ -2,14 +2,14 @@ package com.example.demo.service;
 
 import java.util.List;
 
-import com.example.demo.entity.Posts;
+import com.example.demo.entity.Post;
 
 public interface FeedService {
 
-    List<Posts> getPersonalizedFeed(Long userId);
+    List<Post> getPersonalizedFeed(Long userId);
 
     List<String> getTrendingHashtags();
 
-    List<Posts> filterByUserRole(String role);
+    List<Post> filterByUserRole(String role);
 }
 

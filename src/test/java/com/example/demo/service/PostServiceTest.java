@@ -4,8 +4,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import com.example.demo.dto.PostRequestDTO;
-import com.example.demo.entity.Posts;
-import com.example.demo.repository.PostRepository;
+import com.example.demo.entity.Post;
+import com.example.demo.repo.PostRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -28,15 +28,15 @@ public class PostServiceTest {
         dto.setContent("Testing without logging");
         Long userId = 1L;
 
-        Posts mockSavedPost = new Posts();
+        Post mockSavedPost = new Post();
         mockSavedPost.setId(99L);
         mockSavedPost.setContent(dto.getContent());
 
         // 2. Define Mock Behavior
-        when(postRepository.save(any(Posts.class))).thenReturn(mockSavedPost);
+        when(postRepository.save(any(Post.class))).thenReturn(mockSavedPost);
 
         // 3. Execute
-        Posts result = postService.savePost(dto, userId);
+        Post result = postService.savePost(dto, userId);
 
         // 4. Verify results (JUnit)
         assertNotNull(result);
@@ -44,6 +44,6 @@ public class PostServiceTest {
         assertEquals("Testing without logging", result.getContent());
         
         // Ensure the repository was actually called
-        verify(postRepository, times(1)).save(any(Posts.class));
+        verify(postRepository, times(1)).save(any(Post.class));
     }
 }
