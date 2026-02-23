@@ -3,6 +3,17 @@ package com.example.demo.entity;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
+import java.time.LocalDateTime;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+
 @Entity
 @Table(name = "post_analytics")
 public class PostAnalytics {
@@ -13,7 +24,8 @@ public class PostAnalytics {
 
 	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "post_id", nullable = false, unique = true)
-	private Post post;
+
+	private Posts posts;
 
 	private long totalLikes;
 	private long totalComments;
@@ -32,12 +44,14 @@ public class PostAnalytics {
 		this.id = id;
 	}
 
-	public Post getPost() {
-		return post;
+	
+	
+	public Posts getPost() {
+		return posts;
 	}
 
-	public void setPost(Post post) {
-		this.post = post;
+	public void setPost(Posts posts) {
+		this.posts = posts;
 	}
 
 	public long getTotalLikes() {

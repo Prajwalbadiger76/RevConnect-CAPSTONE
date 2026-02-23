@@ -23,36 +23,36 @@ public class SocialEventListener {
         this.analyticsService = analyticsService;
     }
 
-    @EventListener
-    public void handlePost(PostCreatedEvent event) {
-        analyticsService.createPostAnalytics(event.getPostId());
-        notificationService.notifyFollowersNewPost(event);
-    }
-
-    @EventListener
-    public void handleLike(LikeCreatedEvent event) {
-        analyticsService.incrementLikes(event.getPostId());
-        notificationService.notifyPostLike(event);
-    }
-
-    @EventListener
-    public void handleComment(CommentCreatedEvent event) {
-        analyticsService.incrementComments(event.getPostId());
-        notificationService.notifyPostComment(event);
-    }
-
-    @EventListener
-    public void handleFollow(FollowEvent event) {
-        notificationService.notifyFollow(event);
-    }
-
-    @EventListener
-    public void handleConnection(ConnectionEvent event) {
-        if ("PENDING".equals(event.getStatus())) {
-            notificationService.notifyConnectionRequest(event);
-        }
-        if ("ACCEPTED".equals(event.getStatus())) {
-            notificationService.notifyConnectionAccepted(event);
-        }
-    }
+//    @EventListener
+//    public void handlePost(PostCreatedEvent event) {
+//        analyticsService.createPostAnalytics(event.getPostId());
+//        notificationService.notifyFollowersNewPost(event);
+//    }
+//
+//    @EventListener
+//    public void handleLike(LikeCreatedEvent event) {
+//        analyticsService.incrementLikes(event.getPostId());
+//        notificationService.notifyPostLike(event);
+//    }
+//
+//    @EventListener
+//    public void handleComment(CommentCreatedEvent event) {
+//        analyticsService.incrementComments(event.getPostId());
+//        notificationService.notifyPostComment(event);
+//    }
+//
+//    @EventListener
+//    public void handleFollow(FollowEvent event) {
+//        notificationService.notifyFollow(event);
+//    }
+//
+//    @EventListener
+//    public void handleConnection(ConnectionEvent event) {
+//        if ("PENDING".equals(event.getStatus())) {
+//            notificationService.notifyConnectionRequest(event);
+//        }
+//        if ("ACCEPTED".equals(event.getStatus())) {
+//            notificationService.notifyConnectionAccepted(event);
+//        }
+//    }
 }

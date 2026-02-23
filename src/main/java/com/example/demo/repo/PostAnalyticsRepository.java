@@ -7,4 +7,6 @@ import java.util.Optional;
 public interface PostAnalyticsRepository extends JpaRepository<PostAnalytics, Long> {
 
     Optional<PostAnalytics> findByPostId(Long postId);
+
 }
+

@@ -3,6 +3,10 @@ package com.example.demo.service;
 import com.example.demo.entity.NotificationType;
 import java.util.List;
 
+
+import com.example.demo.entity.NotificationType;
+import java.util.List;
+
 public interface NotificationService {
 
     void createNotification(Long recipientId,
@@ -15,4 +19,7 @@ public interface NotificationService {
     long getUnreadCount(Long userId);
 
     void markAsRead(Long notificationId);
+
 }
+
+
