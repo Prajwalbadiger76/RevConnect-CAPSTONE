@@ -25,7 +25,7 @@ public class PostAnalytics {
 	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "post_id", nullable = false, unique = true)
 
-	private Posts posts;
+	private Post posts;
 
 	private long totalLikes;
 	private long totalComments;
@@ -46,11 +46,12 @@ public class PostAnalytics {
 
 	
 	
-	public Posts getPost() {
+	
+	public Post getPost() {
 		return posts;
 	}
 
-	public void setPost(Posts posts) {
+	public void setPost(Post posts) {
 		this.posts = posts;
 	}
 

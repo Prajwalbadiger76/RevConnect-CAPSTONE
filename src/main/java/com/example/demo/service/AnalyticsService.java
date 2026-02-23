@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.demo.entity.PostAnalytics;
 import com.example.demo.repo.PostAnalyticsRepository;
-import com.example.demo.repository.PostRepository;
+import com.example.demo.repo.PostRepository;
 
 @Service
 public class AnalyticsService {

@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
-import com.example.demo.entity.Posts;
+import com.example.demo.entity.Post;
 import com.example.demo.events.PostCreatedEvent;
 
 import jakarta.persistence.PostPersist;
@@ -20,7 +20,7 @@ public class PostEntityListener {
     }
 
     @PostPersist
-    public void afterInsert(Posts post) {
+    public void afterInsert(Post post) {
         publisher.publishEvent(
                 new PostCreatedEvent(post.getId(), post.getUserId())
         );
