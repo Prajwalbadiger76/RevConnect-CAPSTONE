@@ -8,6 +8,7 @@
 
 <div class="login-wrapper">
 
+<<<<<<< HEAD
     <!-- LEFT SIDE -->
     <div class="login-left"></div>
 
@@ -16,6 +17,13 @@
         <div class="login-card">
 
             <h2>Welcome Back</h2>
+=======
+<form th:action="@{/api/auth/login}" method="post">
+  
+<form th:action="@{/auth/login}" method="post">
+    <label>Username or Email:</label>
+    <input type="text" name="username"/><br/>
+>>>>>>> feature/auth-prajwal
 
             <form th:action="@{/api/auth/login}" method="post">
 
