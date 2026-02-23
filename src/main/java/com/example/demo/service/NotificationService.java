@@ -1,6 +1,6 @@
 package com.example.demo.service;
 
-<<<<<<< HEAD
+
 import com.example.demo.entity.NotificationType;
 import java.util.List;
 
@@ -17,8 +17,4 @@ public interface NotificationService {
 
     void markAsRead(Long notificationId);
 }
-=======
-public class NotificationService {
 
-}
->>>>>>> feature/auth-prajwal
