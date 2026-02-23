@@ -1,36 +1,45 @@
 package com.example.demo.entity;
 
-import java.time.LocalDateTime;
-
-
 import jakarta.persistence.*;
-
-
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
-@Table(name="post")
+@Table(name = "posts")
 public class Post {
 
-	
-	@Id
-	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="post_seq")
-	@SequenceGenerator(name="post_seq",sequenceName="POST_ID_SEQ",allocationSize=1)
-	private Long id;
-	
-	@Column(nullable=false, length=2000)
-	private String content;
-	
-	private String hashtags;
-	
-	private LocalDateTime createdAt;
-	private LocalDateTime scheduledTime;
-	
-	private boolean isPromotional = false;
-	private String ctaLink;
-	
-	@Column(nullable=false)
-	private Long userId;
-	
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "post_seq")
+    @SequenceGenerator(name = "post_seq", sequenceName = "post_id_seq", allocationSize = 1)
+    private Long id;
+
+    @Column(nullable = false, length = 2000)
+    private String content;
+
+    private LocalDateTime createdAt;
+    private LocalDateTime scheduledTime;
+    private String ctaLink;
+
+    private boolean isPinned = false;
+    private boolean isPromotional = false;
+    private boolean isRepost = false;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
+    @ManyToOne
+    @JoinColumn(name = "original_post_id")
+    private Post originalPost;
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PostHashtag> postHashtags;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
+
 	public Long getId() {
 		return id;
 	}
@@ -45,14 +54,6 @@ public class Post {
 
 	public void setContent(String content) {
 		this.content = content;
-	}
-
-	public String getHashtags() {
-		return hashtags;
-	}
-
-	public void setHashtags(String hashtags) {
-		this.hashtags = hashtags;
 	}
 
 	public LocalDateTime getCreatedAt() {
@@ -71,28 +72,12 @@ public class Post {
 		this.scheduledTime = scheduledTime;
 	}
 
-	public boolean isPromotional() {
-		return isPromotional;
-	}
-
-	public void setPromotional(boolean isPromotional) {
-		this.isPromotional = isPromotional;
-	}
-
 	public String getCtaLink() {
 		return ctaLink;
 	}
 
 	public void setCtaLink(String ctaLink) {
 		this.ctaLink = ctaLink;
-	}
-
-	public Long getUserId() {
-		return userId;
-	}
-
-	public void setUserId(Long userId) {
-		this.userId = userId;
 	}
 
 	public boolean isPinned() {
@@ -103,12 +88,45 @@ public class Post {
 		this.isPinned = isPinned;
 	}
 
-	private boolean isPinned=false;
-	
-	@PrePersist
-	protected void onCreate() {
-		  this.createdAt=LocalDateTime.now();
+	public boolean isPromotional() {
+		return isPromotional;
 	}
-	
-	
+
+	public void setPromotional(boolean isPromotional) {
+		this.isPromotional = isPromotional;
+	}
+
+	public boolean isRepost() {
+		return isRepost;
+	}
+
+	public void setRepost(boolean isRepost) {
+		this.isRepost = isRepost;
+	}
+
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
+	}
+
+	public Post getOriginalPost() {
+		return originalPost;
+	}
+
+	public void setOriginalPost(Post originalPost) {
+		this.originalPost = originalPost;
+	}
+
+	public List<PostHashtag> getPostHashtags() {
+		return postHashtags;
+	}
+
+	public void setPostHashtags(List<PostHashtag> postHashtags) {
+		this.postHashtags = postHashtags;
+	}
+
+    
 }

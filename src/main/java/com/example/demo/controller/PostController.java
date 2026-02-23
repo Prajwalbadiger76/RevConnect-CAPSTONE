@@ -1,38 +1,100 @@
 package com.example.demo.controller;
 
-import java.util.List;
-
+import com.example.demo.dto.PostDto;
+import com.example.demo.dto.PostRequestDTO;
+import com.example.demo.service.PostService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-
-import com.example.demo.dto.PostRequestDTO;
-import com.example.demo.entity.Post;
-import com.example.demo.service.PostService;
+import java.util.List;
 
 @Controller
-@RequestMapping("/post")
+@RequestMapping("/posts")
 public class PostController {
-	
-	@Autowired
-	private PostService postService;
-	
-	@GetMapping("/create")
-	public String showCreateForm(Model model) {
-		model.addAttribute("postDTO",new PostRequestDTO());
-		return "post-create";
-	}
-	
-	
-	@GetMapping("/feed") // Change to GetMapping and use the actual URL
-	public String viewFeed(Model model) {
-	    Long currentUserId = 1L;
-	    List<Post> post = postService.getUserFeed(currentUserId);
-	    model.addAttribute("post", post);
-	    return "post-feed"; // This returns the post-feed.html file
-	}
 
+    @Autowired
+    private PostService postService;
+
+   
+    // Show Create Form
+   
+    @GetMapping("/create")
+    public String showCreateForm(Model model) {
+        model.addAttribute("postRequestDTO", new PostRequestDTO());
+        return "create-post";
+    }
+
+   
+    // Create Post
+ 
+    @PostMapping("/create")
+    public String createPost(@ModelAttribute PostRequestDTO dto) {
+
+        Long currentUserId = 1L; // Replace with JWT later
+        postService.createPost(dto, currentUserId);
+
+        return "redirect:/posts/feed";
+    }
+
+
+    // View Feed
+   
+    @GetMapping("/feed")
+    public String viewFeed(Model model) {
+
+        List<PostDto> posts = postService.getFeed();
+        model.addAttribute("posts", posts);
+
+        return "feed";
+    }
+
+   
+    // Update Post
+   
+    @PostMapping("/update/{id}")
+    public String updatePost(@PathVariable Long id,
+                             @ModelAttribute PostRequestDTO dto) {
+
+        Long currentUserId = 1L;
+        postService.updatePost(id, dto, currentUserId);
+
+        return "redirect:/posts/feed";
+    }
+
+  
+    // Delete Post
+  
+    @PostMapping("/delete/{id}")
+    public String deletePost(@PathVariable Long id) {
+
+        Long currentUserId = 1L;
+        postService.deletePost(id, currentUserId);
+
+        return "redirect:/posts/feed";
+    }
+
+    // Pin Post
+  
+    @PostMapping("/pin/{id}")
+    public String pinPost(@PathVariable Long id) {
+
+        Long currentUserId = 1L;
+        postService.pinPost(id, currentUserId);
+
+        return "redirect:/posts/feed";
+    }
+
+   
+    // Repost
+    @PostMapping("/repost/{id}")
+    public String repost(@PathVariable Long id) {
+
+        Long currentUserId = 1L;
+        postService.repostPost(id, currentUserId);
+
+        return "redirect:/posts/feed";
+    }
 }
