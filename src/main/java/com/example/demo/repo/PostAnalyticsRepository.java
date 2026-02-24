@@ -6,7 +6,14 @@ import java.util.Optional;
 
 public interface PostAnalyticsRepository extends JpaRepository<PostAnalytics, Long> {
 
+<<<<<<< Updated upstream
     Optional<PostAnalytics> findByPostId(Long postId);
 
 }
 
+=======
+    // CORRECT METHOD
+    Optional<PostAnalytics> findByPost_Id(Long postId);
+
+}
+>>>>>>> Stashed changes

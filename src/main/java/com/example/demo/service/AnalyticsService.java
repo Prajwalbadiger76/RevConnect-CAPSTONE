@@ -3,6 +3,10 @@ package com.example.demo.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+<<<<<<< Updated upstream
+=======
+import com.example.demo.entity.Post;
+>>>>>>> Stashed changes
 import com.example.demo.entity.PostAnalytics;
 import com.example.demo.repo.PostAnalyticsRepository;
 import com.example.demo.repo.PostRepository;
@@ -16,6 +20,7 @@ public class AnalyticsService {
     @Autowired
     private PostRepository postRepository;
 
+<<<<<<< Updated upstream
 //    public void createPostAnalytics(Long postId) {
 //
 //        PostAnalytics analytics = new PostAnalytics();
@@ -31,24 +36,66 @@ public class AnalyticsService {
                 .findByPostId(postId)
                 .orElseThrow();
 
+=======
+    public void createPostAnalytics(Long postId) {
+
+        if (analyticsRepository.findByPost_Id(postId).isPresent())
+            return;
+
+        Post post = postRepository.findById(postId).orElseThrow();
+
+        PostAnalytics analytics = new PostAnalytics();
+        analytics.setPost(post);
+
+        analyticsRepository.save(analytics);
+    }
+
+    private PostAnalytics getOrCreate(Long postId) {
+
+        return analyticsRepository
+                .findByPost_Id(postId)
+                .orElseGet(() -> {
+                    Post post = postRepository.findById(postId).orElseThrow();
+
+                    PostAnalytics analytics = new PostAnalytics();
+                    analytics.setPost(post);
+
+                    return analyticsRepository.save(analytics);
+                });
+    }
+
+    public void incrementLikes(Long postId) {
+
+        PostAnalytics analytics = getOrCreate(postId);
+>>>>>>> Stashed changes
         analytics.setTotalLikes(analytics.getTotalLikes() + 1);
         analyticsRepository.save(analytics);
     }
 
     public void incrementComments(Long postId) {
+<<<<<<< Updated upstream
         PostAnalytics analytics = analyticsRepository
                 .findByPostId(postId)
                 .orElseThrow();
 
+=======
+
+        PostAnalytics analytics = getOrCreate(postId);
+>>>>>>> Stashed changes
         analytics.setTotalComments(analytics.getTotalComments() + 1);
         analyticsRepository.save(analytics);
     }
 
     public void incrementReach(Long postId) {
+<<<<<<< Updated upstream
         PostAnalytics analytics = analyticsRepository
                 .findByPostId(postId)
                 .orElseThrow();
 
+=======
+
+        PostAnalytics analytics = getOrCreate(postId);
+>>>>>>> Stashed changes
         analytics.setReachCount(analytics.getReachCount() + 1);
         analyticsRepository.save(analytics);
     }
