@@ -351,19 +351,24 @@ function loadNotifications() {
             let dropdown = document.getElementById("notifDropdown");
             dropdown.innerHTML = "";
 
-            data.forEach(n => {
+            // ✅ Show only unread notifications
+            let unreadNotifications = data.filter(n => !n.read);
+
+            unreadNotifications.forEach(n => {
 
                 let div = document.createElement("div");
-                div.className = "notif-item" + (n.read ? "" : " unread");
+                div.className = "notif-item unread";
                 div.innerText = n.message;
 
-                div.onclick = function() {
+                div.onclick = function () {
 
-                    // Mark as read
                     fetch('/notifications/read/' + n.id, { method: 'POST' })
                         .then(() => {
 
-                            // Redirect based on type
+                            // Reload notifications after marking read
+                            loadNotifications();
+
+                            // Redirect
                             if (n.type === "FOLLOW") {
                                 window.location.href = "/profile/" + n.senderUsername;
                             } else {
@@ -374,15 +379,13 @@ function loadNotifications() {
 
                 dropdown.appendChild(div);
             });
-        });
 
-    fetch('/notifications/count')
-        .then(res => res.text())
-        .then(count => {
+            // ✅ Update badge count based on unread size
             let badge = document.getElementById("notifCount");
-            if (count > 0) {
+
+            if (unreadNotifications.length > 0) {
                 badge.style.display = "inline";
-                badge.innerText = count;
+                badge.innerText = unreadNotifications.length;
             } else {
                 badge.style.display = "none";
             }

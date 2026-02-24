@@ -6,6 +6,9 @@ import com.example.demo.entity.User;
 import com.example.demo.repo.CommentRepository;
 import com.example.demo.repo.PostRepository;
 import com.example.demo.repo.UserRepository;
+
+import jakarta.transaction.Transactional;
+
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -32,6 +35,7 @@ public class CommentServiceImpl implements CommentService {
     // ================= ADD COMMENT =================
 
     @Override
+    @Transactional
     public void addComment(String username, Long postId, String content) {
 
         User user = userRepository.findByUsername(username)

@@ -5,8 +5,9 @@ import com.example.demo.entity.Notification;
 import com.example.demo.entity.User;
 import com.example.demo.repo.NotificationRepository;
 import com.example.demo.repo.UserRepository;
-import com.example.demo.service.NotificationService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,12 +25,11 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void createNotification(String recipientUsername,
                                    String senderUsername,
                                    String type,
                                    Long referenceId) {
-
-        if (recipientUsername.equals(senderUsername)) return;
 
         User recipient = userRepository.findByUsername(recipientUsername)
                 .orElseThrow();
@@ -41,6 +41,8 @@ public class NotificationServiceImpl implements NotificationService {
                 new Notification(recipient, sender, type, referenceId);
 
         notificationRepository.save(notification);
+
+        System.out.println("NOTIFICATION SAVED INTO DATABASE");
     }
 
     @Override
@@ -68,11 +70,11 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
+    @Transactional
     public void markAsRead(Long notificationId) {
         Notification notification =
                 notificationRepository.findById(notificationId).orElseThrow();
         notification.setRead(true);
-        notificationRepository.save(notification);
     }
 
     private String buildMessage(Notification n) {
