@@ -7,6 +7,7 @@ public class PostDto {
 
     private Long id;
     private String content;
+<<<<<<< Updated upstream
     private List<String> hashtags;
     private boolean isPromotional;
     private boolean isPinned;
@@ -61,6 +62,44 @@ public class PostDto {
 	public void setScheduledTime(LocalDateTime scheduledTime) {
 		this.scheduledTime = scheduledTime;
 	}
+=======
+    private String username;
+    private LocalDateTime createdAt;
+    private long likeCount;
+    private boolean likedByCurrentUser;
+    private List<CommentDto> comments;
+    private boolean pinned;
+    private List<String> hashtags;
+>>>>>>> Stashed changes
 
     
+<<<<<<< Updated upstream
+=======
+
+    public List<CommentDto> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<CommentDto> comments) {
+        this.comments = comments;
+    }
+
+	public boolean isPinned() {
+		return pinned;
+	}
+
+	public void setPinned(boolean pinned) {
+		this.pinned = pinned;
+	}
+
+	public List<String> getHashtags() {
+		return hashtags;
+	}
+
+	public void setHashtags(List<String> hashtags) {
+		this.hashtags = hashtags;
+	}
+	
+    
+>>>>>>> Stashed changes
 }

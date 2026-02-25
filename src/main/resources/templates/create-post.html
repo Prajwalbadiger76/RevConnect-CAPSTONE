@@ -1,0 +1,66 @@
+<<<<<<< Updated upstream
+=======
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Create Post</title>
+    <style>
+        body {
+            font-family: Arial;
+            max-width: 600px;
+            margin: auto;
+            padding: 40px;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 10px;
+            resize: none;
+        }
+
+        .info {
+            font-size: 13px;
+            color: gray;
+            margin-top: 5px;
+        }
+
+        button {
+            padding: 8px 15px;
+            margin-top: 10px;
+        }
+
+        .btn-back {
+            text-decoration: none;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Create New Post</h2>
+
+<form th:action="@{/post/create}" method="post">
+
+    <label>Post Content</label>
+    <textarea name="content"
+              rows="4"
+              placeholder="What's on your mind?"
+              required></textarea>
+
+    <br><br>
+
+    <label>Hashtags (separate by space)</label>
+    <input type="text"
+           name="hashtags"
+           placeholder="#springboot #java"
+           style="width:100%; padding:8px;" />
+
+    <br><br>
+
+    <button type="submit">Post</button>
+    <a th:href="@{/feed}" class="btn-back">Cancel</a>
+
+</form>
+</body>
+</html>
+>>>>>>> Stashed changes

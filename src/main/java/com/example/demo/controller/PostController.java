@@ -1,10 +1,19 @@
 package com.example.demo.controller;
 
 import com.example.demo.dto.PostDto;
+<<<<<<< Updated upstream
 import com.example.demo.dto.PostRequestDTO;
 import com.example.demo.service.PostService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+=======
+import com.example.demo.dto.ProfileResponse;
+import com.example.demo.entity.Post;
+import com.example.demo.repo.PostRepository;
+import com.example.demo.service.PostService;
+import java.util.List;
+import org.springframework.security.core.Authentication;
+>>>>>>> Stashed changes
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -31,12 +40,28 @@ public class PostController {
     // Create Post
  
     @PostMapping("/create")
+<<<<<<< Updated upstream
     public String createPost(@ModelAttribute PostRequestDTO dto) {
 
         Long currentUserId = 1L; // Replace with JWT later
         postService.createPost(dto, currentUserId);
 
         return "redirect:/posts/feed";
+=======
+    public String createPost(@RequestParam String content,
+                             @RequestParam(required = false) String hashtags,
+                             Authentication authentication) {
+
+        String fullContent = content;
+
+        if (hashtags != null && !hashtags.isBlank()) {
+            fullContent = content + " " + hashtags;
+        }
+
+        postService.createPost(authentication.getName(), fullContent);
+
+        return "redirect:/feed";
+>>>>>>> Stashed changes
     }
 
 
@@ -97,4 +122,25 @@ public class PostController {
 
         return "redirect:/posts/feed";
     }
+    
+    //=============PIN===================
+    
+    @PostMapping("/pin/{id}")
+    public String pinPost(@PathVariable Long id,
+                          Authentication authentication) {
+
+        postService.pinPost(id, authentication.getName());
+        return "redirect:/profile/" + authentication.getName();
+    }
+    
+    @PostMapping("/unpin/{id}")
+    public String unpinPost(@PathVariable Long id,
+                            Authentication authentication) {
+
+        postService.unpinPost(id, authentication.getName());
+        return "redirect:/profile/" + authentication.getName();
+    }
+   
+    
+   
 }
