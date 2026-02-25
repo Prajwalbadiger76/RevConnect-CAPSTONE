@@ -92,17 +92,33 @@ public class ConnectionServiceImpl implements ConnectionService {
     // ================= ACCEPT REQUEST =================
 
     @Override
+    @Transactional
     public void acceptRequest(Long connectionId, String currentUsername) {
 
         Connection connection = connectionRepository.findById(connectionId)
                 .orElseThrow();
 
+        // Security check
         if (!connection.getReceiver().getUsername().equals(currentUsername)) {
             throw new RuntimeException("Unauthorized action");
         }
 
+        // Update status
         connection.setStatus(ConnectionStatus.ACCEPTED);
         connectionRepository.save(connection);
+
+        // -------- SEND ACCEPT NOTIFICATION --------
+        User receiver = connection.getReceiver();   
+        User requester = connection.getRequester(); 
+
+        System.out.println("Sending ACCEPT notification...");
+
+        notificationService.createNotification(
+                requester.getUsername(),   
+                receiver.getUsername(),   
+                "CONNECTION_ACCEPTED",     
+                connection.getId()
+        );
     }
 
     // ================= REJECT REQUEST =================

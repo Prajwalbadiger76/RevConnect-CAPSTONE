@@ -52,7 +52,7 @@ public class PostServiceImpl implements PostService {
 
         Post post = new Post();
         post.setContent(content);
-        post.setCreatedAt(LocalDateTime.now());
+   //     post.setCreatedAt(LocalDateTime.now());
         post.setUser(user);
 
         postRepository.save(post);
@@ -106,7 +106,7 @@ public class PostServiceImpl implements PostService {
         sharedPost.setContent("🔁 Shared from @" 
                 + originalPost.getUser().getUsername()
                 + "\n\n" + originalPost.getContent());
-        sharedPost.setCreatedAt(LocalDateTime.now());
+     //   sharedPost.setCreatedAt(LocalDateTime.now());
         sharedPost.setUser(currentUser);
 
         postRepository.save(sharedPost);
