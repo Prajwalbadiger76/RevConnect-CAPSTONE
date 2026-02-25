@@ -1,16 +1,5 @@
 package com.example.demo.service;
 
-
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import com.example.demo.dto.PostRequestDTO;
-import com.example.demo.entity.*;
-import com.example.demo.entity.Post;
-import com.example.demo.repo.PostRepository;
-import com.example.demo.exception.ResourceNotFoundException;
-import com.example.demo.exception.UnauthorizedActionException;
 import com.example.demo.dto.CommentDto;
 import com.example.demo.dto.PostDto;
 import com.example.demo.entity.*;
@@ -21,7 +10,6 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.regex.*;
 import java.util.stream.Collectors;
-
 
 @Service
 public class PostServiceImpl implements PostService {
