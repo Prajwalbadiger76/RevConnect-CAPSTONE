@@ -42,8 +42,51 @@ public class Post {
     public User getUser() { return user; }
     public void setUser(User user) { this.user = user; }
 
+	public boolean isPromotional() {
+		return isPromotional;
+	}
+
+	public void setPromotional(boolean isPromotional) {
+		this.isPromotional = isPromotional;
+	}
+
+	public String getCtaLink() {
+		return ctaLink;
+	}
+
+	public void setCtaLink(String ctaLink) {
+		this.ctaLink = ctaLink;
+	}
+
+	public Long getUserId() {
+		return userId;
+	}
+
+	public void setUserId(Long userId) {
+		this.userId = userId;
+	}
+
+	public boolean isPinned() {
+		return isPinned;
+	}
+
+	public void setPinned(boolean isPinned) {
+		this.isPinned = isPinned;
+	}
+
+	private boolean isPinned=false;
+	
+	@PrePersist
+	protected void onCreate() {
+		  this.createdAt=LocalDateTime.now();
+	}
+	
+
+}
+
     public List<PostHashtag> getPostHashtags() { return postHashtags; }
     public void setPostHashtags(List<PostHashtag> postHashtags) {
         this.postHashtags = postHashtags;
     }
 }
+

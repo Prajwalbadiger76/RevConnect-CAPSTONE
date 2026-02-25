@@ -13,7 +13,8 @@
 
 <div th:each="req : ${requests}">
     <p>
-        <strong th:text="${req.requester.username}"></strong>
+        <a th:href="@{/profile/{username}(username=${req.requester.username})}"
+           th:text="${req.requester.username}"></a>
 
         <form th:action="@{/connections/accept/{id}(id=${req.id})}"
               method="post"
