@@ -3,6 +3,9 @@ package com.example.demo.service;
 import com.example.demo.entity.*;
 import com.example.demo.repo.ConnectionRepository;
 import com.example.demo.repo.UserRepository;
+
+import jakarta.transaction.Transactional;
+
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -25,7 +28,8 @@ public class ConnectionServiceImpl implements ConnectionService {
     }
 
     // ================= SEND REQUEST =================
-
+    
+    @Transactional
     @Override
     public void sendRequest(String currentUsername, String targetUsername) {
 
@@ -61,7 +65,7 @@ public class ConnectionServiceImpl implements ConnectionService {
                         receiver.getUsername(),
                         requester.getUsername(),
                         "CONNECTION_REQUEST",
-                        null
+                        connection.getId()
                 );
             }
 
@@ -230,5 +234,21 @@ public class ConnectionServiceImpl implements ConnectionService {
         }
 
         return connectedUsers;
+        
+    }
+    @Override
+    public void removeConnection(String currentUsername, String targetUsername) {
+
+        User currentUser = userRepository.findByUsername(currentUsername).orElseThrow();
+        User targetUser = userRepository.findByUsername(targetUsername).orElseThrow();
+
+        Optional<Connection> connection =
+                connectionRepository.findByRequesterAndReceiver(currentUser, targetUser);
+
+        if (connection.isEmpty()) {
+            connection = connectionRepository.findByRequesterAndReceiver(targetUser, currentUser);
+        }
+
+        connection.ifPresent(connectionRepository::delete);
     }
 }

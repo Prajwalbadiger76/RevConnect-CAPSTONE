@@ -22,4 +22,6 @@ public interface ConnectionService {
     Long getPendingRequestId(String currentUsername, String targetUsername);
     
     List<User> getAcceptedConnections(String username);
+    
+    void removeConnection(String currentUsername, String targetUsername);
 }

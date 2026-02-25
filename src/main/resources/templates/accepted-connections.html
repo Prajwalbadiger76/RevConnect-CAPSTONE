@@ -16,6 +16,9 @@
         <a th:href="@{/profile/{username}(username=${user.username})}"
            th:text="${user.username}">
         </a>
+		<form th:action="@{/connections/remove/{username}(username=${user.username})}" method="post" style="display:inline;">
+		            <button>Remove</button>
+		        </form>
     </p>
 </div>
 

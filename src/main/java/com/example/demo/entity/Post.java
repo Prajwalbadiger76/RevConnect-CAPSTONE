@@ -8,63 +8,88 @@ import java.util.List;
 @Table(name = "posts")
 public class Post {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "post_seq")
-	@SequenceGenerator(name = "post_seq", sequenceName = "post_seq", allocationSize = 1)
-	private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "post_seq")
+    @SequenceGenerator(name = "post_seq", sequenceName = "post_seq", allocationSize = 1)
+    private Long id;
 
-	@Column(length = 2000, nullable = false)
-	private String content;
+    @Column(length = 2000, nullable = false)
+    private String content;
 
-	private LocalDateTime createdAt;
+    @Column(nullable = false)
+    private LocalDateTime createdAt;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "user_id", nullable = false)
-	private User user;
+    // Post owner
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
-	@OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
-	private List<PostHashtag> postHashtags;
+    // Hashtags relation
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PostHashtag> postHashtags;
 
-	public Post() {
-	}
+    // Optional social flags
+    @Column(name = "is_pinned", nullable = false)
+    private Boolean isPinned = false;
 
-	public Long getId() {
-		return id;
-	}
+    @Column(name = "is_promotional", nullable = false)
+    private Boolean isPromotional = false;
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    public Post() {}
 
-	public String getContent() {
-		return content;
-	}
+    // Automatically set timestamp when saved
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
 
-	public void setContent(String content) {
-		this.content = content;
-	}
+    // -------- Getters & Setters --------
 
-	public LocalDateTime getCreatedAt() {
-		return createdAt;
-	}
+    public Long getId() {
+        return id;
+    }
 
-	public void setCreatedAt(LocalDateTime createdAt) {
-		this.createdAt = createdAt;
-	}
+    public String getContent() {
+        return content;
+    }
 
-	public User getUser() {
-		return user;
-	}
+    public void setContent(String content) {
+        this.content = content;
+    }
 
-	public void setUser(User user) {
-		this.user = user;
-	}
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
 
-	public List<PostHashtag> getPostHashtags() {
-		return postHashtags;
-	}
+    public User getUser() {
+        return user;
+    }
 
-	public void setPostHashtags(List<PostHashtag> postHashtags) {
-		this.postHashtags = postHashtags;
-	}
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public List<PostHashtag> getPostHashtags() {
+        return postHashtags;
+    }
+
+    public void setPostHashtags(List<PostHashtag> postHashtags) {
+        this.postHashtags = postHashtags;
+    }
+
+    public Boolean getIsPinned() {
+        return isPinned;
+    }
+
+    public void setIsPinned(Boolean pinned) {
+        isPinned = pinned;
+    }
+
+    public Boolean getIsPromotional() {
+        return isPromotional;
+    }
+
+    public void setIsPromotional(Boolean promotional) {
+        isPromotional = promotional;
+    }
 }

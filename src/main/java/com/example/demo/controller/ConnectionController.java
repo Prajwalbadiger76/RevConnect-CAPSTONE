@@ -54,7 +54,15 @@ public class ConnectionController {
 
         return "redirect:/connections";
     }
+    
+    //REMOVE CONNECTION
+    @PostMapping("/remove/{username}")
+    public String removeConnection(@PathVariable String username,
+                                   Authentication authentication) {
 
+        connectionService.removeConnection(authentication.getName(), username);
+        return "redirect:/connections/accepted";
+    }
     // VIEW PENDING REQUESTS
     @GetMapping
     public String viewPendingRequests(Authentication authentication,
