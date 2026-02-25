@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>RevConnect - Feed</title>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        .navbar {
+            background-color: #111827;
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar h2 { margin: 0; }
+
+        .navbar-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .navbar form {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .navbar input {
+            padding: 6px 10px;
+            border-radius: 5px;
+            border: none;
+            outline: none;
+        }
+
+        .navbar button {
+            padding: 6px 10px;
+            border-radius: 5px;
+            border: none;
+            background-color: #2563eb;
+            color: white;
+            cursor: pointer;
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            margin-left: 15px;
+        }
+
+        /* 🔔 Notification */
+        .notif-container {
+            position: relative;
+            margin-left: 15px;
+            cursor: pointer;
+        }
+
+        .notif-count {
+            position: absolute;
+            top: -5px;
+            right: -8px;
+            background: red;
+            color: white;
+            font-size: 12px;
+            padding: 2px 6px;
+            border-radius: 50%;
+            display: none;
+        }
+
+        .notif-dropdown {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 30px;
+            background: white;
+            color: black;
+            width: 280px;
+            max-height: 350px;
+            overflow-y: auto;
+            border-radius: 6px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            z-index: 100;
+        }
+
+        .notif-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .notif-item.unread {
+            background: #eef2ff;
+        }
+
+        .container {
+            width: 60%;
+            margin: 30px auto;
+        }
+
+        .create-post {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .create-post button {
+            padding: 10px 20px;
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .post-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .post-header { font-weight: bold; margin-bottom: 10px; }
+
+        .post-header a {
+            text-decoration: none;
+            color: #2563eb;
+        }
+
+        .post-header a:hover { text-decoration: underline; }
+
+        .post-content { margin-bottom: 15px; }
+
+        .post-actions { margin-bottom: 15px; }
+
+        .post-actions button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        .comment-section {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #ddd;
+        }
+
+        .comment { margin-bottom: 8px; font-size: 14px; }
+
+        .comment strong a {
+            color: #2563eb;
+            text-decoration: none;
+        }
+
+        .comment strong a:hover { text-decoration: underline; }
+
+        .comment-form { margin-top: 10px; }
+
+        .comment-form input {
+            width: 75%;
+            padding: 6px;
+        }
+
+        .comment-form button {
+            padding: 6px 10px;
+            background-color: #10b981;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .delete-btn {
+            background-color: red;
+            color: white;
+            border: none;
+            padding: 3px 6px;
+            font-size: 12px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div class="navbar">
+    <div class="navbar-left">
+        <h2>RevConnect</h2>
+
+        <form th:action="@{/profile/search}" method="get">
+            <input type="text" name="keyword" placeholder="Search users..." required>
+            <button type="submit">Search</button>
+        </form>
+    </div>
+
+	<div style="display:flex; align-items:center;">
+
+	    <!-- Notification Bell -->
+	    <div class="notif-container" onclick="toggleNotifications()">
+	        🔔
+	        <span id="notifCount" class="notif-count"></span>
+	        <div id="notifDropdown" class="notif-dropdown"></div>
+	    </div>
+
+	    <!-- ⭐ YOUR TASK (Pending Page Link) -->
+	    <a th:href="@{/connections}">Pending Requests</a>
+
+	    <a th:href="@{/connections/accepted}">My Connections</a>
+	    <a th:href="@{/profile}">Profile</a>
+	    <a th:href="@{/logout}">Logout</a>
+
+	</div>
+</div>
+
+
+<div class="container">
+
+    <!-- Create Post -->
+    <div class="create-post">
+        <form th:action="@{/post/create}" method="post">
+            <textarea name="content" rows="3"
+                      style="width:100%; padding:10px;"
+                      placeholder="What's on your mind?"
+                      required></textarea>
+            <br><br>
+            <button type="submit">Create Post</button>
+        </form>
+    </div>
+
+    <!-- Posts -->
+    <div th:each="post : ${posts}" class="post-card">
+
+        <div class="post-header">
+            <a th:href="@{/profile/{username}(username=${post.username})}"
+               th:text="${post.username}"></a>
+
+            <span style="float:right; font-size:12px;"
+                  th:text="${#temporals.format(post.createdAt, 'dd MMM yyyy HH:mm')}"></span>
+        </div>
+
+		<!-- Normal Post -->
+		<div th:if="${!#strings.startsWith(post.content, '🔁 Shared from')}"
+		     class="post-content"
+		     th:text="${post.content}">
+		</div>
+
+		<!-- Shared Post -->
+		<div th:if="${#strings.startsWith(post.content, '🔁 Shared from')}"
+		     class="post-content">
+
+		    <div style="margin-bottom:10px; font-weight:bold;">
+		        🔁 Shared
+		    </div>
+
+		    <div style="
+		        background:#f9fafb;
+		        padding:15px;
+		        border-radius:8px;
+		        border:1px solid #e5e7eb;
+		        font-size:14px;
+		        white-space:pre-line;
+		    "
+		         th:text="${post.content}">
+		    </div>
+
+		</div>
+
+		<div class="post-actions">
+
+		    <!-- Like -->
+		    <form th:action="@{/like/{postId}(postId=${post.id})}"
+		          method="post" style="display:inline;">
+		        <button type="submit"
+		                th:text="${post.likedByCurrentUser ? '❤️ Unlike' : '🤍 Like'}">
+		        </button>
+		    </form>
+
+		    <span th:text="${post.likeCount} + ' likes'"></span>
+
+		    <!-- Share -->
+		    <form th:action="@{/post/share/{id}(id=${post.id})}"
+		          method="post" style="display:inline;">
+		        <button type="submit">🔁 Share</button>
+		    </form>
+
+		    <!-- Edit (only owner) -->
+		    <form th:if="${post.username == currentUsername}"
+		          th:action="@{/post/edit/{id}(id=${post.id})}"
+		          method="get"
+		          style="display:inline;">
+		        <button type="submit">✏ Edit</button>
+		    </form>
+
+		    <!-- Delete (only owner) -->
+		    <form th:if="${post.username == currentUsername}"
+		          th:action="@{/post/delete/{id}(id=${post.id})}"
+		          method="post"
+		          style="display:inline;">
+		        <button type="submit">🗑 Delete</button>
+		    </form>
+
+		</div>
+
+        <div class="comment-section">
+
+            <div th:each="comment : ${post.comments}" class="comment">
+                <strong>
+                    <a th:href="@{/profile/{username}(username=${comment.username})}"
+                       th:text="${comment.username}"></a>
+                </strong> :
+                <span th:text="${comment.content}"></span>
+
+                <form th:if="${comment.ownedByCurrentUser}"
+                      th:action="@{/comment/delete/{commentId}(commentId=${comment.id})}"
+                      method="post" style="display:inline;">
+                    <button type="submit" class="delete-btn">Delete</button>
+                </form>
+            </div>
+
+            <div class="comment-form">
+                <form th:action="@{/comment/{postId}(postId=${post.id})}" method="post">
+                    <input type="text" name="content" placeholder="Write a comment..." required />
+                    <button type="submit">Post</button>
+                </form>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+function toggleNotifications() {
+    let dropdown = document.getElementById("notifDropdown");
+    dropdown.style.display =
+        dropdown.style.display === "block" ? "none" : "block";
+}
+
+function loadNotifications() {
+
+    fetch('/notifications')
+        .then(res => res.json())
+        .then(data => {
+
+            let dropdown = document.getElementById("notifDropdown");
+            dropdown.innerHTML = "";
+
+            data.forEach(n => {
+
+                let div = document.createElement("div");
+                div.className = "notif-item" + (n.read ? "" : " unread");
+                div.innerText = n.message;
+
+                div.onclick = function() {
+
+                    // Mark as read
+                    fetch('/notifications/read/' + n.id, { method: 'POST' })
+                        .then(() => {
+
+                            // Redirect based on type
+                            if (n.type === "FOLLOW") {
+                                window.location.href = "/profile/" + n.senderUsername;
+                            } else {
+                                window.location.href = "/feed";
+                            }
+                        });
+                };
+
+                dropdown.appendChild(div);
+            });
+        });
+
+    fetch('/notifications/count')
+        .then(res => res.text())
+        .then(count => {
+            let badge = document.getElementById("notifCount");
+            if (count > 0) {
+                badge.style.display = "inline";
+                badge.innerText = count;
+            } else {
+                badge.style.display = "none";
+            }
+        });
+}
+
+setInterval(loadNotifications, 5000);
+loadNotifications();
+</script>
+
+</body>
+</html>

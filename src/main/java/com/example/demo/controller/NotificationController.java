@@ -1,46 +1,39 @@
 package com.example.demo.controller;
 
-import org.springframework.stereotype.Controller;
+import java.util.List;
+
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.dto.NotificationDto;
 import com.example.demo.service.NotificationService;
-import com.example.demo.service.UserService;
 
-@Controller
+@RestController
 @RequestMapping("/notifications")
 public class NotificationController {
 
-    private final NotificationService service;
-    private final UserService userService;
+    private final NotificationService notificationService;
 
-    public NotificationController(NotificationService service,
-                                  UserService userService) {
-        this.service = service;
-        this.userService = userService;
+    public NotificationController(NotificationService notificationService) {
+        this.notificationService = notificationService;
     }
 
-//    @GetMapping
-//    public String showNotifications(Model model) {
-//
-//        Long userId = userService.getCurrentUserId();
-//
-//        model.addAttribute("notifications",
-//                service.getUserNotifications(userId));
-//
-//        model.addAttribute("unreadCount",
-//                service.getUnreadCount(userId));
-//
-//        return "notifications";
-//    }
+    @GetMapping
+    public List<NotificationDto> getNotifications(Authentication auth) {
+        return notificationService.getUserNotifications(auth.getName());
+    }
 
-    @GetMapping("/read/{id}")
-    public String markRead(@PathVariable Long id) {
+    @GetMapping("/count")
+    public long getUnreadCount(Authentication auth) {
+        return notificationService.getUnreadCount(auth.getName());
+    }
 
-        service.markAsRead(id);
-
-        return "redirect:/notifications";
+    @PostMapping("/read/{id}")
+    public void markAsRead(@PathVariable Long id) {
+        notificationService.markAsRead(id);
     }
 }
-

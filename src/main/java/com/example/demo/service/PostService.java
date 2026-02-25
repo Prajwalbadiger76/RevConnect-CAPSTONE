@@ -1,13 +1,23 @@
 package com.example.demo.service;
 
-import com.example.demo.dto.PostRequestDTO;
-import com.example.demo.entity.Post;
+import com.example.demo.dto.PostDto;
 import java.util.List;
 
-
 public interface PostService {
-	Post savePost(PostRequestDTO dto,Long userId);
-	void deletePost(Long postId, Long userId);
-	List<Post> getUserFeed(Long userId);
 
+    void createPost(String username, String content);
+
+    List<PostDto> getUserPosts(String username);
+    
+    void toggleLike(Long postId, String username);
+
+    List<PostDto> getAllPosts();
+
+    List<PostDto> getFeedPosts(String username);
+    
+    void updatePost(Long postId, String username, String content);
+
+    void deletePost(Long postId, String username);
+    
+    void sharePost(Long id, String username);
 }

@@ -1,20 +1,19 @@
 package com.example.demo.service;
 
+import com.example.demo.dto.NotificationDto;
 
-import com.example.demo.entity.NotificationType;
 import java.util.List;
 
 public interface NotificationService {
 
-    void createNotification(Long recipientId,
-                            Long senderId,
-                            NotificationType type,
+    void createNotification(String recipientUsername,
+                            String senderUsername,
+                            String type,
                             Long referenceId);
 
-    List<?> getUserNotifications(Long userId);
+    List<NotificationDto> getUserNotifications(String username);
 
-    long getUnreadCount(Long userId);
+    long getUnreadCount(String username);
 
     void markAsRead(Long notificationId);
 }
-
