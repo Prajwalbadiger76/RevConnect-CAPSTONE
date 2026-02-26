@@ -204,16 +204,14 @@
 
 	<div style="display:flex; align-items:center;">
 
-	    <!-- Notification Bell -->
 	    <div class="notif-container" onclick="toggleNotifications()">
 	        🔔
 	        <span id="notifCount" class="notif-count"></span>
 	        <div id="notifDropdown" class="notif-dropdown"></div>
 	    </div>
 
-	    <!-- ⭐ YOUR TASK (Pending Page Link) -->
 	    <a th:href="@{/connections}">Pending Requests</a>
-
+	    <a th:href="@{/connections/sent}">Sent Requests</a>
 	    <a th:href="@{/connections/accepted}">My Connections</a>
 	    <a th:href="@{/profile}">Profile</a>
 	    <a th:href="@{/logout}">Logout</a>

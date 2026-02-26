@@ -87,4 +87,20 @@ public class ConnectionController {
 
         return "accepted-connections";
     }
+    @PostMapping("/cancel/{username}")
+    public String cancel(@PathVariable String username,
+                         Authentication authentication){
+
+        connectionService.cancelRequest(authentication.getName(),username);
+        return "redirect:/connections/sent";
+    }
+    
+    @GetMapping("/sent")
+    public String sentRequests(Authentication authentication,Model model){
+
+        model.addAttribute("sent",
+                connectionService.getSentRequests(authentication.getName()));
+
+        return "sent-requests";
+    }
 }
