@@ -237,7 +237,8 @@ public class ConnectionServiceImpl implements ConnectionService {
         
     }
     @Override
-    public void removeConnection(String currentUsername, String targetUsername) {
+    @Transactional
+    public void removeConnection(String currentUsername, String targetUsername){
 
         User currentUser = userRepository.findByUsername(currentUsername).orElseThrow();
         User targetUser = userRepository.findByUsername(targetUsername).orElseThrow();
@@ -250,5 +251,31 @@ public class ConnectionServiceImpl implements ConnectionService {
         }
 
         connection.ifPresent(connectionRepository::delete);
+    }
+    
+    @Override
+    @Transactional
+    public void cancelRequest(String currentUsername, String targetUsername){
+
+        User requester = userRepository.findByUsername(currentUsername).orElseThrow();
+        User receiver = userRepository.findByUsername(targetUsername).orElseThrow();
+
+        Optional<Connection> connection =
+                connectionRepository.findByRequesterAndReceiver(requester, receiver);
+
+        if(connection.isPresent()
+                && connection.get().getStatus()==ConnectionStatus.PENDING){
+
+            connectionRepository.delete(connection.get());
+        }
+    }
+    
+    @Override
+    public List<Connection> getSentRequests(String username){
+
+        User user=userRepository.findByUsername(username).orElseThrow();
+
+        return connectionRepository
+                .findByRequesterAndStatus(user,ConnectionStatus.PENDING);
     }
 }

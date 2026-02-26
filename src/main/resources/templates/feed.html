@@ -30,6 +30,8 @@
         </div>
 
         <a th:href="@{/connections}">Pending</a>
+        <a th:href="@{/connections}">Pending Requests</a>
+		<a th:href="@{/connections/sent}">Sent Requests</a>
         <a th:href="@{/connections/accepted}">Connections</a>
 
         <div class="profile-menu">
@@ -121,10 +123,10 @@
             <span th:text="${post.likeCount} + ' likes'"></span>
 			
 			<!-- COMMENT COUNT BUTTON -->
-			    <span class="comment-toggle"
-			          onclick="toggleComments([[${post.id}]])">
-			        💬 <span th:text="${#lists.size(post.comments)}"></span> Comments
-			    </span>
+			<span class="comment-toggle"
+                th:attr="onclick=|toggleComments(${post.id})|">
+                💬 <span th:text="${#lists.size(post.comments)}"></span> Comments
+            </span>
 
             <form th:action="@{/post/share/{id}(id=${post.id})}" method="post">
                 <button>🔁 Share</button>

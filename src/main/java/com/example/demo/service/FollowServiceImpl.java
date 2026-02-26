@@ -6,6 +6,9 @@ import com.example.demo.repo.FollowRepository;
 import com.example.demo.repo.UserRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 public class FollowServiceImpl implements FollowService {
 
@@ -39,7 +42,6 @@ public class FollowServiceImpl implements FollowService {
 
         followRepository.save(follow);
 
-        // 🔔 FOLLOW NOTIFICATION
         notificationService.createNotification(
                 targetUsername,
                 currentUsername,
@@ -54,7 +56,8 @@ public class FollowServiceImpl implements FollowService {
         User follower = userRepository.findByUsername(currentUsername).orElseThrow();
         User following = userRepository.findByUsername(targetUsername).orElseThrow();
 
-        followRepository.deleteByFollowerAndFollowing(follower, following);
+        followRepository.findByFollowerAndFollowing(follower, following)
+                .ifPresent(followRepository::delete);
     }
 
     @Override
@@ -66,5 +69,37 @@ public class FollowServiceImpl implements FollowService {
         return followRepository
                 .findByFollowerAndFollowing(follower, following)
                 .isPresent();
+    }
+
+    @Override
+    public List<User> getFollowers(String username){
+
+        User user = userRepository.findByUsername(username).orElseThrow();
+
+        List<Follow> follows = followRepository.findByFollowing(user);
+
+        List<User> followers = new ArrayList<>();
+
+        for(Follow f : follows){
+            followers.add(f.getFollower());
+        }
+
+        return followers;
+    }
+
+    @Override
+    public List<User> getFollowing(String username){
+
+        User user = userRepository.findByUsername(username).orElseThrow();
+
+        List<Follow> follows = followRepository.findByFollower(user);
+
+        List<User> following = new ArrayList<>();
+
+        for(Follow f : follows){
+            following.add(f.getFollowing());
+        }
+
+        return following;
     }
 }
