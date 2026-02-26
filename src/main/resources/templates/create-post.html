@@ -1,5 +1,3 @@
-<<<<<<< Updated upstream
-=======
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
@@ -16,12 +14,6 @@
             width: 100%;
             padding: 10px;
             resize: none;
-        }
-
-        .info {
-            font-size: 13px;
-            color: gray;
-            margin-top: 5px;
         }
 
         button {
@@ -41,26 +33,21 @@
 
 <form th:action="@{/post/create}" method="post">
 
-    <label>Post Content</label>
+    <!-- Content -->
     <textarea name="content"
-              rows="4"
+              rows="5"
               placeholder="What's on your mind?"
               required></textarea>
 
-    <br><br>
-
-    <label>Hashtags (separate by space)</label>
+    <!-- Hashtags -->
     <input type="text"
            name="hashtags"
-           placeholder="#springboot #java"
-           style="width:100%; padding:8px;" />
+           placeholder="Add hashtags (comma separated)">
 
-    <br><br>
+    <!-- Submit -->
+    <button type="submit">Create Post</button>
 
-    <button type="submit">Post</button>
     <a th:href="@{/feed}" class="btn-back">Cancel</a>
 
-</form>
 </body>
 </html>
->>>>>>> Stashed changes

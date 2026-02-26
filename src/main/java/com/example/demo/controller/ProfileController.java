@@ -1,9 +1,5 @@
 package com.example.demo.controller;
 
-<<<<<<< Updated upstream
-public class ProfileController {
-
-=======
 import com.example.demo.dto.ProfileResponse;
 import com.example.demo.dto.UpdateProfileRequest;
 import com.example.demo.service.ConnectionService;
@@ -112,35 +108,21 @@ public class ProfileController {
     }
 
     // ================= SEARCH USERS =================
+    
     @GetMapping("/search")
-    public String search(@RequestParam String keyword,
-                         Authentication authentication,
-                         Model model) {
+    public String searchUsers(@RequestParam String keyword,
+                              Authentication authentication,
+                              Model model) {
 
         String currentUsername = authentication.getName();
 
-        // 🔎 If hashtag search
-        if (keyword.startsWith("#")) {
-
-            String tag = keyword.substring(1).toLowerCase();
-
-            model.addAttribute("posts",
-                    postService.searchByHashtag(tag));
-
-            model.addAttribute("currentUsername",
-                    currentUsername);
-
-            return "feed";   // reuse feed page
-        }
-
-        // 👤 Normal user search
         model.addAttribute("results",
                 profileService.searchUsers(keyword));
 
-        model.addAttribute("currentUsername",
-                currentUsername);
+        model.addAttribute("currentUsername", currentUsername);
+        
+        model.addAttribute("showCreateForm", false);
 
-        return "search-results";
+        return "feed"; // Only users
     }
->>>>>>> Stashed changes
 }

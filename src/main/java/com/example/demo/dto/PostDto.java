@@ -7,74 +7,83 @@ public class PostDto {
 
     private Long id;
     private String content;
-<<<<<<< Updated upstream
-    private List<String> hashtags;
-    private boolean isPromotional;
-    private boolean isPinned;
-    private boolean isRepost;
-    private String ctaLink;
-    private LocalDateTime scheduledTime;
-	public Long getId() {
-		return id;
-	}
-	public void setId(Long id) {
-		this.id = id;
-	}
-	public String getContent() {
-		return content;
-	}
-	public void setContent(String content) {
-		this.content = content;
-	}
-	public List<String> getHashtags() {
-		return hashtags;
-	}
-	public void setHashtags(List<String> hashtags) {
-		this.hashtags = hashtags;
-	}
-	public boolean isPromotional() {
-		return isPromotional;
-	}
-	public void setPromotional(boolean isPromotional) {
-		this.isPromotional = isPromotional;
-	}
-	public boolean isPinned() {
-		return isPinned;
-	}
-	public void setPinned(boolean isPinned) {
-		this.isPinned = isPinned;
-	}
-	public boolean isRepost() {
-		return isRepost;
-	}
-	public void setRepost(boolean isRepost) {
-		this.isRepost = isRepost;
-	}
-	public String getCtaLink() {
-		return ctaLink;
-	}
-	public void setCtaLink(String ctaLink) {
-		this.ctaLink = ctaLink;
-	}
-	public LocalDateTime getScheduledTime() {
-		return scheduledTime;
-	}
-	public void setScheduledTime(LocalDateTime scheduledTime) {
-		this.scheduledTime = scheduledTime;
-	}
-=======
     private String username;
     private LocalDateTime createdAt;
+
     private long likeCount;
     private boolean likedByCurrentUser;
-    private List<CommentDto> comments;
-    private boolean pinned;
-    private List<String> hashtags;
->>>>>>> Stashed changes
 
-    
-<<<<<<< Updated upstream
-=======
+    private boolean pinned;
+
+    private List<String> hashtags;
+    private List<CommentDto> comments;
+
+
+    // ================= Getters & Setters =================
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public long getLikeCount() {
+        return likeCount;
+    }
+
+    public void setLikeCount(long likeCount) {
+        this.likeCount = likeCount;
+    }
+
+    public boolean isLikedByCurrentUser() {
+        return likedByCurrentUser;
+    }
+
+    public void setLikedByCurrentUser(boolean likedByCurrentUser) {
+        this.likedByCurrentUser = likedByCurrentUser;
+    }
+
+    public boolean isPinned() {
+        return pinned;
+    }
+
+    public void setPinned(boolean pinned) {
+        this.pinned = pinned;
+    }
+
+    public List<String> getHashtags() {
+        return hashtags;
+    }
+
+    public void setHashtags(List<String> hashtags) {
+        this.hashtags = hashtags;
+    }
 
     public List<CommentDto> getComments() {
         return comments;
@@ -83,23 +92,4 @@ public class PostDto {
     public void setComments(List<CommentDto> comments) {
         this.comments = comments;
     }
-
-	public boolean isPinned() {
-		return pinned;
-	}
-
-	public void setPinned(boolean pinned) {
-		this.pinned = pinned;
-	}
-
-	public List<String> getHashtags() {
-		return hashtags;
-	}
-
-	public void setHashtags(List<String> hashtags) {
-		this.hashtags = hashtags;
-	}
-	
-    
->>>>>>> Stashed changes
 }

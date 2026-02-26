@@ -1,10 +1,8 @@
 package com.example.demo.service;
 
-public class ProfileService {
+import com.example.demo.dto.ProfileResponse;
+import com.example.demo.dto.UpdateProfileRequest;
 
-<<<<<<< Updated upstream
-}
-=======
 import java.util.List;
 
 public interface ProfileService {
@@ -20,4 +18,3 @@ public interface ProfileService {
     ProfileResponse getProfileWithFollowInfo(String currentUsername, String targetUsername);
     
 }
->>>>>>> Stashed changes

@@ -1,32 +1,44 @@
 package com.example.demo.service;
 
 import com.example.demo.dto.PostDto;
-import com.example.demo.dto.PostRequestDTO;
+import com.example.demo.entity.Post;
+
 import java.util.List;
 
 public interface PostService {
 
-    PostDto createPost(PostRequestDTO dto, Long userId);
+	void createPost(String username,
+            String content,
+            String hashtags,
+            String scheduledAt);
 
-    PostDto updatePost(Long postId, PostRequestDTO dto, Long userId);
+    void updatePost(Long postId, String content, String hashtags, String username);
 
-    void deletePost(Long postId, Long userId);
-
-    List<PostDto> getFeed();
-
-<<<<<<< Updated upstream
-    PostDto pinPost(Long postId, Long userId);
-
-    PostDto repostPost(Long postId, Long userId);
-=======
     void deletePost(Long postId, String username);
-    
-    void sharePost(Long id, String username);
-    
+
+    void sharePost(Long postId, String username);
+
+    void toggleLike(Long postId, String username);
+
     void pinPost(Long postId, String username);
 
     void unpinPost(Long postId, String username);
 
-    List<PostDto> searchByHashtag(String hashtag);
->>>>>>> Stashed changes
+    List<PostDto> getUserPosts(String username);
+
+    List<PostDto> getAllPosts();
+
+    List<PostDto> getFeedPosts(String username);
+
+    // ✅ ADD THIS (needed for edit page)
+    PostDto getPostById(Long postId, String currentUsername);
+
+    // ✅ ADD THIS (needed for hashtag search)
+    List<PostDto> searchPostsByHashtag(String tag,String username);
+    
+    List<String> getTrendingHashtags();
+    
+
+    List<PostDto> searchPostsByContent(String keyword, String username);
+
 }

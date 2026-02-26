@@ -1,101 +1,66 @@
 package com.example.demo.entity;
 
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "notifications")
 public class Notification {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "recipient_id", nullable = false) // post owner [for whose post]
-	private User recipient;
+    // User who receives notification
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "recipient_id", nullable = false)
+    private User recipient;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "sender_id", nullable = false) // liked by
-	private User sender;
+    // User who triggered notification
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "sender_id", nullable = false)
+    private User sender;
 
-	@Enumerated(EnumType.STRING)
-	@Column(nullable = false)
-	private NotificationType type;
+    @Column(nullable = false)
+    private String type; 
+    // LIKE, COMMENT, FOLLOW
 
-	private Long referenceId;
+    private Long referenceId; 
+    // postId (for like/comment), null for follow
 
-	private boolean isRead = false;
+    @Column(nullable = false)
+    private boolean isRead = false;
 
-	private LocalDateTime createdAt = LocalDateTime.now();
+    @Column(nullable = false)
+    private LocalDateTime createdAt = LocalDateTime.now();
 
-	// getters & setters
+    public Notification() {}
 
-	public Long getId() {
-		return id;
-	}
+    public Notification(User recipient, User sender, String type, Long referenceId) {
+        this.recipient = recipient;
+        this.sender = sender;
+        this.type = type;
+        this.referenceId = referenceId;
+        this.createdAt = LocalDateTime.now();
+        this.isRead = false;
+    }
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    public Long getId() { return id; }
 
-	public User getRecipient() {
-		return recipient;
-	}
+    public User getRecipient() { return recipient; }
+    public void setRecipient(User recipient) { this.recipient = recipient; }
 
-	public void setRecipient(User recipient) {
-		this.recipient = recipient;
-	}
+    public User getSender() { return sender; }
+    public void setSender(User sender) { this.sender = sender; }
 
-	public User getSender() {
-		return sender;
-	}
+    public String getType() { return type; }
+    public void setType(String type) { this.type = type; }
 
-	public void setSender(User sender) {
-		this.sender = sender;
-	}
+    public Long getReferenceId() { return referenceId; }
+    public void setReferenceId(Long referenceId) { this.referenceId = referenceId; }
 
-	public NotificationType getType() {
-		return type;
-	}
+    public boolean isRead() { return isRead; }
+    public void setRead(boolean read) { isRead = read; }
 
-	public void setType(NotificationType type) {
-		this.type = type;
-	}
-
-	public Long getReferenceId() {
-		return referenceId;
-	}
-
-	public void setReferenceId(Long referenceId) {
-		this.referenceId = referenceId;
-	}
-
-	public boolean isRead() {
-		return isRead;
-	}
-
-	public void setRead(boolean isRead) {
-		this.isRead = isRead;
-	}
-
-	public LocalDateTime getCreatedAt() {
-		return createdAt;
-	}
-
-	public void setCreatedAt(LocalDateTime createdAt) {
-		this.createdAt = createdAt;
-	}
-
+    public LocalDateTime getCreatedAt() { return createdAt; }
 }

@@ -7,7 +7,11 @@ import jakarta.persistence.*;
 public class PostHashtag {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE,
+            generator = "post_hashtag_seq")
+    @SequenceGenerator(name = "post_hashtag_seq",
+            sequenceName = "post_hashtag_seq",
+            allocationSize = 1)
     private Long id;
 
     @ManyToOne
@@ -18,29 +22,17 @@ public class PostHashtag {
     @JoinColumn(name = "hashtag_id")
     private Hashtag hashtag;
 
-	public Long getId() {
-		return id;
-	}
+    public PostHashtag() {}
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    public Long getId() { return id; }
 
-	public Post getPost() {
-		return post;
-	}
+    public void setId(Long id) { this.id = id; }
 
-	public void setPost(Post post) {
-		this.post = post;
-	}
+    public Post getPost() { return post; }
 
-	public Hashtag getHashtag() {
-		return hashtag;
-	}
+    public void setPost(Post post) { this.post = post; }
 
-	public void setHashtag(Hashtag hashtag) {
-		this.hashtag = hashtag;
-	}
+    public Hashtag getHashtag() { return hashtag; }
 
-    
+    public void setHashtag(Hashtag hashtag) { this.hashtag = hashtag; }
 }

@@ -48,12 +48,6 @@
             font-size: 14px;
         }
 
-        .info {
-            font-size: 13px;
-            color: gray;
-            margin-top: 5px;
-        }
-
         .btn-group {
             margin-top: 20px;
             display: flex;
@@ -96,28 +90,27 @@
 
         <h2>Edit Post</h2>
 
-        <form th:action="@{/post/update/{id}(id=${post.id})}" method="post">
+		<form th:action="@{/post/update/{id}(id=${post.id})}" method="post">
+		            <textarea name="content"
+		                      rows="5"
+		                      th:text="${post.content}"
+		                      required></textarea>
+					
+					<input type="text"
+						   name="hashtags"
+						   placeholder="Update hashtags (comma separated)"
+						   style="width:100%; padding:8px;">
 
-            <textarea name="content"
-                      rows="5"
-                      th:text="${post.content}"
-                      required></textarea>
+		            <div class="btn-group">
+		                <button type="submit" class="btn btn-primary">
+		                    Update Post
+		                </button>
 
-            <div class="info">
-                Add Hashtags 
-            </div>
-
-            <div class="btn-group">
-                <button type="submit" class="btn btn-primary">
-                    Update Post
-                </button>
-
-                <a th:href="@{/profile}" class="btn btn-secondary">
-                    Cancel
-                </a>
-            </div>
-
-        </form>
+		                <a th:href="@{/feed}" class="btn btn-secondary">
+		                    Cancel
+		                </a>
+		            </div>
+		        </form>
 
     </div>
 </div>
