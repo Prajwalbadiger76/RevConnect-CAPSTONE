@@ -24,6 +24,17 @@
 
     <div class="navbar-right">
 
+	    <div class="notif-container" onclick="toggleNotifications()">
+	        🔔
+	        <span id="notifCount" class="notif-count"></span>
+	        <div id="notifDropdown" class="notif-dropdown"></div>
+	    </div>
+
+	    <a th:href="@{/connections}">Pending Requests</a>
+	    <a th:href="@{/connections/sent}">Sent Requests</a>
+	    <a th:href="@{/connections/accepted}">My Connections</a>
+	    <a th:href="@{/profile}">Profile</a>
+	    <a th:href="@{/logout}">Logout</a>
         <div class="notif-bell" onclick="toggleNotifications()">
             🔔
             <span id="notifCount" class="notif-count"></span>

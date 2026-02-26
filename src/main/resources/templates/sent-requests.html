@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-<title>My Connections</title>
+<title>Sent Requests</title>
 
 <style>
 body{
@@ -14,11 +14,6 @@ body{
 .container{
     width:55%;
     margin:auto;
-}
-
-h2{
-    text-align:center;
-    margin-bottom:25px;
 }
 
 .card{
@@ -53,7 +48,6 @@ h2{
     align-items:center;
     justify-content:center;
     font-weight:bold;
-    font-size:18px;
 }
 
 .name{
@@ -62,11 +56,7 @@ h2{
     color:#2563eb;
 }
 
-.name:hover{
-    text-decoration:underline;
-}
-
-.remove{
+.cancel{
     border:none;
     padding:8px 16px;
     border-radius:7px;
@@ -76,26 +66,15 @@ h2{
     transition:0.25s;
 }
 
-/* hover */
-.remove:hover{
+/* hover animation */
+.cancel:hover{
     background:#dc2626;
     transform:scale(1.05);
 }
 
 /* click animation */
-.remove:active{
+.cancel:active{
     transform:scale(0.95);
-}
-
-.back{
-    text-align:center;
-    margin-top:25px;
-}
-
-.back a{
-    text-decoration:none;
-    color:#2563eb;
-    font-weight:600;
 }
 </style>
 </head>
@@ -104,49 +83,46 @@ h2{
 
 <div class="container">
 
-<h2>My Connections</h2>
+<h2 style="text-align:center;">Sent Requests</h2>
 
-<div th:if="${#lists.isEmpty(connections)}">
-    <p style="text-align:center;">No connections yet.</p>
+<div th:if="${#lists.isEmpty(sent)}" style="text-align:center;">
+    No sent requests
 </div>
 
-<div th:each="user : ${connections}" class="card">
+<div th:each="req : ${sent}" class="card">
 
     <div class="left">
         <div class="avatar"
-             th:text="${#strings.substring(user.username,0,1).toUpperCase()}"></div>
+             th:text="${#strings.substring(req.receiver.username,0,1)}"></div>
 
         <a class="name"
-           th:href="@{/profile/{username}(username=${user.username})}"
-           th:text="${user.username}"></a>
+           th:href="@{/profile/{username}(username=${req.receiver.username})}"
+           th:text="${req.receiver.username}"></a>
     </div>
 
-    <form th:action="@{/connections/remove/{username}(username=${user.username})}"
+    <form th:action="@{/connections/cancel/{username}(username=${req.receiver.username})}"
           method="post"
-          onsubmit="changeRemove(this,event)">
-        <button class="remove">Remove</button>
+          onsubmit="changeCancel(this,event)">
+        <button class="cancel">Cancel</button>
     </form>
 
 </div>
 
-<div class="back">
+<div style="text-align:center;margin-top:20px;">
     <a th:href="@{/feed}">← Back to Feed</a>
 </div>
 
 </div>
 
 <script>
-function changeRemove(form,event){
+function changeCancel(form,event){
 
     event.preventDefault();
 
-    if(!confirm("Remove connection?")) return;
-
     let btn=form.querySelector("button");
 
-    btn.innerText="Removed";
+    btn.innerText="Cancelled";
     btn.style.background="#9ca3af";
-    btn.style.transform="scale(0.95)";
     btn.disabled=true;
 
     setTimeout(()=>{

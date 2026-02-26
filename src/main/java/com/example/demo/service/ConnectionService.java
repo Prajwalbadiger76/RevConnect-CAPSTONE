@@ -24,4 +24,8 @@ public interface ConnectionService {
     List<User> getAcceptedConnections(String username);
     
     void removeConnection(String currentUsername, String targetUsername);
+    
+    void cancelRequest(String currentUsername, String targetUsername);
+    
+    List<Connection> getSentRequests(String username);
 }
