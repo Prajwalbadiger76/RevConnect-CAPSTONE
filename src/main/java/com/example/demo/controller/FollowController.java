@@ -1,6 +1,8 @@
 package com.example.demo.controller;
 
 import com.example.demo.service.FollowService;
+
+import org.springframework.ui.Model;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -29,5 +31,26 @@ public class FollowController {
 
         followService.unfollow(authentication.getName(), username);
         return "redirect:/profile/" + username;
+    }
+    
+    @GetMapping("/followers/{username}")
+    public String followers(@PathVariable String username, Model model){
+
+        model.addAttribute("followers",
+                followService.getFollowers(username));
+
+        model.addAttribute("username", username);
+
+        return "followers";
+    }    
+    @GetMapping("/following/{username}")
+    public String following(@PathVariable String username, Model model){
+
+        model.addAttribute("following",
+                followService.getFollowing(username));
+
+        model.addAttribute("username", username);
+
+        return "following";
     }
 }

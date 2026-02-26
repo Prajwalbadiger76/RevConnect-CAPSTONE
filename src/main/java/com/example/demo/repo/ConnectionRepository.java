@@ -40,4 +40,7 @@ public interface ConnectionRepository
             User receiver,
             ConnectionStatus status
     );
+    
+    //Cancel Sent request
+    void deleteByRequesterAndReceiver(User requester, User receiver);
 }
