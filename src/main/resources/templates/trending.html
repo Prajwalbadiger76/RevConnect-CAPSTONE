@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Trending Hashtags</title>
+    <link rel="stylesheet" th:href="@{/css/feed.css}">
+</head>
+<body>
+
+<div class="navbar">
+    <h2>RevConnect</h2>
+    <a th:href="@{/feed}">Back to Feed</a>
+</div>
+
+<div class="feed-container">
+
+    <!-- Trending Pills -->
+    <div class="trending-tags-row">
+
+        <a th:each="tagItem : ${trendingHashtags}"
+           th:href="@{/post/trending(tag=${tagItem})}"
+           class="trend-pill"
+           th:classappend="${tagItem == selectedTag} ? ' active-tag' : ''"
+           th:text="${'#' + tagItem}">
+        </a>
+
+    </div>
+
+    <!-- Posts Below -->
+    <div th:each="post : ${posts}" class="post-card">
+
+        <div class="post-top">
+
+            <div class="avatar small">
+                <span th:text="${#strings.substring(post.username,0,1).toUpperCase()}"></span>
+            </div>
+
+            <div class="post-meta">
+                <a th:text="${post.username}"></a>
+                <span th:text="${#temporals.format(post.createdAt,'dd MMM yyyy HH:mm')}"></span>
+            </div>
+
+        </div>
+
+        <div class="post-content"
+             th:text="${post.content}">
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>
