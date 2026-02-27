@@ -1,402 +1,332 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
-    <title>RevConnect - Feed</title>
     <meta charset="UTF-8">
+    <title>RevConnect - Feed</title>
+    <link rel="stylesheet" th:href="@{/css/feed.css}">
+
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f6f9;
-            margin: 0;
-            padding: 0;
-        }
 
-        .navbar {
-            background-color: #111827;
-            color: white;
-            padding: 15px 30px;
+        /* ====== PAGE LAYOUT ====== */
+        .page-layout {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            justify-content: center;
+            gap: 40px;
+            padding-top: 20px;
         }
 
-        .navbar h2 { margin: 0; }
-
-        .navbar-left {
-            display: flex;
-            align-items: center;
-            gap: 20px;
+        .feed-container {
+            width: 650px;
         }
 
-        .navbar form {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .navbar input {
-            padding: 6px 10px;
-            border-radius: 5px;
-            border: none;
-            outline: none;
-        }
-
-        .navbar button {
-            padding: 6px 10px;
-            border-radius: 5px;
-            border: none;
-            background-color: #2563eb;
-            color: white;
-            cursor: pointer;
-        }
-
-        .navbar a {
-            color: white;
-            text-decoration: none;
-            margin-left: 15px;
-        }
-
-        /* 🔔 Notification */
-        .notif-container {
-            position: relative;
-            margin-left: 15px;
-            cursor: pointer;
-        }
-
-        .notif-count {
-            position: absolute;
-            top: -5px;
-            right: -8px;
-            background: red;
-            color: white;
-            font-size: 12px;
-            padding: 2px 6px;
-            border-radius: 50%;
-            display: none;
-        }
-
-        .notif-dropdown {
-            display: none;
-            position: absolute;
-            right: 0;
-            top: 30px;
-            background: white;
-            color: black;
-            width: 280px;
-            max-height: 350px;
+        /* ===== RIGHT SIDEBAR ===== */
+        .notification-sidebar {
+            width: 320px;
+            height: calc(100vh - 80px);
+            position: sticky;
+            top: 70px;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            padding: 15px;
             overflow-y: auto;
-            border-radius: 6px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-            z-index: 100;
+        }
+
+        .sidebar-header {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .notif-title {
+            font-size: 14px;
+            color: #666;
+            margin: 15px 0 8px 0;
+            font-weight: 600;
         }
 
         .notif-item {
-            padding: 10px;
-            border-bottom: 1px solid #eee;
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .notif-item:hover {
+            background: #f5f7fb;
         }
 
         .notif-item.unread {
-            background: #eef2ff;
+            background: #eef3ff;
         }
 
-        .container {
-            width: 60%;
-            margin: 30px auto;
+        .notif-item.read {
+            background: #fafafa;
         }
 
-        .create-post {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
+        .notif-text {
+            font-size: 14px;
+        }
+
+        .empty-text {
+            font-size: 13px;
+            color: #888;
             text-align: center;
         }
 
-        .create-post button {
-            padding: 10px 20px;
-            background-color: #2563eb;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
+        /* ===== ANALYTICS BAR ===== */
+
+        .analytics-bar {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin-top: 12px;
+            padding: 10px;
+            background: linear-gradient(90deg, #eef2ff, #f8f9ff);
+            border-radius: 10px;
+            font-size: 14px;
+            border: 1px solid #e5e8f0;
         }
 
-        .post-card {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
+        .analytics-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
-        .post-header { font-weight: bold; margin-bottom: 10px; }
-
-        .post-header a {
-            text-decoration: none;
-            color: #2563eb;
+        .analytics-item span {
+            font-weight: 600;
+            font-size: 16px;
         }
 
-        .post-header a:hover { text-decoration: underline; }
-
-        .post-content { margin-bottom: 15px; }
-
-        .post-actions { margin-bottom: 15px; }
-
-        .post-actions button {
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 15px;
+        .analytics-item small {
+            font-size: 11px;
+            color: #777;
         }
 
-        .comment-section {
-            margin-top: 10px;
-            padding-top: 10px;
-            border-top: 1px solid #ddd;
-        }
-
-        .comment { margin-bottom: 8px; font-size: 14px; }
-
-        .comment strong a {
-            color: #2563eb;
-            text-decoration: none;
-        }
-
-        .comment strong a:hover { text-decoration: underline; }
-
-        .comment-form { margin-top: 10px; }
-
-        .comment-form input {
-            width: 75%;
-            padding: 6px;
-        }
-
-        .comment-form button {
-            padding: 6px 10px;
-            background-color: #10b981;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        .delete-btn {
-            background-color: red;
-            color: white;
-            border: none;
-            padding: 3px 6px;
-            font-size: 12px;
-            border-radius: 4px;
-            cursor: pointer;
-        }
     </style>
+
 </head>
+
 <body>
+
+<!-- ================= NAVBAR ================= -->
 
 <div class="navbar">
     <div class="navbar-left">
-        <h2>RevConnect</h2>
+        <h2 class="logo">RevConnect</h2>
 
-        <form th:action="@{/profile/search}" method="get">
+        <form th:action="@{/profile/search}" method="get" class="search-form">
             <input type="text" name="keyword" placeholder="Search users..." required>
             <button type="submit">Search</button>
         </form>
     </div>
 
-	<div style="display:flex; align-items:center;">
+    <div class="navbar-right">
+        <a th:href="@{/connections}">Pending</a>
+        <a th:href="@{/connections/accepted}">Connections</a>
 
-	    <!-- Notification Bell -->
-	    <div class="notif-container" onclick="toggleNotifications()">
-	        🔔
-	        <span id="notifCount" class="notif-count"></span>
-	        <div id="notifDropdown" class="notif-dropdown"></div>
-	    </div>
-
-	    <!-- ⭐ YOUR TASK (Pending Page Link) -->
-	    <a th:href="@{/connections}">Pending Requests</a>
-
-	    <a th:href="@{/connections/accepted}">My Connections</a>
-	    <a th:href="@{/profile}">Profile</a>
-	    <a th:href="@{/logout}">Logout</a>
-
-	</div>
-</div>
-
-
-<div class="container">
-
-    <!-- Create Post -->
-    <div class="create-post">
-        <form th:action="@{/post/create}" method="post">
-            <textarea name="content" rows="3"
-                      style="width:100%; padding:10px;"
-                      placeholder="What's on your mind?"
-                      required></textarea>
-            <br><br>
-            <button type="submit">Create Post</button>
-        </form>
-    </div>
-
-    <!-- Posts -->
-    <div th:each="post : ${posts}" class="post-card">
-
-        <div class="post-header">
-            <a th:href="@{/profile/{username}(username=${post.username})}"
-               th:text="${post.username}"></a>
-
-            <span style="float:right; font-size:12px;"
-                  th:text="${#temporals.format(post.createdAt, 'dd MMM yyyy HH:mm')}"></span>
-        </div>
-
-		<!-- Normal Post -->
-		<div th:if="${!#strings.startsWith(post.content, '🔁 Shared from')}"
-		     class="post-content"
-		     th:text="${post.content}">
-		</div>
-
-		<!-- Shared Post -->
-		<div th:if="${#strings.startsWith(post.content, '🔁 Shared from')}"
-		     class="post-content">
-
-		    <div style="margin-bottom:10px; font-weight:bold;">
-		        🔁 Shared
-		    </div>
-
-		    <div style="
-		        background:#f9fafb;
-		        padding:15px;
-		        border-radius:8px;
-		        border:1px solid #e5e7eb;
-		        font-size:14px;
-		        white-space:pre-line;
-		    "
-		         th:text="${post.content}">
-		    </div>
-
-		</div>
-
-		<div class="post-actions">
-
-		    <!-- Like -->
-		    <form th:action="@{/like/{postId}(postId=${post.id})}"
-		          method="post" style="display:inline;">
-		        <button type="submit"
-		                th:text="${post.likedByCurrentUser ? '❤️ Unlike' : '🤍 Like'}">
-		        </button>
-		    </form>
-
-		    <span th:text="${post.likeCount} + ' likes'"></span>
-
-		    <!-- Share -->
-		    <form th:action="@{/post/share/{id}(id=${post.id})}"
-		          method="post" style="display:inline;">
-		        <button type="submit">🔁 Share</button>
-		    </form>
-
-		    <!-- Edit (only owner) -->
-		    <form th:if="${post.username == currentUsername}"
-		          th:action="@{/post/edit/{id}(id=${post.id})}"
-		          method="get"
-		          style="display:inline;">
-		        <button type="submit">✏ Edit</button>
-		    </form>
-
-		    <!-- Delete (only owner) -->
-		    <form th:if="${post.username == currentUsername}"
-		          th:action="@{/post/delete/{id}(id=${post.id})}"
-		          method="post"
-		          style="display:inline;">
-		        <button type="submit">🗑 Delete</button>
-		    </form>
-
-		</div>
-
-        <div class="comment-section">
-
-            <div th:each="comment : ${post.comments}" class="comment">
-                <strong>
-                    <a th:href="@{/profile/{username}(username=${comment.username})}"
-                       th:text="${comment.username}"></a>
-                </strong> :
-                <span th:text="${comment.content}"></span>
-
-                <form th:if="${comment.ownedByCurrentUser}"
-                      th:action="@{/comment/delete/{commentId}(commentId=${comment.id})}"
-                      method="post" style="display:inline;">
-                    <button type="submit" class="delete-btn">Delete</button>
-                </form>
+        <div class="profile-menu">
+            <div class="profile-circle"
+                 onclick="toggleProfileMenu()"
+                 th:text="${#strings.substring(currentUsername,0,1).toUpperCase()}">
             </div>
 
-            <div class="comment-form">
-                <form th:action="@{/comment/{postId}(postId=${post.id})}" method="post">
-                    <input type="text" name="content" placeholder="Write a comment..." required />
+            <div id="profileDropdown" class="dropdown">
+                <a th:href="@{/profile}">My Profile</a>
+                <a th:href="@{/logout}">Logout</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ================= MAIN LAYOUT ================= -->
+
+<div class="page-layout">
+
+    <!-- ================= FEED ================= -->
+
+    <div class="feed-container">
+
+        <!-- CREATE POST -->
+        <div class="create-post">
+            <form th:action="@{/post/create}" method="post">
+                <div class="create-row">
+                    <div class="avatar">
+                        <span th:text="${#strings.substring(currentUsername,0,1).toUpperCase()}"></span>
+                    </div>
+                    <textarea name="content" placeholder="What's on your mind?" required></textarea>
+                </div>
+
+                <div class="create-actions">
+                    <div class="create-icons">📷 📄 #</div>
                     <button type="submit">Post</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- POSTS -->
+        <div th:each="post : ${posts}" class="post-card">
+
+            <div class="post-top">
+                <div class="avatar small">
+                    <span th:text="${#strings.substring(post.username,0,1).toUpperCase()}"></span>
+                </div>
+
+                <div class="post-meta">
+                    <a th:href="@{/profile/{username}(username=${post.username})}"
+                       th:text="${post.username}"></a>
+                    <span th:text="${#temporals.format(post.createdAt,'dd MMM yyyy HH:mm')}"></span>
+                </div>
+            </div>
+
+            <div class="post-content"
+                 th:text="${post.content}"></div>
+
+            <!-- ACTIONS -->
+            <div class="post-actions">
+
+                <form th:action="@{/like/{postId}(postId=${post.id})}" method="post">
+                    <button th:text="${post.likedByCurrentUser ? '❤️ Unlike' : '🤍 Like'}"></button>
                 </form>
+
+                <span th:text="${post.likeCount} + ' likes'"></span>
+
+                <span class="comment-toggle"
+                      th:attr="onclick='toggleComments(' + ${post.id} + ')'">
+                    💬 <span th:text="${#lists.size(post.comments)}"></span> Comments
+                </span>
+
+                <form th:action="@{/post/share/{id}(id=${post.id})}" method="post">
+                    <button>🔁 Share</button>
+                </form>
+
+                <form th:if="${post.username == currentUsername}"
+                      th:action="@{/post/delete/{id}(id=${post.id})}"
+                      method="post">
+                    <button>🗑 Delete</button>
+                </form>
+
+            </div>
+			<div class="comment-section">
+
+			          <div th:each="comment : ${post.comments}" class="comment">
+			              <strong>
+			                  <a th:href="@{/profile/{username}(username=${comment.username})}"
+			                     th:text="${comment.username}"></a>
+			              </strong> :
+			              <span th:text="${comment.content}"></span>
+
+			              <form th:if="${comment.ownedByCurrentUser}"
+			                    th:action="@{/comment/delete/{commentId}(commentId=${comment.id})}"
+			                    method="post" style="display:inline;">
+			                  <button type="submit" class="delete-btn">Delete</button>
+			              </form>
+			          </div>
+
+			          <div class="comment-form">
+			              <form th:action="@{/comment/{postId}(postId=${post.id})}" method="post">
+			                  <input type="text" name="content" placeholder="Write a comment..." required />
+			                  <button type="submit">Post</button>
+			              </form>
+			          </div>
+
+			      </div>
+
+            <!-- 🔥 ANALYTICS BAR -->
+			<div th:if="${currentUserRole == 'CREATOR' or currentUserRole == 'BUSINESS'}"
+			     class="analytics-bar">
+				 
+                <div class="analytics-item">
+                    👁 <span th:text="${post.reachCount}">0</span>
+                    <small>Reach</small>
+                </div>
+
+                <div class="analytics-item">
+                    🔁 <span th:text="${post.totalShares}">0</span>
+                    <small>Shares</small>
+                </div>
+
+                <div class="analytics-item">
+                    📊 <span th:text="${#numbers.formatDecimal(post.engagementRate,1,2)}">0</span>%
+                    <small>Engagement</small>
+                </div>
+
             </div>
 
         </div>
+    </div>
 
+    <!-- ================= NOTIFICATION SIDEBAR ================= -->
+
+    <div class="notification-sidebar">
+        <div class="sidebar-header">Notifications</div>
+        <div class="notif-title">Read</div>
+        <div id="notifUnread"></div>
+        <div class="notif-title">Unread</div>
+        <div id="notifRead"></div>
     </div>
 
 </div>
-
 
 <script>
-function toggleNotifications() {
-    let dropdown = document.getElementById("notifDropdown");
-    dropdown.style.display =
-        dropdown.style.display === "block" ? "none" : "block";
-}
 
-function loadNotifications() {
+    function toggleProfileMenu() {
+        document.getElementById("profileDropdown").classList.toggle("show");
+    }
 
-    fetch('/notifications')
-        .then(res => res.json())
-        .then(data => {
-
-            let dropdown = document.getElementById("notifDropdown");
-            dropdown.innerHTML = "";
-
-            data.forEach(n => {
-
-                let div = document.createElement("div");
-                div.className = "notif-item" + (n.read ? "" : " unread");
-                div.innerText = n.message;
-
-                div.onclick = function() {
-
-                    // Mark as read
-                    fetch('/notifications/read/' + n.id, { method: 'POST' })
-                        .then(() => {
-
-                            // Redirect based on type
-                            if (n.type === "FOLLOW") {
-                                window.location.href = "/profile/" + n.senderUsername;
-                            } else {
-                                window.location.href = "/feed";
-                            }
-                        });
-                };
-
-                dropdown.appendChild(div);
+    function fetchNotifications() {
+        fetch('/notifications')
+            .then(res => res.json())
+            .then(data => {
+                let unread = data.filter(n => !n.read);
+                let read = data.filter(n => n.read);
+                renderNotifications(unread, read);
             });
-        });
+    }
 
-    fetch('/notifications/count')
-        .then(res => res.text())
-        .then(count => {
-            let badge = document.getElementById("notifCount");
-            if (count > 0) {
-                badge.style.display = "inline";
-                badge.innerText = count;
-            } else {
-                badge.style.display = "none";
-            }
-        });
-}
+    function renderNotifications(unread, read) {
 
-setInterval(loadNotifications, 5000);
-loadNotifications();
+        const unreadBox = document.getElementById("notifUnread");
+        const readBox = document.getElementById("notifRead");
+
+        unreadBox.innerHTML = "";
+        readBox.innerHTML = "";
+
+        unread.forEach(n => unreadBox.appendChild(createItem(n, true)));
+        read.forEach(n => readBox.appendChild(createItem(n, false)));
+    }
+
+    function createItem(n, unread) {
+
+        let div = document.createElement("div");
+        div.className = "notif-item " + (unread ? "unread" : "read");
+
+        div.innerHTML = `<div class="notif-text">${n.message}</div>`;
+
+        div.onclick = function () {
+            fetch('/notifications/read/' + n.id, {method: 'POST'})
+                .then(() => fetchNotifications());
+        };
+
+        return div;
+    }
+
+    setInterval(fetchNotifications, 5000);
+    fetchNotifications();
+
+    function toggleComments(postId) {
+        let section = document.getElementById("comments-" + postId);
+        if (!section) return;
+        section.style.display =
+            (section.style.display === "none" || section.style.display === "")
+                ? "block" : "none";
+    }
+
 </script>
 
 </body>
 </html>
+

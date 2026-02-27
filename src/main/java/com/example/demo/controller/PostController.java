@@ -46,7 +46,6 @@ public class PostController {
         Post post = postRepository.findById(id)
                 .orElseThrow();
 
-        // 🔒 Security check
         if (!post.getUser().getUsername()
                 .equals(authentication.getName())) {
             return "redirect:/feed";
@@ -83,16 +82,5 @@ public class PostController {
 
         postService.sharePost(id, authentication.getName());
         return "redirect:/feed";
-    }
-    
-    @GetMapping("/post/{id}")
-    public String openPost(@PathVariable Long id, Model model){
-
-        Post post = postRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Post not found"));
-
-        model.addAttribute("singlePost", post);
-
-        return "single-post";
     }
 }

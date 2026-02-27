@@ -12,7 +12,6 @@ public class PostAnalytics {
 	@SequenceGenerator(name = "post_analytics_seq", sequenceName = "post_analytics_seq", allocationSize = 1)
 	private Long id;
 
-	// 🔴 IMPORTANT: property name MUST be 'post'
 	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "post_id", nullable = false, unique = true)
 	private Post post;

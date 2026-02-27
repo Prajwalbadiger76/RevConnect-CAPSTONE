@@ -12,7 +12,7 @@ public interface PostAnalyticsRepository extends JpaRepository<PostAnalytics, Lo
 
     Optional<PostAnalytics> findByPost_Id(Long postId);
 
-    // 🔥 LIKE
+    //LIKE
     @Modifying
     @Query("""
         update PostAnalytics pa
@@ -32,7 +32,7 @@ public interface PostAnalyticsRepository extends JpaRepository<PostAnalytics, Lo
     void incrementLikes(@Param("postId") Long postId);
 
 
-    // 🔥 COMMENT
+    // COMMENT
     @Modifying
     @Query("""
         update PostAnalytics pa
@@ -52,7 +52,7 @@ public interface PostAnalyticsRepository extends JpaRepository<PostAnalytics, Lo
     void incrementComments(@Param("postId") Long postId);
 
 
-    // 🔥 SHARE
+    //  SHARE
     @Modifying
     @Query("""
         update PostAnalytics pa
@@ -72,7 +72,7 @@ public interface PostAnalyticsRepository extends JpaRepository<PostAnalytics, Lo
     void incrementShares(@Param("postId") Long postId);
 
 
-    // 🔥 REACH
+    // REACH
     @Modifying
     @Query("""
         update PostAnalytics pa

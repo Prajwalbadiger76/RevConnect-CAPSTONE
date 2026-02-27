@@ -47,7 +47,6 @@ public class CommentServiceImpl implements CommentService {
         commentRepository.save(comment);
         
 
-        // 🔥 PUBLISH EVENT (instead of direct notification)
         eventPublisherService.publishCommentCreated(
                 post.getId(),
                 username,

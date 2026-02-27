@@ -29,7 +29,7 @@ public class ProfileServiceImpl implements ProfileService {
         return getProfileWithFollowInfo(username, username);
     }
 
-    // ✅ REQUIRED BY INTERFACE (KEEP THIS)
+    // REQUIRED BY INTERFACE (KEEP THIS)
     @Override
     public ProfileResponse getProfile(String username) {
         return getProfileWithFollowInfo(username, username);

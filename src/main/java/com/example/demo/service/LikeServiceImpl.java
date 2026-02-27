@@ -44,7 +44,6 @@ public class LikeServiceImpl implements LikeService {
                             like.setPost(post);
                             likeRepository.save(like);
 
-                            // 🔔 PUBLISH EVENT ONLY WHEN NEW LIKE CREATED
                             eventPublisherService.publishLikeCreated(
                                     post.getId(),
                                     user.getUsername(),

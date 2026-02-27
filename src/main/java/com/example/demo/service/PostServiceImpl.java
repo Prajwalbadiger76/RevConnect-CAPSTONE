@@ -4,278 +4,247 @@ import com.example.demo.dto.CommentDto;
 import com.example.demo.dto.PostDto;
 import com.example.demo.entity.*;
 import com.example.demo.repo.*;
-import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.*;
 import java.util.regex.*;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class PostServiceImpl implements PostService {
 
-    private final PostRepository postRepository;
-    private final HashtagRepository hashtagRepository;
-    private final PostHashtagRepository postHashtagRepository;
-    private final UserRepository userRepository;
-    private final FollowRepository followRepository;
-    private final LikeRepository likeRepository;
-    private final CommentRepository commentRepository;
-    private final NotificationService notificationService;
+	private final PostRepository postRepository;
+	private final HashtagRepository hashtagRepository;
+	private final PostHashtagRepository postHashtagRepository;
+	private final UserRepository userRepository;
+	private final FollowRepository followRepository;
+	private final LikeRepository likeRepository;
+	private final CommentRepository commentRepository;
+	private final NotificationService notificationService;
+	private final AnalyticsService analyticsService;
 
-    public PostServiceImpl(PostRepository postRepository,
-                           HashtagRepository hashtagRepository,
-                           PostHashtagRepository postHashtagRepository,
-                           UserRepository userRepository,
-                           FollowRepository followRepository,
-                           LikeRepository likeRepository,
-                           CommentRepository commentRepository,
-                           NotificationService notificationService) {
+	public PostServiceImpl(PostRepository postRepository, HashtagRepository hashtagRepository,
+			PostHashtagRepository postHashtagRepository, UserRepository userRepository,
+			FollowRepository followRepository, LikeRepository likeRepository, CommentRepository commentRepository,
+			NotificationService notificationService, AnalyticsService analyticsService) {
 
-        this.postRepository = postRepository;
-        this.hashtagRepository = hashtagRepository;
-        this.postHashtagRepository = postHashtagRepository;
-        this.userRepository = userRepository;
-        this.followRepository = followRepository;
-        this.likeRepository = likeRepository;
-        this.commentRepository = commentRepository;
-        this.notificationService = notificationService;
-    }
+		this.postRepository = postRepository;
+		this.hashtagRepository = hashtagRepository;
+		this.postHashtagRepository = postHashtagRepository;
+		this.userRepository = userRepository;
+		this.followRepository = followRepository;
+		this.likeRepository = likeRepository;
+		this.commentRepository = commentRepository;
+		this.notificationService = notificationService;
+		this.analyticsService = analyticsService;
+	}
 
-    // ================= CREATE POST =================
+	// ================= CREATE POST =================
 
-    @Override
-    public void createPost(String username, String content) {
+	@Override
+	public void createPost(String username, String content) {
 
-        User user = userRepository.findByUsername(username)
-                .orElseThrow();
+		User user = userRepository.findByUsername(username).orElseThrow();
 
-        Post post = new Post();
-        post.setContent(content);
-   //     post.setCreatedAt(LocalDateTime.now());
-        post.setUser(user);
+		Post post = new Post();
+		post.setContent(content);
+		post.setUser(user);
 
-        postRepository.save(post);
+		Post savedPost = postRepository.save(post);
 
-        parseHashtags(post, content);
-    }
+		// Create analytics row
+		analyticsService.createPostAnalytics(savedPost);
+		parseHashtags(savedPost, content);
+	}
 
-    // ================= UPDATE POST =================
+	// ================= UPDATE POST =================
 
-    @Override
-    public void updatePost(Long postId, String content, String username) {
+	@Override
+	public void updatePost(Long postId, String username, String content) {
 
-        Post post = postRepository.findById(postId)
-                .orElseThrow();
+		Post post = postRepository.findById(postId).orElseThrow();
 
-        if (!post.getUser().getUsername().equals(username)) {
-            throw new RuntimeException("You cannot edit this post");
-        }
+		if (!post.getUser().getUsername().equals(username)) {
+			throw new RuntimeException("You cannot edit this post");
+		}
 
-        post.setContent(content);
-        postRepository.save(post);
-    }
+		post.setContent(content);
+		postRepository.save(post);
+	}
 
-    // ================= DELETE POST =================
+	// ================= DELETE POST =================
 
-    @Override
-    public void deletePost(Long postId, String username) {
+	@Override
+	public void deletePost(Long postId, String username) {
 
-        Post post = postRepository.findById(postId)
-                .orElseThrow();
+		Post post = postRepository.findById(postId).orElseThrow();
 
-        if (!post.getUser().getUsername().equals(username)) {
-            throw new RuntimeException("You cannot delete this post");
-        }
+		if (!post.getUser().getUsername().equals(username)) {
+			throw new RuntimeException("You cannot delete this post");
+		}
 
-        postRepository.delete(post);
-    }
+		postRepository.delete(post);
+	}
 
-    // ================= SHARE POST =================
+	// ================= GET USER POSTS =================
 
-    @Override
-    public void sharePost(Long postId, String username) {
+	@Override
+	public List<PostDto> getUserPosts(String username) {
 
-        User currentUser = userRepository.findByUsername(username)
-                .orElseThrow();
+		User currentUser = userRepository.findByUsername(username).orElseThrow();
 
-        Post originalPost = postRepository.findById(postId)
-                .orElseThrow();
+		return postRepository.findByUserOrderByCreatedAtDesc(currentUser).stream().map(post -> map(post, currentUser))
+				.collect(Collectors.toList());
+	}
 
-        Post sharedPost = new Post();
-        sharedPost.setContent("🔁 Shared from @" 
-                + originalPost.getUser().getUsername()
-                + "\n\n" + originalPost.getContent());
-     //   sharedPost.setCreatedAt(LocalDateTime.now());
-        sharedPost.setUser(currentUser);
+	// ================= GET ALL POSTS =================
 
-        postRepository.save(sharedPost);
+	@Override
+	public List<PostDto> getAllPosts() {
 
-        // 🔔 Notify original author (if not self)
-        if (!originalPost.getUser().getUsername().equals(username)) {
-            notificationService.createNotification(
-                    originalPost.getUser().getUsername(),
-                    username,
-                    "SHARE",
-                    originalPost.getId()
-            );
-        }
-    }
+		return postRepository.findAllByOrderByCreatedAtDesc().stream().map(post -> map(post, post.getUser()))
+				.collect(Collectors.toList());
+	}
 
-    // ================= TOGGLE LIKE =================
+	// ================= FEED (RECORD VIEW HERE) =================
 
-    @Override
-    public void toggleLike(Long postId, String username) {
+	@Override
+	public List<PostDto> getFeedPosts(String username) {
 
-        User user = userRepository.findByUsername(username)
-                .orElseThrow();
+		User currentUser = userRepository.findByUsername(username).orElseThrow();
 
-        Post post = postRepository.findById(postId)
-                .orElseThrow();
+		List<User> followedUsers = followRepository.findByFollower(currentUser).stream().map(Follow::getFollowing)
+				.collect(Collectors.toList());
 
-        Optional<Like> existingLike =
-                likeRepository.findByUserAndPost(user, post);
+		List<User> feedUsers = new ArrayList<>(followedUsers);
+		feedUsers.add(currentUser);
 
-        if (existingLike.isPresent()) {
-            likeRepository.delete(existingLike.get());
-        } else {
+		return postRepository.findByUserInOrderByCreatedAtDesc(feedUsers).stream().map(post -> {
 
-            Like like = new Like();
-            like.setUser(user);
-            like.setPost(post);
-            likeRepository.save(like);
+			// ⭐ RECORD UNIQUE VIEW
+			analyticsService.recordView(post.getId(), currentUser.getId());
 
-            if (!post.getUser().getUsername().equals(username)) {
-                notificationService.createNotification(
-                        post.getUser().getUsername(),
-                        username,
-                        "LIKE",
-                        post.getId()
-                );
-            }
-        }
-    }
+			return map(post, currentUser);
+		}).collect(Collectors.toList());
+	}
 
-    // ================= USER POSTS =================
+	// ================= LIKE =================
 
-    @Override
-    public List<PostDto> getUserPosts(String username) {
+	@Override
+	public void toggleLike(Long postId, String username) {
 
-        User currentUser = userRepository.findByUsername(username)
-                .orElseThrow();
+		User user = userRepository.findByUsername(username).orElseThrow();
+		Post post = postRepository.findById(postId).orElseThrow();
 
-        return postRepository.findByUserOrderByCreatedAtDesc(currentUser)
-                .stream()
-                .map(post -> map(post, currentUser))
-                .collect(Collectors.toList());
-    }
+		Optional<Like> existingLike = likeRepository.findByUserAndPost(user, post);
 
-    // ================= ALL POSTS =================
+		if (existingLike.isPresent()) {
+			likeRepository.delete(existingLike.get());
+		} else {
 
-    @Override
-    public List<PostDto> getAllPosts() {
+			Like like = new Like();
+			like.setUser(user);
+			like.setPost(post);
+			likeRepository.save(like);
 
-        return postRepository.findAllByOrderByCreatedAtDesc()
-                .stream()
-                .map(post -> {
-                    PostDto dto = new PostDto();
-                    dto.setId(post.getId());
-                    dto.setContent(post.getContent());
-                    dto.setCreatedAt(post.getCreatedAt());
-                    dto.setUsername(post.getUser().getUsername());
-                    dto.setLikeCount(likeRepository.countByPost(post));
-                    dto.setLikedByCurrentUser(false);
-                    dto.setComments(Collections.emptyList());
-                    return dto;
-                })
-                .collect(Collectors.toList());
-    }
+			// analyticsService.incrementLikes(postId);
 
-    // ================= PERSONALIZED FEED =================
+			if (!post.getUser().getUsername().equals(username)) {
+				notificationService.createNotification(post.getUser().getUsername(), username, "LIKE", postId);
+			}
+		}
+	}
 
-    @Override
-    public List<PostDto> getFeedPosts(String username) {
+	// ================= SHARE =================
 
-        User currentUser = userRepository.findByUsername(username)
-                .orElseThrow();
+	@Override
+	public void sharePost(Long postId, String username) {
 
-        List<User> followedUsers = followRepository
-                .findByFollower(currentUser)
-                .stream()
-                .map(Follow::getFollowing)
-                .collect(Collectors.toList());
+		User currentUser = userRepository.findByUsername(username).orElseThrow();
+		Post originalPost = postRepository.findById(postId).orElseThrow();
 
-        List<User> feedUsers = new ArrayList<>(followedUsers);
-        feedUsers.add(currentUser);
+		Post sharedPost = new Post();
+		sharedPost.setContent(
+				"🔁 Shared from @" + originalPost.getUser().getUsername() + "\n\n" + originalPost.getContent());
+		sharedPost.setUser(currentUser);
 
-        return postRepository
-                .findByUserInOrderByCreatedAtDesc(feedUsers)
-                .stream()
-                .map(post -> map(post, currentUser))
-                .collect(Collectors.toList());
-    }
+		postRepository.save(sharedPost);
 
-    // ================= DTO MAPPER =================
+		analyticsService.incrementShares(postId);
 
-    private PostDto map(Post post, User currentUser) {
+		if (!originalPost.getUser().getUsername().equals(username)) {
+			notificationService.createNotification(originalPost.getUser().getUsername(), username, "SHARE", postId);
+		}
+	}
 
-        PostDto dto = new PostDto();
-        dto.setId(post.getId());
-        dto.setContent(post.getContent());
-        dto.setCreatedAt(post.getCreatedAt());
-        dto.setUsername(post.getUser().getUsername());
+	// ================= DTO MAPPER =================
 
-        dto.setLikeCount(likeRepository.countByPost(post));
-        dto.setLikedByCurrentUser(
-                likeRepository.findByUserAndPost(currentUser, post).isPresent()
-        );
+	private PostDto map(Post post, User currentUser) {
 
-        List<CommentDto> commentDtos = commentRepository
-                .findByPostOrderByCreatedAtAsc(post)
-                .stream()
-                .map(comment -> {
-                    CommentDto cd = new CommentDto();
-                    cd.setId(comment.getId());
-                    cd.setUsername(comment.getUser().getUsername());
-                    cd.setContent(comment.getContent());
-                    cd.setCreatedAt(comment.getCreatedAt());
-                    cd.setOwnedByCurrentUser(
-                            comment.getUser().getUsername()
-                                    .equals(currentUser.getUsername())
-                    );
-                    return cd;
-                })
-                .collect(Collectors.toList());
+		PostDto dto = new PostDto();
 
-        dto.setComments(commentDtos);
+		dto.setId(post.getId());
+		dto.setContent(post.getContent());
+		dto.setCreatedAt(post.getCreatedAt());
+		dto.setUsername(post.getUser().getUsername());
 
-        return dto;
-    }
+		dto.setLikeCount(likeRepository.countByPost(post));
+		dto.setLikedByCurrentUser(likeRepository.findByUserAndPost(currentUser, post).isPresent());
 
-    // ================= HASHTAG PARSER =================
+		List<CommentDto> commentDtos = commentRepository.findByPostOrderByCreatedAtAsc(post).stream().map(comment -> {
+			CommentDto cd = new CommentDto();
+			cd.setId(comment.getId());
+			cd.setUsername(comment.getUser().getUsername());
+			cd.setContent(comment.getContent());
+			cd.setCreatedAt(comment.getCreatedAt());
+			cd.setOwnedByCurrentUser(comment.getUser().getUsername().equals(currentUser.getUsername()));
+			return cd;
+		}).toList();
 
-    private void parseHashtags(Post post, String content) {
+		dto.setComments(commentDtos);
 
-        Pattern pattern = Pattern.compile("#(\\w+)");
-        Matcher matcher = pattern.matcher(content);
+		PostAnalytics analytics = analyticsService.getAnalyticsByPostId(post.getId());
 
-        while (matcher.find()) {
+		if (analytics != null) {
+			dto.setTotalComments(analytics.getTotalComments());
+			dto.setTotalShares(analytics.getTotalShares());
+			dto.setReachCount(analytics.getReachCount());
+			dto.setEngagementRate(analytics.getEngagementRate());
+		} else {
+			dto.setTotalComments(0);
+			dto.setTotalShares(0);
+			dto.setReachCount(0);
+			dto.setEngagementRate(0.0);
+		}
 
-            String tag = matcher.group(1).toLowerCase();
+		return dto;
+	}
 
-            Hashtag hashtag = hashtagRepository
-                    .findByName(tag)
-                    .orElseGet(() -> {
-                        Hashtag newTag = new Hashtag();
-                        newTag.setName(tag);
-                        return hashtagRepository.save(newTag);
-                    });
+	// ================= HASHTAGS =================
 
-            PostHashtag ph = new PostHashtag();
-            ph.setPost(post);
-            ph.setHashtag(hashtag);
+	private void parseHashtags(Post post, String content) {
 
-            postHashtagRepository.save(ph);
-        }
-    }
+		Pattern pattern = Pattern.compile("#(\\w+)");
+		Matcher matcher = pattern.matcher(content);
+
+		while (matcher.find()) {
+
+			String tag = matcher.group(1).toLowerCase();
+
+			Hashtag hashtag = hashtagRepository.findByName(tag).orElseGet(() -> {
+				Hashtag newTag = new Hashtag();
+				newTag.setName(tag);
+				return hashtagRepository.save(newTag);
+			});
+
+			PostHashtag ph = new PostHashtag();
+			ph.setPost(post);
+			ph.setHashtag(hashtag);
+
+			postHashtagRepository.save(ph);
+		}
+	}
 }

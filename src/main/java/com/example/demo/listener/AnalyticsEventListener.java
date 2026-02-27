@@ -17,20 +17,20 @@ public class AnalyticsEventListener {
         this.analyticsService = analyticsService;
     }
 
-    // 🔥 LIKE ANALYTICS
+    // LIKE ANALYTICS
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleLikeCreated(LikeCreatedEvent event) {
 
-        System.out.println("🔥 ANALYTICS LIKE EVENT RECEIVED");
+        System.out.println("ANALYTICS LIKE EVENT RECEIVED");
 
         analyticsService.incrementLikes(event.getPostId());
     }
 
-    // 🔥 COMMENT ANALYTICS
+    // COMMENT ANALYTICS
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleCommentCreated(CommentCreatedEvent event) {
 
-        System.out.println("🔥 ANALYTICS COMMENT EVENT RECEIVED");
+        System.out.println("ANALYTICS COMMENT EVENT RECEIVED");
 
         analyticsService.incrementComments(event.getPostId());
     }

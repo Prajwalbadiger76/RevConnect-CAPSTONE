@@ -14,10 +14,8 @@ public class PostDto {
 	private long likeCount;
 	private boolean likedByCurrentUser;
 
-	// ⭐ NEVER NULL AGAIN
 	private List<CommentDto> comments = new ArrayList<>();
 
-	// ===== Analytics =====
 	private long totalComments;
 	private long totalShares;
 	private long reachCount;
@@ -35,7 +33,6 @@ public class PostDto {
 		this.comments = new ArrayList<>();
 	}
 
-	// ---------- BASIC ----------
 
 	public Long getId() {
 		return id;
@@ -85,7 +82,6 @@ public class PostDto {
 		this.likedByCurrentUser = likedByCurrentUser;
 	}
 
-	// ⭐ CRITICAL FIX (NULL PROTECTION)
 	public List<CommentDto> getComments() {
 		if (comments == null) {
 			comments = new ArrayList<>();
@@ -97,7 +93,6 @@ public class PostDto {
 		this.comments = (comments == null) ? new ArrayList<>() : comments;
 	}
 
-	// ---------- ANALYTICS ----------
 
 	public long getTotalComments() {
 		return totalComments;

@@ -26,9 +26,7 @@ public class AnalyticsService {
         this.postViewRepository = postViewRepository;
     }
 
-    // =====================================================
     // CREATE ANALYTICS ROW (When post is created)
-    // =====================================================
 
     @Transactional
     public void createPostAnalytics(Post post) {
@@ -47,60 +45,49 @@ public class AnalyticsService {
 
         analyticsRepository.save(analytics);
 
-        System.out.println("✅ ANALYTICS ROW CREATED FOR POST -> " + post.getId());
+        System.out.println(" ANALYTICS ROW CREATED FOR POST -> " + post.getId());
     }
 
-    // =====================================================
     // LIKE (AFTER_COMMIT SAFE)
-    // =====================================================
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void incrementLikes(Long postId) {
 
-        System.out.println("🔥 incrementLikes DB update");
+        System.out.println(" incrementLikes DB update");
 
         analyticsRepository.incrementLikes(postId);
     }
 
-    // =====================================================
     // COMMENT (AFTER_COMMIT SAFE)
-    // =====================================================
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void incrementComments(Long postId) {
 
-        System.out.println("🔥 incrementComments DB update");
-
+        System.out.println(" incrementComments DB update");
         analyticsRepository.incrementComments(postId);
     }
 
-    // =====================================================
     // SHARE
-    // =====================================================
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void incrementShares(Long postId) {
 
         analyticsRepository.incrementShares(postId);
 
-        System.out.println("🔥 incrementShares DB update");
+        System.out.println(" incrementShares DB update");
     }
 
-    // =====================================================
     // REACH (UNIQUE VIEW)
-    // =====================================================
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void incrementReach(Long postId) {
 
         analyticsRepository.incrementReach(postId);
 
-        System.out.println("🔥 incrementReach DB update");
+        System.out.println(" incrementReach DB update");
     }
 
-    // =====================================================
     // UNIQUE VIEW TRACKING
-    // =====================================================
 
     @Transactional
     public void recordView(Long postId, Long userId) {
@@ -123,9 +110,7 @@ public class AnalyticsService {
         }
     }
 
-    // =====================================================
     // FETCH ANALYTICS
-    // =====================================================
 
     public PostAnalytics getAnalyticsByPostId(Long postId) {
         return analyticsRepository.findByPost_Id(postId).orElse(null);
