@@ -21,6 +21,7 @@ public class PostAnalytics {
 	private long totalComments = 0;
 	private long totalShares = 0;
 	private long reachCount = 0;
+	private double engagementRate = 0.0;
 
 	private LocalDateTime updatedAt = LocalDateTime.now();
 
@@ -76,5 +77,12 @@ public class PostAnalytics {
 
 	public LocalDateTime getUpdatedAt() {
 		return updatedAt;
+	}
+	public double getEngagementRate() {
+	    return engagementRate;
+	}
+
+	public void setEngagementRate(double engagementRate) {
+	    this.engagementRate = engagementRate;
 	}
 }

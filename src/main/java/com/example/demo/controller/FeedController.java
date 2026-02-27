@@ -1,5 +1,7 @@
 package com.example.demo.controller;
 
+import com.example.demo.entity.User;
+import com.example.demo.repo.UserRepository;
 import com.example.demo.service.PostService;
 
 import org.springframework.security.core.Authentication;
@@ -11,9 +13,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class FeedController {
 
     private final PostService postService;
+    private final UserRepository userRepository;   // ✅ Add this
 
-    public FeedController(PostService postService) {
+    public FeedController(PostService postService,
+                          UserRepository userRepository) {
         this.postService = postService;
+        this.userRepository = userRepository;   // ✅ Inject it
     }
 
     @GetMapping("/feed")
@@ -21,10 +26,18 @@ public class FeedController {
 
         String username = authentication.getName();
 
+        // ✅ Fetch logged-in user from DB
+        User user = userRepository.findByUsername(username)
+                .orElseThrow();
+
         model.addAttribute("posts",
                 postService.getFeedPosts(username));
 
-        model.addAttribute("currentUsername", username); // 🔥 IMPORTANT
+        model.addAttribute("currentUsername", username);
+
+        // ✅ Pass role to Thymeleaf
+        model.addAttribute("currentUserRole",
+                user.getRole().name());  // if enum
 
         return "feed";
     }
