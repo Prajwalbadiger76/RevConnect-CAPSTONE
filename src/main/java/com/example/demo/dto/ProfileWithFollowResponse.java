@@ -2,13 +2,12 @@ package com.example.demo.dto;
 
 import com.example.demo.entity.Role;
 
-public record UpdateProfileRequest(
+public record ProfileWithFollowResponse(
 
-        // BASIC
+		
         String username,
         String email,
         Role role,
-
         String fullName,
         String bio,
         String profilePicture,
@@ -17,23 +16,16 @@ public record UpdateProfileRequest(
         String website,
         Boolean isPrivate,
 
-        // CREATOR
+        // 🔥 Add missing fields
         String creatorName,
         String industry,
-        String instagramLink,
-        String youtubeLink,
-        String twitterLink,
-        String portfolioLink,
+        String category,
+        String businessName,
+        String servicesOffered,
         String skills,
 
-        // BUSINESS
-        String businessName,
-        String category,
-        String contactInfo,
-        String businessAddress,
-        String businessHours,
-        String businessDescription,
-        String servicesOffered,
-        String mapLocationLink
-
+        boolean isFollowing,
+        long followerCount,
+        long followingCount,
+        boolean isOwn
 ) {}

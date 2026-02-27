@@ -28,9 +28,8 @@ public class SecurityConfig {
             //  Disable CSRF for JWT
             .csrf(csrf -> csrf.disable())
 
-            //  Make application stateless (IMPORTANT FIX)
             .sessionManagement(session ->
-                    session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                   session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
             )
 
             //  URL Authorization Rules

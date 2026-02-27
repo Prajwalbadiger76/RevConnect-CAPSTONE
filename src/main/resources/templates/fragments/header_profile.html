@@ -1,0 +1,110 @@
+<div th:fragment="headerProfile">
+
+    <div style="
+        position:absolute;
+        top:0;
+        left:0;
+        width:100%;
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        padding:15px 40px;
+        box-sizing:border-box;
+        background:rgba(0,0,0,0.4);
+        backdrop-filter:blur(4px);
+        z-index:1000;
+    ">
+
+        <!-- LEFT SECTION -->
+        <div style="display:flex; align-items:center; gap:20px;">
+            <a href="javascript:history.back()"
+               style="color:white; text-decoration:none; font-weight:bold;">
+                ← Back
+            </a>
+        </div>
+
+
+        <!-- CENTER SEARCH SECTION -->
+        <div style="flex:1; display:flex; flex-direction:column; align-items:center;">
+
+            <form id="searchForm" class="header-search-form" 
+                  style="display:flex; align-items:center; gap:8px;">
+                <input type="text" id="searchInput" 
+                       placeholder="Search users..." required
+                       style="padding:8px 12px; border-radius:20px; border:none; width:250px;">
+                <button type="submit"
+                        style="padding:6px 10px; border:none; border-radius:50%; cursor:pointer;">
+                    🔍
+                </button>
+            </form>
+
+            <div id="searchError" class="search-inline-error" style="display:none;"></div>
+
+            <!-- SEARCH ERROR MESSAGE -->
+            <div th:if="${searchError}"
+                 style="
+                     margin-top:8px;
+                     background:#ffe2e2;
+                     color:#c92a2a;
+                     padding:6px 12px;
+                     border-radius:8px;
+                     font-size:13px;
+                     font-weight:500;
+                 ">
+                ❌ <span th:text="${searchError}"></span>
+            </div>
+
+        </div>
+
+
+        <!-- RIGHT SECTION (AVATAR + LOGO) -->
+        <div style="display:flex; align-items:center; gap:20px;">
+
+            <!-- Avatar + Dropdown -->
+            <div style="position:relative;">
+
+                <img class="header-avatar"
+                     th:src="${profile.profilePicture != null and !profile.profilePicture.isEmpty() 
+                              ? profile.profilePicture 
+                              : 'https://i.pravatar.cc/40'}"
+                     onclick="toggleDropdown()"
+                     style="width:40px; height:40px; border-radius:50%; border:2px solid white; cursor:pointer;">
+
+                <div id="dropdownMenu"
+                     style="
+                         display:none;
+                         position:absolute;
+                         right:0;
+                         top:55px;
+                         background:white;
+                         border-radius:10px;
+                         width:180px;
+                         box-shadow:0 5px 15px rgba(0,0,0,0.2);
+                         overflow:hidden;
+                         flex-direction:column;
+                     ">
+
+                    <a th:href="@{/api/profile/me}"
+                       style="display:block; padding:12px; text-decoration:none; color:#333;">
+                        My Profile
+                    </a>
+
+                    <a th:href="@{/api/profile/edit}"
+                       style="display:block; padding:12px; text-decoration:none; color:#333;">
+                        Edit Profile
+                    </a>
+
+                    <a th:href="@{/logout}"
+                       style="display:block; padding:12px; text-decoration:none; color:#e11d48;">
+                        Logout
+                    </a>
+
+                </div>
+
+            </div>            
+
+        </div>
+
+    </div>
+
+</div>

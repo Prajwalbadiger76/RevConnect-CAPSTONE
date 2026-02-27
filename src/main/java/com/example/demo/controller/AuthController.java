@@ -29,7 +29,8 @@ public class AuthController {
     public AuthController(UserService userService) {
         this.userService = userService;
     }
-
+    
+    // ================= REGISTER =================
     @PostMapping("/register")
     public String register(@Valid @ModelAttribute RegisterRequest request) {
 
@@ -39,6 +40,7 @@ public class AuthController {
     }
     
     
+    // ================= LOGIN =================
     @PostMapping("/login")
     public String login(@Valid @ModelAttribute LoginRequest request,
                         HttpServletResponse response,
@@ -61,6 +63,20 @@ public class AuthController {
             model.addAttribute("error", "Invalid username or password");
             return "login";   // stay on login page
         }
+    }
+    
+ // ================= LOGOUT =================
+    @GetMapping("/logout")
+    public String logout(HttpServletResponse response) {
+
+        Cookie cookie = new Cookie("JWT", null);
+        cookie.setHttpOnly(true);
+        cookie.setPath("/");
+        cookie.setMaxAge(0); // delete cookie
+
+        response.addCookie(cookie);
+
+        return "redirect:/login";
     }
 
 }
