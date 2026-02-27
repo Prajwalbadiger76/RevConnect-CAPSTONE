@@ -61,10 +61,10 @@
             <span id="notifCount" class="notif-count"></span>
         </div>
 
-        <a th:href="@{/connections}">Pending</a>
         <a th:href="@{/connections}">Pending Requests</a>
         <a th:href="@{/connections/sent}">Sent Requests</a>
         <a th:href="@{/connections/accepted}">Connections</a>
+
 
         <div class="profile-menu">
             <div class="profile-circle"
@@ -439,12 +439,15 @@ function suggestHashtags() {
     let value = textarea.value;
     let suggestionBox = document.getElementById("hashtagSuggestions");
 
+
     let match = value.match(/#(\w*)$/);
 
     if (!match) {
         suggestionBox.style.display = "none";
         return;
     }
+	<textarea name="content" id="postContent" placeholder="What's on your mind?"
+			required></textarea>
 
     let keyword = match[1].toLowerCase();
 

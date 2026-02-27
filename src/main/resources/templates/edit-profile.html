@@ -17,7 +17,7 @@
            th:text="${error}">
         </p>
 
-        <form th:action="@{/api/profile/edit}"
+        <form th:action="@{/profile/edit}"
               method="post"
               enctype="multipart/form-data">
 
@@ -202,7 +202,7 @@
 			        Save Changes
 			    </button>
 
-			    <a th:href="@{/api/profile/me}" class="btn-cancel">
+			    <a th:href="@{/profile}" class="btn-cancel">
 			        Cancel
 			    </a>
 
