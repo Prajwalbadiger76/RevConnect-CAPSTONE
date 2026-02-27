@@ -34,7 +34,8 @@
 
             <form id="bannerUploadForm"
                   th:if="${isOwner}"
-                  th:action="@{/api/profile/edit}"
+                  th:action="@{/profile/edit}"
+
                   method="post"
                   enctype="multipart/form-data">
 
@@ -65,7 +66,8 @@
 
                 <form id="profileUploadForm"
                       th:if="${isOwner}"
-                      th:action="@{/api/profile/edit}"
+                      th:action="@{/profile/edit}"
+
                       method="post"
                       enctype="multipart/form-data">
 
@@ -85,6 +87,54 @@
                 <p class="username">
                     @<span th:text="${profile.username}"></span>
                 </p>
+
+				<!-- ================= FOLLOW & CONNECTION ACTIONS ================= -->
+				<div th:if="${!isOwner}" class="action-buttons">
+
+				    <!-- FOLLOW BUTTON -->
+				    <form th:if="${!profile.isFollowing}"
+				          th:action="@{/follow/{username}(username=${profile.username})}"
+				          method="post"
+				          style="display:inline;">
+				        <button class="btn-follow">➕ Follow</button>
+				    </form>
+
+				    <form th:if="${profile.isFollowing}"
+				          th:action="@{/follow/unfollow/{username}(username=${profile.username})}"
+				          method="post"
+				          style="display:inline;">
+				        <button class="btn-following">✓ Following</button>
+				    </form>
+
+				    <!-- CONNECTION LOGIC -->
+				    <div style="display:inline;">
+
+				        <!-- NO CONNECTION -->
+				        <form th:if="${connectionStatus == 'NONE'}"
+				              th:action="@{/connections/send/{username}(username=${profile.username})}"
+				              method="post"
+				              style="display:inline;">
+				            <button class="btn-connect">🤝 Connect</button>
+				        </form>
+
+				        <!-- PENDING -->
+				        <button th:if="${connectionStatus == 'PENDING'}"
+				                class="btn-pending"
+				                disabled>
+				            ⏳ Pending
+				        </button>
+
+				        <!-- CONNECTED -->
+				        <form th:if="${connectionStatus == 'CONNECTED'}"
+				              th:action="@{/connections/remove/{username}(username=${profile.username})}"
+				              method="post"
+				              style="display:inline;">
+				            <button class="btn-connected">✓ Connected</button>
+				        </form>
+
+				    </div>
+
+				</div>
 
                 <!-- PRIVATE MESSAGE -->
                 <div th:if="${!canView}"
@@ -205,14 +255,16 @@
                     <!-- ================= STATS ================= -->
                     <div class="profile-stats">
 
-                        <a th:href="@{/api/profile/{username}/followers(username=${profile.username})}"
+                        <a th:href="@{/profile/{username}/followers(username=${profile.username})}"
+
                            class="stat-item">
                             <span class="stat-number"
                                   th:text="${profile.followerCount}">0</span>
                             <span class="stat-label">Followers</span>
                         </a>
 
-                        <a th:href="@{/api/profile/{username}/following(username=${profile.username})}"
+                        <a th:href="@{/profile/{username}/following(username=${profile.username})}"
+
                            class="stat-item">
                             <span class="stat-number"
                                   th:text="${profile.followingCount}">0</span>
@@ -231,7 +283,8 @@
 
                 <!-- EDIT BUTTON -->
                 <div class="edit-btn-wrapper" th:if="${isOwner}">
-                    <a th:href="@{/api/profile/edit}" class="edit-btn">
+                    <a th:href="@{/profile/edit}" class="edit-btn">
+
                         ✏ Edit Profile
                     </a>
                 </div>
@@ -242,17 +295,20 @@
         <!-- ================= TABS (NOW CORRECT POSITION) ================= -->
         <div class="profile-tabs">
 
-            <a th:href="@{/api/profile/{username}(username=${profile.username}, tab='posts')}"
+            <a th:href="@{/profile/{username}(username=${profile.username}, tab='posts')}"
+
                th:classappend="${param.tab == null or param.tab == 'posts'} ? 'active-tab' : ''">
                 Posts
             </a>
 
-            <a th:href="@{/api/profile/{username}(username=${profile.username}, tab='about')}"
+            <a th:href="@{/profile/{username}(username=${profile.username}, tab='about')}"
+
                th:classappend="${param.tab == 'about'} ? 'active-tab' : ''">
                 About
             </a>
 
-            <a th:href="@{/api/profile/{username}(username=${profile.username}, tab='connections')}"
+            <a th:href="@{/profile/{username}(username=${profile.username}, tab='connections')}"
+
                th:classappend="${param.tab == 'connections'} ? 'active-tab' : ''">
                 Connections
             </a>
@@ -319,11 +375,12 @@ if (searchForm) {
         var keyword = keywordInput.value.trim();
         if (!keyword) return;
 
-        fetch("/api/profile/search-api?keyword=" + encodeURIComponent(keyword))
+        fetch("/profile/search-api?keyword=" + encodeURIComponent(keyword))
             .then(function(response) {
                 if (response.status === 200) {
                     return response.text().then(function(username) {
-                        window.location.href = "/api/profile/" + username;
+                        window.location.href = "/profile/" + username;
+
                     });
                 } else {
                     return response.text().then(function(msg) {

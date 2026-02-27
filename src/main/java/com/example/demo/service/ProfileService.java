@@ -1,6 +1,7 @@
 package com.example.demo.service;
 
 import com.example.demo.dto.ProfileResponse;
+import com.example.demo.dto.ProfileWithFollowResponse;
 import com.example.demo.dto.UpdateProfileRequest;
 
 import java.util.List;
