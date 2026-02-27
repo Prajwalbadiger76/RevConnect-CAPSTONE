@@ -6,11 +6,8 @@ import com.example.demo.entity.User;
 import com.example.demo.repo.CommentRepository;
 import com.example.demo.repo.PostRepository;
 import com.example.demo.repo.UserRepository;
-
-import jakarta.transaction.Transactional;
-
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDateTime;
 
 @Service
@@ -19,17 +16,17 @@ public class CommentServiceImpl implements CommentService {
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
     private final PostRepository postRepository;
-    private final NotificationService notificationService;
+    private final EventPublisherService eventPublisherService;
 
     public CommentServiceImpl(CommentRepository commentRepository,
                               UserRepository userRepository,
                               PostRepository postRepository,
-                              NotificationService notificationService) {
+                              EventPublisherService eventPublisherService) {
 
         this.commentRepository = commentRepository;
         this.userRepository = userRepository;
         this.postRepository = postRepository;
-        this.notificationService = notificationService;
+        this.eventPublisherService = eventPublisherService;
     }
 
     // ================= ADD COMMENT =================
@@ -38,11 +35,8 @@ public class CommentServiceImpl implements CommentService {
     @Transactional
     public void addComment(String username, Long postId, String content) {
 
-        User user = userRepository.findByUsername(username)
-                .orElseThrow();
-
-        Post post = postRepository.findById(postId)
-                .orElseThrow();
+        User user = userRepository.findByUsername(username).orElseThrow();
+        Post post = postRepository.findById(postId).orElseThrow();
 
         Comment comment = new Comment();
         comment.setContent(content);
@@ -51,13 +45,13 @@ public class CommentServiceImpl implements CommentService {
         comment.setPost(post);
 
         commentRepository.save(comment);
+        
 
-        // 🔔 CREATE COMMENT NOTIFICATION
-        notificationService.createNotification(
-                post.getUser().getUsername(),  // recipient (post owner)
-                username,                      // sender
-                "COMMENT",
-                post.getId()
+        // 🔥 PUBLISH EVENT (instead of direct notification)
+        eventPublisherService.publishCommentCreated(
+                post.getId(),
+                username,
+                post.getUser().getUsername()
         );
     }
 
@@ -66,10 +60,8 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public void deleteComment(String username, Long commentId) {
 
-        Comment comment = commentRepository.findById(commentId)
-                .orElseThrow();
+        Comment comment = commentRepository.findById(commentId).orElseThrow();
 
-        // 🔒 Security check
         if (!comment.getUser().getUsername().equals(username)) {
             throw new RuntimeException("You cannot delete this comment");
         }
