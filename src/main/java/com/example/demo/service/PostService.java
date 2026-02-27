@@ -16,7 +16,7 @@ public interface PostService {
 
     void deletePost(Long postId, String username);
 
-    void sharePost(Long postId, String username);
+   // void sharePost(Long postId, String username);
 
     void toggleLike(Long postId, String username);
 
@@ -30,12 +30,14 @@ public interface PostService {
 
     List<PostDto> getFeedPosts(String username);
 
-    // ✅ ADD THIS (needed for edit page)
+    // ADD THIS (needed for edit page)
     PostDto getPostById(Long postId, String currentUsername);
 
-    // ✅ ADD THIS (needed for hashtag search)
+    // ADD THIS (needed for hashtag search)
     List<PostDto> searchPostsByHashtag(String tag,String username);
     
+    void sharePost(Long id, String username);
+
     List<String> getTrendingHashtags();
     
 

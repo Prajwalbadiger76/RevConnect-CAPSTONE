@@ -65,6 +65,38 @@ public class ProfileServiceImpl implements ProfileService {
         return map(profileUser, false);
     }
     
+    @Override
+    public ProfileResponse getProfile(String username, String viewerUsername) {
+
+        logger.info("Profile view request: {} viewing {}", viewerUsername, username);
+
+        User profileUser = findUser(username);
+
+        boolean isOwner = viewerUsername != null &&
+                profileUser.getUsername().equals(viewerUsername);
+
+        boolean isFollower = false; // future integration
+
+        if (profileUser.isPrivate() && !isOwner && !isFollower) {
+            return map(profileUser, true);
+        }
+
+        return map(profileUser, false);
+    }
+    
+    
+ // ================= GET MY PROFILE =================
+    @Override
+    public ProfileResponse getMyProfile(String username) {
+
+        logger.info("Fetching own profile for user: {}", username);
+
+        User user = findUser(username);
+
+        // own profile → never limited view
+        return map(user, false);
+    }
+
     // ================= VIEW PROFILE WITH FOLLOW INFO =================
     
     @Override
@@ -90,7 +122,8 @@ public class ProfileServiceImpl implements ProfileService {
 //        long postCount = postRepository.countByUser(targetUser);
         long postCount = 0;
 
-        // 🔥 Privacy Logic
+        //  Privacy Logic
+
         boolean limitedView = false;
         String privateMessage = null;
 
@@ -99,7 +132,8 @@ public class ProfileServiceImpl implements ProfileService {
             privateMessage = "This account is private. Follow to see full profile.";
         }
 
-        // 🔥 Completion Percentage (simple example)
+        //  Completion Percentage (simple example)
+
         int completionPercentage = calculateCompletionPercentage(targetUser);
 
         return new ProfileResponse(
@@ -378,7 +412,7 @@ public class ProfileServiceImpl implements ProfileService {
                 limitedView,
                 limitedView ? "This account is private. Follow to see full details." : null,
 
-                // 🔥 ADD THESE TWO
+                //  ADD THESE TWO
                 false,
                 false
         );

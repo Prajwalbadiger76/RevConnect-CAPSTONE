@@ -35,6 +35,7 @@
             <form id="bannerUploadForm"
                   th:if="${isOwner}"
                   th:action="@{/profile/edit}"
+
                   method="post"
                   enctype="multipart/form-data">
 
@@ -66,6 +67,7 @@
                 <form id="profileUploadForm"
                       th:if="${isOwner}"
                       th:action="@{/profile/edit}"
+
                       method="post"
                       enctype="multipart/form-data">
 
@@ -85,6 +87,7 @@
                 <p class="username">
                     @<span th:text="${profile.username}"></span>
                 </p>
+
 				<!-- ================= FOLLOW & CONNECTION ACTIONS ================= -->
 				<div th:if="${!isOwner}" class="action-buttons">
 
@@ -253,6 +256,7 @@
                     <div class="profile-stats">
 
                         <a th:href="@{/profile/{username}/followers(username=${profile.username})}"
+
                            class="stat-item">
                             <span class="stat-number"
                                   th:text="${profile.followerCount}">0</span>
@@ -260,6 +264,7 @@
                         </a>
 
                         <a th:href="@{/profile/{username}/following(username=${profile.username})}"
+
                            class="stat-item">
                             <span class="stat-number"
                                   th:text="${profile.followingCount}">0</span>
@@ -279,6 +284,7 @@
                 <!-- EDIT BUTTON -->
                 <div class="edit-btn-wrapper" th:if="${isOwner}">
                     <a th:href="@{/profile/edit}" class="edit-btn">
+
                         ✏ Edit Profile
                     </a>
                 </div>
@@ -290,16 +296,19 @@
         <div class="profile-tabs">
 
             <a th:href="@{/profile/{username}(username=${profile.username}, tab='posts')}"
+
                th:classappend="${param.tab == null or param.tab == 'posts'} ? 'active-tab' : ''">
                 Posts
             </a>
 
             <a th:href="@{/profile/{username}(username=${profile.username}, tab='about')}"
+
                th:classappend="${param.tab == 'about'} ? 'active-tab' : ''">
                 About
             </a>
 
             <a th:href="@{/profile/{username}(username=${profile.username}, tab='connections')}"
+
                th:classappend="${param.tab == 'connections'} ? 'active-tab' : ''">
                 Connections
             </a>
@@ -371,6 +380,7 @@ if (searchForm) {
                 if (response.status === 200) {
                     return response.text().then(function(username) {
                         window.location.href = "/profile/" + username;
+
                     });
                 } else {
                     return response.text().then(function(msg) {
