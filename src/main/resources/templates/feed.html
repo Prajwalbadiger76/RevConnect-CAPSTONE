@@ -150,198 +150,6 @@
 					</a>
 					<div id="trendingBox"></div>
 
-                <button type="submit">Search</button>
-            </form>
-
-        </div>
-    </div>
-
-    <!-- RIGHT -->
-    <div class="navbar-right">
-
-        <div class="notif-bell" onclick="toggleNotifications()">
-            🔔
-            <span id="notifCount" class="notif-count"></span>
-        </div>
-
-        <a th:href="@{/connections}">Pending Requests</a>
-        <a th:href="@{/connections/sent}">Sent Requests</a>
-        <a th:href="@{/connections/accepted}">Connections</a>
-
-
-        <div class="profile-menu">
-            <div class="profile-circle"
-                 onclick="toggleProfileMenu()"
-                 th:text="${#strings.substring(currentUsername,0,1).toUpperCase()}">
-            </div>
-
-            <div id="profileDropdown" class="dropdown">
-                <a th:href="@{/profile}">My Profile</a>
-                <a th:href="@{/logout}">Logout</a>
-            </div>
-        </div>
-
-    </div>
-
-</div>
-
-<!-- NOTIFICATIONS PANEL (UNCHANGED) -->
-<div id="notifPanel" class="notif-panel">
-    <div class="notif-header">
-		</br></br></br>
-        <h3>Notifications</h3>
-        <span class="close-btn" onclick="toggleNotifications()">✖</span>
-    </div>
-    <div id="notifList" class="notif-list"></div>
-</div>
-
-<!-- FEED -->
-<div class="feed-container">
-	
-	
-	<!-- CREATE POST -->
-	<div class="create-post" th:if="${showCreateForm}">
-	    <form th:action="@{/post/create}" method="post">
-
-	        <!-- Row 1: Avatar + Textarea -->
-	        <div class="create-row">
-
-
-	            <textarea name="content"
-	                      id="postContent"
-	                      placeholder="What's on your mind?"
-	                      required></textarea>
-
-	        </div>
-
-	        <!-- Hashtag Suggestions (outside flex row) -->
-	        <div id="hashtagSuggestions"></div>
-
-	        <!-- Row 2: Hashtag input -->
-	        <div style="margin-top:15px;">
-	            <input type="text"
-	                   name="hashtags"
-	                   placeholder="Add hashtags (comma separated)"
-	                   style="width:100%; padding:10px; border-radius:12px; border:1px solid #d1d5db;">
-	        </div>
-
-	        <!-- Hidden field -->
-	        <input type="hidden" name="scheduledAt" id="scheduledAtInput">
-
-	        <!-- Row 3: Buttons -->
-	        <div class="create-actions">
-
-	            <button type="submit">
-	                Create Post
-	            </button>
-
-	            <button type="button"
-	                    onclick="openSchedule()"
-	                    style="background:#111827;">
-	                Schedule Post
-	            </button>
-
-	        </div>
-
-	    </form>
-	</div>
-	
-	
-    <!-- POSTS -->
-    <div th:each="post : ${posts}" class="post-card">
-
-        <div class="post-top">
-
-            <div class="avatar small">
-                <span th:text="${#strings.substring(post.username,0,1).toUpperCase()}"></span>
-            </div>
-
-            <div class="post-meta">
-                <a th:href="@{/profile/{username}(username=${post.username})}"
-                   th:text="${post.username}"></a>
-
-                <span th:text="${#temporals.format(post.createdAt,'dd MMM yyyy HH:mm')}"></span>
-            </div>
-
-        </div>
-
-        <div th:if="${!#strings.startsWith(post.content,'🔁 Shared from')}"
-             class="post-content"
-             th:text="${post.content}">
-        </div>
-		<div th:if="${post.hashtags != null}">
-		            <span th:each="tag : ${post.hashtags}">
-		                <a th:href="@{/post/search(keyword=${'#' + tag})}"
-		                   style="color:#2563eb; text-decoration:none; margin-right:8px;">
-		                    <span th:text="${'#' + tag}"></span>
-		                </a>
-		            </span>
-		        </div>
-
-        <div th:if="${#strings.startsWith(post.content,'🔁 Shared from')}"
-             class="shared-box"
-             th:text="${post.content}">
-        </div>
-
-        <div class="post-actions">
-
-            <form th:action="@{/like/{postId}(postId=${post.id})}" method="post">
-                <button th:text="${post.likedByCurrentUser ? '❤️ Unlike' : '🤍 Like'}"></button>
-            </form>
-
-            <span th:text="${post.likeCount} + ' likes'"></span>
-			
-			<!-- COMMENT COUNT BUTTON -->
-			<span class="comment-toggle"
-                th:attr="onclick=|toggleComments(${post.id})|">
-                💬 <span th:text="${#lists.size(post.comments)}"></span> Comments
-            </span>
-
-            <form th:action="@{/post/share/{id}(id=${post.id})}" method="post">
-                <button>🔁 Re-Share </button>
-            </form>
-
-            <form th:if="${post.username == currentUsername}"
-                  th:action="@{/post/delete/{id}(id=${post.id})}" method="post">
-                <button>🗑 Delete</button>
-            </form>
-
-        </div>
-
-		<div class="comment-section">
-
-		    <!-- EXISTING COMMENTS (TOGGLE THIS ONLY) -->
-		    <div class="comments-list"
-		         th:id="'comments-' + ${post.id}"
-		         style="display:none;">
-
-		        <div th:each="comment : ${post.comments}" class="comment">
-
-		            <div class="comment-left">
-		                <strong>
-		                    <a th:href="@{/profile/{username}(username=${comment.username})}"
-		                       th:text="${comment.username}"></a>
-		                </strong>
-		                <span th:text="${comment.content}"></span>
-		            </div>
-
-		            <form th:if="${comment.ownedByCurrentUser}"
-		                  th:action="@{/comment/delete/{commentId}(commentId=${comment.id})}"
-		                  method="post">
-		                <button class="delete-btn">Delete</button>
-		            </form>
-
-		        </div>
-
-		    </div>
-
-		    <!-- COMMENT FORM (ALWAYS VISIBLE) -->
-		    <div class="comment-form">
-		        <form th:action="@{/comment/{postId}(postId=${post.id})}" method="post">
-		            <input type="text" name="content" placeholder="Write a comment..." required>
-		            <button type="submit">Post</button>
-		        </form>
-		    </div>
 					<button type="submit">Search</button>
 				</form>
 
@@ -356,7 +164,6 @@
 						<span id="notifCount" class="notif-count"></span>
 					</div>
 
-					<a th:href="@{/connections}">Pending</a>
 					<a th:href="@{/connections}">Pending Requests</a>
 					<a th:href="@{/connections/sent}">Sent Requests</a>
 					<a th:href="@{/connections/accepted}">Connections</a>
@@ -366,15 +173,6 @@
 							th:text="${#strings.substring(currentUsername,0,1).toUpperCase()}">
 						</div>
 
-
-    let match = value.match(/#(\w*)$/);
-
-    if (!match) {
-        suggestionBox.style.display = "none";
-        return;
-    }
-	<textarea name="content" id="postContent" placeholder="What's on your mind?"
-			required></textarea>
 						<div id="profileDropdown" class="dropdown">
 							<a th:href="@{/profile}">My Profile</a>
 							<a th:href="@{/logout}">Logout</a>
@@ -408,12 +206,9 @@
 			<div class="create-post" th:if="${showCreateForm}">
 				<form th:action="@{/post/create}" method="post">
 
-					<!-- Row 1: Avatar + Textarea -->
+					<!-- Row 1: Textarea -->
 					<div class="create-row">
 
-						<div class="avatar">
-							<span th:text="${#strings.substring(currentUsername,0,1).toUpperCase()}"></span>
-						</div>
 
 						<textarea name="content" id="postContent" placeholder="What's on your mind?"
 							required></textarea>
@@ -567,9 +362,9 @@
 
 		<div class="notification-sidebar">
 			<div class="sidebar-header">Notifications</div>
-			<div class="notif-title">Read</div>
-			<div id="notifUnread"></div>
 			<div class="notif-title">Unread</div>
+			<div id="notifUnread"></div>
+			<div class="notif-title">Read</div>
 			<div id="notifRead"></div>
 		</div>
 
