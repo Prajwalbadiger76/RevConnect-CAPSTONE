@@ -1,7 +1,6 @@
 package com.example.demo.service;
 
 import com.example.demo.dto.ProfileResponse;
-import com.example.demo.dto.ProfileWithFollowResponse;
 import com.example.demo.dto.UpdateProfileRequest;
 import com.example.demo.entity.Role;
 import com.example.demo.entity.User;
@@ -34,36 +33,6 @@ public class ProfileServiceImpl implements ProfileService {
             this.postRepository = postRepository;
     }
 
-    // ================= GET MY PROFILE =================
-    @Override
-    public ProfileResponse getMyProfile(String username) {
-
-        logger.info("Fetching own profile for user: {}", username);
-
-        User user = findUser(username);
-
-        return map(user, false);
-    }
-
-    // ================= GET PROFILE =================
-    @Override
-    public ProfileResponse getProfile(String username, String viewerUsername) {
-
-        logger.info("Profile view request: {} viewing {}", viewerUsername, username);
-
-        User profileUser = findUser(username);
-
-        boolean isOwner = viewerUsername != null &&
-                profileUser.getUsername().equals(viewerUsername);
-
-        boolean isFollower = false; // future integration
-
-        if (profileUser.isPrivate() && !isOwner && !isFollower) {
-            return map(profileUser, true);
-        }
-
-        return map(profileUser, false);
-    }
     
     @Override
     public ProfileResponse getProfile(String username, String viewerUsername) {
@@ -96,7 +65,6 @@ public class ProfileServiceImpl implements ProfileService {
         // own profile → never limited view
         return map(user, false);
     }
-
     // ================= VIEW PROFILE WITH FOLLOW INFO =================
     
     @Override
@@ -123,7 +91,6 @@ public class ProfileServiceImpl implements ProfileService {
         long postCount = 0;
 
         //  Privacy Logic
-
         boolean limitedView = false;
         String privateMessage = null;
 
@@ -133,7 +100,6 @@ public class ProfileServiceImpl implements ProfileService {
         }
 
         //  Completion Percentage (simple example)
-
         int completionPercentage = calculateCompletionPercentage(targetUser);
 
         return new ProfileResponse(
