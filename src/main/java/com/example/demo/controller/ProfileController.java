@@ -3,6 +3,7 @@ package com.example.demo.controller;
 import com.example.demo.dto.ProfileResponse;
 import com.example.demo.dto.UpdateProfileRequest;
 import com.example.demo.service.ConnectionService;
+import com.example.demo.service.PostService;
 import com.example.demo.service.ProfileService;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -15,11 +16,14 @@ public class ProfileController {
 
     private final ProfileService profileService;
     private final ConnectionService connectionService; // ✅ NEW
+    private final PostService postService;
 
     public ProfileController(ProfileService profileService,
-                             ConnectionService connectionService) { // ✅ UPDATED
+                             ConnectionService connectionService,
+                             PostService postService) { // ✅ UPDATED
         this.profileService = profileService;
         this.connectionService = connectionService;
+        this.postService=postService;
     }
 
     // ================= VIEW MY PROFILE =================
@@ -104,17 +108,21 @@ public class ProfileController {
     }
 
     // ================= SEARCH USERS =================
+    
     @GetMapping("/search")
     public String searchUsers(@RequestParam String keyword,
                               Authentication authentication,
                               Model model) {
 
+        String currentUsername = authentication.getName();
+
         model.addAttribute("results",
                 profileService.searchUsers(keyword));
 
-        model.addAttribute("currentUsername",
-                authentication.getName());
+        model.addAttribute("currentUsername", currentUsername);
+        
+        model.addAttribute("showCreateForm", false);
 
-        return "search-results";
+        return "feed"; // Only users
     }
 }

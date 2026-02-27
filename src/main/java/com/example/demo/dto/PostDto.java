@@ -9,19 +9,17 @@ public class PostDto {
     private String content;
     private String username;
     private LocalDateTime createdAt;
+
     private long likeCount;
     private boolean likedByCurrentUser;
+
+    private boolean pinned;
+
+    private List<String> hashtags;
     private List<CommentDto> comments;
 
-    public PostDto() {
-    }
 
-    public PostDto(Long id, String content, String username, LocalDateTime createdAt) {
-        this.id = id;
-        this.content = content;
-        this.username = username;
-        this.createdAt = createdAt;
-    }
+    // ================= Getters & Setters =================
 
     public Long getId() {
         return id;
@@ -70,7 +68,22 @@ public class PostDto {
     public void setLikedByCurrentUser(boolean likedByCurrentUser) {
         this.likedByCurrentUser = likedByCurrentUser;
     }
-    
+
+    public boolean isPinned() {
+        return pinned;
+    }
+
+    public void setPinned(boolean pinned) {
+        this.pinned = pinned;
+    }
+
+    public List<String> getHashtags() {
+        return hashtags;
+    }
+
+    public void setHashtags(List<String> hashtags) {
+        this.hashtags = hashtags;
+    }
 
     public List<CommentDto> getComments() {
         return comments;

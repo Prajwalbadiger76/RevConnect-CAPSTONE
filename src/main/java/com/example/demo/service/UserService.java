@@ -8,4 +8,5 @@ public interface UserService {
     void register(RegisterRequest request);
 
     String login(LoginRequest request);
+    
 }

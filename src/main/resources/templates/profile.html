@@ -22,13 +22,14 @@
         }
 
         .btn {
-            padding: 8px 15px;
+            padding: 6px 12px;
             border-radius: 5px;
             text-decoration: none;
-            margin-right: 10px;
+            margin-right: 8px;
             display: inline-block;
             border: none;
             cursor: pointer;
+            font-size: 13px;
         }
 
         .btn-primary {
@@ -44,6 +45,22 @@
         .btn-secondary {
             background-color: #6c757d;
             color: white;
+        }
+
+        .post-card {
+            border: 1px solid #eee;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .pinned-badge {
+            background: #fef3c7;
+            color: #92400e;
+            padding: 3px 6px;
+            border-radius: 6px;
+            font-size: 12px;
+            margin-left: 8px;
         }
     </style>
 </head>
@@ -64,15 +81,15 @@
         Connections: <span th:text="${connectionCount}"></span>
     </div>
 
-    <!-- Show Edit Button only if own profile -->
+    <!-- Edit Button -->
     <div th:if="${profile.isOwnProfile}">
         <a th:href="@{/profile/edit}" class="btn btn-secondary">Edit Profile</a>
     </div>
 
-    <!-- Show Follow / Unfollow + Connection only if NOT own profile -->
+    <!-- Follow + Connection Section -->
     <div th:if="${!profile.isOwnProfile}">
 
-        <!-- Follow Section (UNCHANGED) -->
+        <!-- Follow -->
         <form th:if="${!profile.isFollowing}"
               th:action="@{/follow/{username}(username=${profile.username})}"
               method="post">
@@ -85,47 +102,82 @@
             <button type="submit" class="btn btn-danger">Unfollow</button>
         </form>
 
-		<!-- ================= CONNECTION SECTION ================= -->
+        <!-- Connection Section -->
 
-		<!-- Not Connected -->
-		<form th:if="${connectionStatus == 'NONE'}"
-		      th:action="@{/connections/send/{username}(username=${profile.username})}"
-		      method="post">
-		    <button type="submit" class="btn btn-primary">Connect</button>
-		</form>
+        <form th:if="${connectionStatus == 'NONE'}"
+              th:action="@{/connections/send/{username}(username=${profile.username})}"
+              method="post">
+            <button type="submit" class="btn btn-primary">Connect</button>
+        </form>
 
-		<!-- Request Sent -->
-		<button th:if="${connectionStatus == 'PENDING' and pendingRequestId == null}"
-		        class="btn btn-secondary"
-		        disabled>
-		    Pending
-		</button> 	
+        <button th:if="${connectionStatus == 'PENDING' and pendingRequestId == null}"
+                class="btn btn-secondary"
+                disabled>
+            Pending
+        </button>
 
-		<!-- Request Received -->
-		<div th:if="${connectionStatus == 'PENDING' and pendingRequestId != null}">
-		    <form th:action="@{/connections/accept/{id}(id=${pendingRequestId})}"
-		          method="post" style="display:inline;">
-		        <button type="submit" class="btn btn-primary">Accept</button>
-		    </form>
+        <div th:if="${connectionStatus == 'PENDING' and pendingRequestId != null}">
+            <form th:action="@{/connections/accept/{id}(id=${pendingRequestId})}"
+                  method="post" style="display:inline;">
+                <button type="submit" class="btn btn-primary">Accept</button>
+            </form>
 
-		    <form th:action="@{/connections/reject/{id}(id=${pendingRequestId})}"
-		          method="post" style="display:inline;">
-		        <button type="submit" class="btn btn-danger">Reject</button>
-		    </form>
-		</div>
+            <form th:action="@{/connections/reject/{id}(id=${pendingRequestId})}"
+                  method="post" style="display:inline;">
+                <button type="submit" class="btn btn-danger">Reject</button>
+            </form>
+        </div>
 
-		<!-- Connected -->
-		<button th:if="${connectionStatus == 'ACCEPTED'}"
-		        class="btn btn-secondary"
-		        disabled>
-		    Connected
-		</button>
+        <button th:if="${connectionStatus == 'ACCEPTED'}"
+                class="btn btn-secondary"
+                disabled>
+            Connected
+        </button>
 
     </div>
 
     <br>
     <a th:href="@{/feed}" class="btn btn-secondary">Back to Feed</a>
     <a th:href="@{/logout}" class="btn btn-secondary">Logout</a>
+
+</div>
+
+<!-- USER POSTS SECTION -->
+<div th:if="${posts != null}">
+
+    <h3 style="margin-top:30px;">Posts</h3>
+
+    <div th:each="post : ${posts}" class="post-card">
+
+        <div>
+            <span th:text="${#temporals.format(post.createdAt, 'dd MMM yyyy HH:mm')}"></span>
+
+            <span th:if="${post.pinned}" class="pinned-badge">
+                📌 Pinned
+            </span>
+        </div>
+
+        <p th:text="${post.content}"></p>
+
+        <div th:if="${profile.isOwnProfile}">
+
+            <form th:if="${!post.pinned}"
+                  th:action="@{/post/pin/{id}(id=${post.id})}"
+                  method="post"
+                  style="display:inline;">
+                <button type="submit" class="btn btn-secondary">📌 Pin</button>
+            </form>
+
+            <form th:if="${post.pinned}"
+                  th:action="@{/post/unpin/{id}(id=${post.id})}"
+                  method="post"
+                  style="display:inline;">
+                <button type="submit" class="btn btn-danger">❌ Unpin</button>
+            </form>
+
+        </div>
+
+    </div>
 
 </div>
 

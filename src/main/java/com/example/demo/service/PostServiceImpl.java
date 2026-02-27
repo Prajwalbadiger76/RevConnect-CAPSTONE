@@ -4,11 +4,13 @@ import com.example.demo.dto.CommentDto;
 import com.example.demo.dto.PostDto;
 import com.example.demo.entity.*;
 import com.example.demo.repo.*;
+
+import jakarta.transaction.Transactional;
+
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.regex.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -45,25 +47,46 @@ public class PostServiceImpl implements PostService {
     // ================= CREATE POST =================
 
     @Override
-    public void createPost(String username, String content) {
+    public void createPost(String username,
+                           String content,
+                           String hashtags,
+                           String scheduledAt) {
 
         User user = userRepository.findByUsername(username)
-                .orElseThrow();
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
         Post post = new Post();
         post.setContent(content);
-        post.setCreatedAt(LocalDateTime.now());
         post.setUser(user);
+
+        post.setPinned(false);
+        post.setPinnedAt(null);
+
+        // Always set created time as now
+        post.setCreatedAt(LocalDateTime.now());
+
+        // If scheduled time exists → save it in scheduledAt column
+        if (scheduledAt != null && !scheduledAt.isBlank()) {
+
+            LocalDateTime scheduledDateTime =
+                    LocalDateTime.parse(scheduledAt);
+
+            post.setScheduledAt(scheduledDateTime);
+
+        } else {
+            post.setScheduledAt(null);
+        }
 
         postRepository.save(post);
 
-        parseHashtags(post, content);
+        // Save hashtags
+        saveHashtags(post, hashtags);
     }
 
     // ================= UPDATE POST =================
 
     @Override
-    public void updatePost(Long postId, String content, String username) {
+    public void updatePost(Long postId, String content, String hashtags, String username) {
 
         Post post = postRepository.findById(postId)
                 .orElseThrow();
@@ -74,20 +97,28 @@ public class PostServiceImpl implements PostService {
 
         post.setContent(content);
         postRepository.save(post);
+
+        // remove old hashtags
+        postHashtagRepository.deleteByPost(post);
+
+        // save new hashtags
+        saveHashtags(post, hashtags);
     }
 
     // ================= DELETE POST =================
-
     @Override
+    @Transactional
     public void deletePost(Long postId, String username) {
 
         Post post = postRepository.findById(postId)
-                .orElseThrow();
+                .orElseThrow(() -> new RuntimeException("Post not found"));
 
+        // Security check
         if (!post.getUser().getUsername().equals(username)) {
-            throw new RuntimeException("You cannot delete this post");
+            throw new RuntimeException("You are not authorized to delete this post");
         }
 
+        // Just delete post
         postRepository.delete(post);
     }
 
@@ -97,10 +128,10 @@ public class PostServiceImpl implements PostService {
     public void sharePost(Long postId, String username) {
 
         User currentUser = userRepository.findByUsername(username)
-                .orElseThrow();
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
         Post originalPost = postRepository.findById(postId)
-                .orElseThrow();
+                .orElseThrow(() -> new RuntimeException("Post not found"));
 
         Post sharedPost = new Post();
         sharedPost.setContent("🔁 Shared from @" 
@@ -109,19 +140,14 @@ public class PostServiceImpl implements PostService {
         sharedPost.setCreatedAt(LocalDateTime.now());
         sharedPost.setUser(currentUser);
 
+       
+        sharedPost.setPinned(false);
+        sharedPost.setPinnedAt(null);
+
         postRepository.save(sharedPost);
 
-        // 🔔 Notify original author (if not self)
-        if (!originalPost.getUser().getUsername().equals(username)) {
-            notificationService.createNotification(
-                    originalPost.getUser().getUsername(),
-                    username,
-                    "SHARE",
-                    originalPost.getId()
-            );
-        }
+        
     }
-
     // ================= TOGGLE LIKE =================
 
     @Override
@@ -156,6 +182,39 @@ public class PostServiceImpl implements PostService {
         }
     }
 
+    // ================= GET POST BY ID =================
+
+    @Override
+    public PostDto getPostById(Long postId, String currentUsername) {
+
+        User currentUser = userRepository.findByUsername(currentUsername)
+                .orElseThrow();
+
+        Post post = postRepository.findById(postId)
+                .orElseThrow();
+
+        return map(post, currentUser);
+    }
+
+    // ================= SEARCH BY HASHTAG =================
+    @Override
+    public List<PostDto> searchPostsByHashtag(String tag, String username) {
+
+        User currentUser = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        List<Post> posts =
+                postRepository
+                .findByPostHashtags_Hashtag_NameAndCreatedAtLessThanEqualOrderByCreatedAtDesc(
+                        tag,
+                        LocalDateTime.now()
+                );
+
+        return posts.stream()
+                .map(post -> map(post, currentUser))
+                .toList();
+    }
+
     // ================= USER POSTS =================
 
     @Override
@@ -164,7 +223,10 @@ public class PostServiceImpl implements PostService {
         User currentUser = userRepository.findByUsername(username)
                 .orElseThrow();
 
-        return postRepository.findByUserOrderByCreatedAtDesc(currentUser)
+        return postRepository.findByUserAndCreatedAtLessThanEqualOrderByPinnedDescCreatedAtDesc(
+                currentUser,
+                LocalDateTime.now()
+        )
                 .stream()
                 .map(post -> map(post, currentUser))
                 .collect(Collectors.toList());
@@ -175,23 +237,15 @@ public class PostServiceImpl implements PostService {
     @Override
     public List<PostDto> getAllPosts() {
 
-        return postRepository.findAllByOrderByCreatedAtDesc()
+        return postRepository.findAllByCreatedAtLessThanEqualOrderByCreatedAtDesc(
+                LocalDateTime.now()
+        )
                 .stream()
-                .map(post -> {
-                    PostDto dto = new PostDto();
-                    dto.setId(post.getId());
-                    dto.setContent(post.getContent());
-                    dto.setCreatedAt(post.getCreatedAt());
-                    dto.setUsername(post.getUser().getUsername());
-                    dto.setLikeCount(likeRepository.countByPost(post));
-                    dto.setLikedByCurrentUser(false);
-                    dto.setComments(Collections.emptyList());
-                    return dto;
-                })
+                .map(post -> map(post, post.getUser()))
                 .collect(Collectors.toList());
     }
 
-    // ================= PERSONALIZED FEED =================
+    // ================= FEED =================
 
     @Override
     public List<PostDto> getFeedPosts(String username) {
@@ -209,10 +263,10 @@ public class PostServiceImpl implements PostService {
         feedUsers.add(currentUser);
 
         return postRepository
-                .findByUserInOrderByCreatedAtDesc(feedUsers)
+                .findFeedPosts(feedUsers, LocalDateTime.now())
                 .stream()
                 .map(post -> map(post, currentUser))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     // ================= DTO MAPPER =================
@@ -228,6 +282,13 @@ public class PostServiceImpl implements PostService {
         dto.setLikeCount(likeRepository.countByPost(post));
         dto.setLikedByCurrentUser(
                 likeRepository.findByUserAndPost(currentUser, post).isPresent()
+        );
+
+        dto.setHashtags(
+                post.getPostHashtags()
+                        .stream()
+                        .map(ph -> ph.getHashtag().getName())
+                        .collect(Collectors.toList())
         );
 
         List<CommentDto> commentDtos = commentRepository
@@ -252,16 +313,19 @@ public class PostServiceImpl implements PostService {
         return dto;
     }
 
-    // ================= HASHTAG PARSER =================
+    // ================= SAVE HASHTAGS =================
 
-    private void parseHashtags(Post post, String content) {
+    private void saveHashtags(Post post, String hashtags) {
 
-        Pattern pattern = Pattern.compile("#(\\w+)");
-        Matcher matcher = pattern.matcher(content);
+        if (hashtags == null || hashtags.isBlank()) return;
 
-        while (matcher.find()) {
+        String[] tags = hashtags.split(",");
 
-            String tag = matcher.group(1).toLowerCase();
+        for (String rawTag : tags) {
+
+            String tag = rawTag.trim().replace("#", "").toLowerCase();
+
+            if (tag.isEmpty()) continue;
 
             Hashtag hashtag = hashtagRepository
                     .findByName(tag)
@@ -278,4 +342,91 @@ public class PostServiceImpl implements PostService {
             postHashtagRepository.save(ph);
         }
     }
+
+    @Override
+    public void pinPost(Long postId, String username) {
+
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("Post not found"));
+
+        // Only owner can pin
+        if (!post.getUser().getUsername().equals(username)) {
+            throw new RuntimeException("You cannot pin this post");
+        }
+
+        post.setPinned(true);
+        post.setPinnedAt(LocalDateTime.now());
+
+        postRepository.save(post);
+    }
+	
+
+    @Override
+    public void unpinPost(Long postId, String username) {
+
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("Post not found"));
+
+        // Only owner can unpin
+        if (!post.getUser().getUsername().equals(username)) {
+            throw new RuntimeException("You cannot unpin this post");
+        }
+
+        post.setPinned(false);
+        post.setPinnedAt(null);
+
+        postRepository.save(post);
+    }
+
+    @Override
+    public List<String> getTrendingHashtags() {
+
+        List<Post> posts = postRepository.findAll();
+
+        Map<String, Integer> countMap = new HashMap<>();
+
+        for (Post post : posts) {
+
+            for (PostHashtag ph : post.getPostHashtags()) {
+
+                String tagName = ph.getHashtag().getName();
+
+                countMap.put(tagName,
+                        countMap.getOrDefault(tagName, 0) + 1);
+            }
+        }
+
+        return countMap.entrySet()
+                .stream()
+                .sorted((a, b) -> b.getValue().compareTo(a.getValue()))
+                .map(Map.Entry::getKey)
+                .limit(10)
+                .toList();
+    }
+    
+   
+    @Override
+    public List<PostDto> searchPostsByContent(String keyword, String username) {
+
+        User currentUser = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        List<Post> posts =
+                postRepository
+                .findAllByCreatedAtLessThanEqualOrderByCreatedAtDesc(
+                        LocalDateTime.now()
+                );
+
+        return posts.stream()
+                .filter(post ->
+                        post.getContent() != null &&
+                        post.getContent().toLowerCase()
+                                .contains(keyword.toLowerCase()))
+                .map(post -> map(post, currentUser))
+                .toList();
+    }
+   
+    
 }
+ 
+

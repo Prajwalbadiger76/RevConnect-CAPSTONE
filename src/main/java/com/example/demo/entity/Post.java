@@ -2,94 +2,81 @@ package com.example.demo.entity;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "posts")
 public class Post {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "post_seq")
-    @SequenceGenerator(name = "post_seq", sequenceName = "post_seq", allocationSize = 1)
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "post_seq")
+	@SequenceGenerator(
+	        name = "post_seq",
+	        sequenceName = "post_seq",
+	        allocationSize = 1
+	)
+	private Long id;
 
-    @Column(length = 2000, nullable = false)
+    @Column(nullable = false, length = 2000)
     private String content;
 
-    @Column(nullable = false)
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    @Column(name = "pinned_at")
+    private LocalDateTime pinnedAt;
+
     @Column(name = "is_pinned", nullable = false)
-    private Boolean isPinned = false;
+    private Boolean pinned = false;
 
-    @Column(name = "is_promotional", nullable = false)
-    private Boolean isPromotional = false;
-
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
-    private List<PostHashtag> postHashtags;
-
-    public Post() {
-        this.createdAt = LocalDateTime.now();
-        this.isPinned = false;
-        this.isPromotional = false;
-    }
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PostHashtag> postHashtags = new ArrayList<>();
+    
+    @Column(name = "scheduled_at")
+    private LocalDateTime scheduledAt;
 
     // Getters & Setters
 
-    public Long getId() {
-        return id;
-    }
+    public Long getId() { return id; }
 
-    public String getContent() {
-        return content;
-    }
+    public String getContent() { return content; }
 
-    public void setContent(String content) {
-        this.content = content;
-    }
+    public void setContent(String content) { this.content = content; }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-    public void setCreatedAt(LocalDateTime createdAt) { 
-    	this.createdAt = createdAt; 
-    }
+    public LocalDateTime getCreatedAt() { return createdAt; }
 
-    public User getUser() {
-        return user;
-    }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 
-    public void setUser(User user) {
-        this.user = user;
-    }
+    public LocalDateTime getPinnedAt() { return pinnedAt; }
 
-    public Boolean getIsPinned() {
-        return isPinned;
-    }
+    public void setPinnedAt(LocalDateTime pinnedAt) { this.pinnedAt = pinnedAt; }
 
-    public void setIsPinned(Boolean isPinned) {
-        this.isPinned = isPinned;
-    }
+    public Boolean getPinned() { return pinned; }
 
-    public Boolean getIsPromotional() {
-        return isPromotional;
-    }
+    public void setPinned(Boolean pinned) { this.pinned = pinned; }
 
-    public void setIsPromotional(Boolean isPromotional) {
-        this.isPromotional = isPromotional;
-    }
+    public User getUser() { return user; }
 
-    public List<PostHashtag> getPostHashtags() {
-        return postHashtags;
-    }
+    public void setUser(User user) { this.user = user; }
 
-    public void setPostHashtags(List<PostHashtag> postHashtags) {
-        this.postHashtags = postHashtags;
-    }
+    public List<PostHashtag> getPostHashtags() { return postHashtags; }
+
+    public void setPostHashtags(List<PostHashtag> postHashtags) { this.postHashtags = postHashtags; }
+
+	public LocalDateTime getScheduledAt() {
+		return scheduledAt;
+	}
+
+	public void setScheduledAt(LocalDateTime scheduledAt) {
+		this.scheduledAt = scheduledAt;
+	}
     
-   
+    
+    
+    
 }
