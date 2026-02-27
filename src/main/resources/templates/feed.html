@@ -164,10 +164,7 @@
 						<span id="notifCount" class="notif-count"></span>
 					</div>
 
-<<<<<<< HEAD
 					<a th:href="@{/connections}">Pending</a>
-=======
->>>>>>> origin/develop
 					<a th:href="@{/connections}">Pending Requests</a>
 					<a th:href="@{/connections/sent}">Sent Requests</a>
 					<a th:href="@{/connections/accepted}">Connections</a>
@@ -210,18 +207,12 @@
 			<div class="create-post" th:if="${showCreateForm}">
 				<form th:action="@{/post/create}" method="post">
 
-<<<<<<< HEAD
 					<!-- Row 1: Avatar + Textarea -->
 					<div class="create-row">
 
 						<div class="avatar">
 							<span th:text="${#strings.substring(currentUsername,0,1).toUpperCase()}"></span>
 						</div>
-=======
-					<!-- Row 1: Textarea -->
-					<div class="create-row">
-
->>>>>>> origin/develop
 
 						<textarea name="content" id="postContent" placeholder="What's on your mind?"
 							required></textarea>
@@ -375,15 +366,9 @@
 
 		<div class="notification-sidebar">
 			<div class="sidebar-header">Notifications</div>
-<<<<<<< HEAD
 			<div class="notif-title">Read</div>
 			<div id="notifUnread"></div>
 			<div class="notif-title">Unread</div>
-=======
-			<div class="notif-title">Unread</div>
-			<div id="notifUnread"></div>
-			<div class="notif-title">Read</div>
->>>>>>> origin/develop
 			<div id="notifRead"></div>
 		</div>
 
@@ -477,63 +462,7 @@
 
 	<!-- SCRIPT (UNCHANGED) -->
 	<script>
-
-		function toggleNotifications() {
-			let panel = document.getElementById("notifPanel");
-			let overlay = document.getElementById("overlay");
-			panel.classList.toggle("active");
-			overlay.classList.toggle("active");
-		}
-
-		function toggleProfileMenu() {
-			let dropdown = document.getElementById("profileDropdown");
-			dropdown.classList.toggle("show");
-		}
-
-		window.onclick = function (e) {
-			if (!e.target.closest('.profile-menu')) {
-				let dropdown = document.getElementById("profileDropdown");
-				if (dropdown) dropdown.classList.remove("show");
-			}
-		}
-
-		function loadNotifications() {
-			fetch('/notifications')
-				.then(res => res.json())
-				.then(data => {
-					let list = document.getElementById("notifList");
-					list.innerHTML = "";
-					let unread = data.filter(n => !n.read);
-
-					data.forEach(n => {
-						let div = document.createElement("div");
-						div.className = "notif-item " + (!n.read ? "unread" : "");
-						div.innerText = n.message;
-						div.onclick = function () {
-							fetch('/notifications/read/' + n.id, {method: 'POST'})
-								.then(() => {
-									loadNotifications();
-									if (n.type === "FOLLOW") {
-										window.location.href = "/profile/" + n.senderUsername;
-									} else {
-										window.location.href = "/feed";
-									}
-								});
-						};
-						list.appendChild(div);
-					});
-
-					let badge = document.getElementById("notifCount");
-					if (unread.length > 0) {
-						badge.style.display = "inline";
-						badge.innerText = unread.length;
-					} else {
-						badge.style.display = "none";
-					}
-				});
-		}
-		setInterval(loadNotifications, 5000);
-		loadNotifications();
+		
 
 		function toggleComments(postId) {
 			let section = document.getElementById("comments-" + postId);
