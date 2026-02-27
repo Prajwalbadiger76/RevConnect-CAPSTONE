@@ -57,7 +57,7 @@ public class PostServiceTest {
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
         // 2️⃣ Call service
-        postService.createPost("testuser", "Testing post content");
+        postService.createPost("testuser", "Testing post content", "trend", "");
 
         // 3️⃣ Verify save was called
         verify(postRepository, times(1)).save(any(Post.class));
