@@ -1,8 +1,10 @@
 package com.example.demo.controller;
 
+import com.example.demo.dto.FollowerGrowthDTO;
 import com.example.demo.dto.ProfileResponse;
 import com.example.demo.dto.ProfileWithFollowResponse;
 import com.example.demo.dto.UpdateProfileRequest;
+import com.example.demo.service.AnalyticsService;
 import com.example.demo.service.ConnectionService;
 import com.example.demo.service.ProfileService;
 import com.example.demo.service.UserService;
@@ -16,6 +18,7 @@ import java.util.Collections;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -31,14 +34,17 @@ public class ProfileController {
     private final ProfileService profileService;
     private final ConnectionService connectionService; // ✅ keep existing
     private final UserService userService;
+    private final AnalyticsService analyticsService;
 
     public ProfileController(ProfileService profileService,
-                             ConnectionService connectionService,
-                             UserService userService) {
-        this.profileService = profileService;
-        this.connectionService = connectionService;
-        this.userService = userService;
-    }
+            ConnectionService connectionService,
+            UserService userService,
+            AnalyticsService analyticsService) {
+this.profileService = profileService;
+this.connectionService = connectionService;
+this.userService = userService;
+this.analyticsService = analyticsService;
+}
 
     // ============================================================
     // ================= VIEW MY PROFILE ==========================
@@ -270,5 +276,24 @@ public class ProfileController {
                 authentication.getName());
 
         return "search-results";
+    }
+    
+    @PreAuthorize("hasAnyRole('CREATOR','BUSINESS')")
+    @GetMapping("/{username}/analytics")
+    public String followerAnalytics(@PathVariable String username,
+                                    Authentication authentication,
+                                    Model model) {
+
+        if (authentication == null) {
+            return "redirect:/login";
+        }
+
+        List<FollowerGrowthDTO> growthData =
+                analyticsService.getFollowerGrowth(username);
+
+        model.addAttribute("growthData", growthData);
+        model.addAttribute("username", username);
+
+        return "analytics";
     }
 }

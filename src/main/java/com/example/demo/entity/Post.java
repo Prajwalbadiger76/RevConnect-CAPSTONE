@@ -75,6 +75,17 @@ public class Post {
             createdAt = LocalDateTime.now();
     }
 
+    @Column(name = "is_promotional", nullable = false)
+    private Boolean isPromotional = false;
+
+    public Boolean getIsPromotional() {
+        return isPromotional;
+    }
+
+    public void setIsPromotional(Boolean isPromotional) {
+        this.isPromotional = isPromotional;
+    }
+    
     // ================= GETTERS & SETTERS =================
 
     public Long getId() {
