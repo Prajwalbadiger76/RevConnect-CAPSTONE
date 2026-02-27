@@ -103,9 +103,6 @@
 	        <!-- Row 1: Avatar + Textarea -->
 	        <div class="create-row">
 
-	            <div class="avatar">
-	                <span th:text="${#strings.substring(currentUsername,0,1).toUpperCase()}"></span>
-	            </div>
 
 	            <textarea name="content"
 	                      id="postContent"
@@ -198,7 +195,7 @@
             </span>
 
             <form th:action="@{/post/share/{id}(id=${post.id})}" method="post">
-                <button>🔁 Share</button>
+                <button>🔁 Re-Share </button>
             </form>
 
             <form th:if="${post.username == currentUsername}"
