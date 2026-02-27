@@ -85,7 +85,8 @@ public class Post {
     public void setIsPromotional(Boolean isPromotional) {
         this.isPromotional = isPromotional;
     }
-    
+   
+
     // ================= GETTERS & SETTERS =================
 
     public Long getId() {

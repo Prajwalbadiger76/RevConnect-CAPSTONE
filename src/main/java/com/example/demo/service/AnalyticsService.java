@@ -13,6 +13,12 @@ import com.example.demo.repo.UserRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.example.demo.entity.Post;
+import com.example.demo.entity.PostAnalytics;
+import com.example.demo.entity.PostView;
+import com.example.demo.repo.PostAnalyticsRepository;
+import com.example.demo.repo.PostRepository;
+import com.example.demo.repo.PostViewRepository;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -37,8 +43,8 @@ public class AnalyticsService {
         this.followRepository = followRepository;
         this.userRepository = userRepository;
 
-
     }
+
 
     // CREATE ANALYTICS ROW (When post is created)
 
@@ -147,7 +153,7 @@ public class AnalyticsService {
     // followers count analysis
     public List<FollowerGrowthDTO> getFollowerGrowth(String username) {
 
-        // 🔥 convert username → userId here
+        // convert username → userId here
     	User user = userRepository.findByUsername(username)
     	        .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -164,4 +170,5 @@ public class AnalyticsService {
 
         return result;
     }
+
 }
