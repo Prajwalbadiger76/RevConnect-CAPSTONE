@@ -111,12 +111,14 @@ public class PostServiceImpl implements PostService {
     public void deletePost(Long postId, String username) {
 
         Post post = postRepository.findById(postId)
-                .orElseThrow();
+                .orElseThrow(() -> new RuntimeException("Post not found"));
 
+        // Security check
         if (!post.getUser().getUsername().equals(username)) {
-            throw new RuntimeException("You cannot delete this post");
+            throw new RuntimeException("You are not authorized to delete this post");
         }
 
+        // Just delete post
         postRepository.delete(post);
     }
 
@@ -144,7 +146,7 @@ public class PostServiceImpl implements PostService {
 
         postRepository.save(sharedPost);
 
-        // Temporarily remove notification
+        
     }
     // ================= TOGGLE LIKE =================
 
