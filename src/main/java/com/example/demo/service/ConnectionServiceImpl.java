@@ -278,4 +278,12 @@ public class ConnectionServiceImpl implements ConnectionService {
         return connectionRepository
                 .findByRequesterAndStatus(user,ConnectionStatus.PENDING);
     }
+    
+   
+        @Override
+        public long getPendingRequestCount(String username){
+            return connectionRepository
+                    .countByReceiverUsernameAndStatus(username, ConnectionStatus.PENDING);
+        }
+    
 }

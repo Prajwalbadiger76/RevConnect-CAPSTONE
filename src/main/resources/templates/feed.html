@@ -29,7 +29,10 @@
             <span id="notifCount" class="notif-count"></span>
         </div>
 
-        <a th:href="@{/connections}">Pending Requests</a>
+		<a href="/connections/pending" class="badge-container">
+		    Pending Requests
+		    <span id="pendingBadge" class="notif-count" style="display:none;"></span>
+		</a>
 		<a th:href="@{/connections/sent}">Sent Requests</a>
         <a th:href="@{/connections/accepted}">Connections</a>
 
@@ -183,6 +186,7 @@
 
 <!-- SCRIPT (UNCHANGED) -->
 <script>
+	
 function toggleNotifications(){
 let panel=document.getElementById("notifPanel");
 let overlay=document.getElementById("overlay");
@@ -248,6 +252,25 @@ function toggleComments(postId){
         section.style.display = "none";
     }
 }
+// ===== PENDING REQUEST COUNT =====
+function loadPendingCount(){
+fetch('/connections/pending/count')
+.then(res=>res.text())
+.then(count=>{
+let badge=document.getElementById("pendingBadge");
+if(!badge) return;
+
+if(count>0){
+badge.style.display="inline";
+badge.innerText=count;
+}else{
+badge.style.display="none";
+}
+});
+}
+
+setInterval(loadPendingCount,5000);
+loadPendingCount();
 </script>
 
 </body>

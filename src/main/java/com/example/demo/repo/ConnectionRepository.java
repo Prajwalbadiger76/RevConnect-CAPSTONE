@@ -43,4 +43,6 @@ public interface ConnectionRepository
     
     //Cancel Sent request
     void deleteByRequesterAndReceiver(User requester, User receiver);
+    
+    long countByReceiverUsernameAndStatus(String username, ConnectionStatus status);
 }

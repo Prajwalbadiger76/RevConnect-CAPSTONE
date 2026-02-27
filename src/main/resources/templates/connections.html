@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-<title>Pending Connection Requests</title>
-
+<title>Connection Requests</title>
+<link rel="stylesheet" th:href="@{/css/connection.css}">
 <style>
 body{
 font-family:Segoe UI;
@@ -11,15 +11,9 @@ margin:0;
 padding:40px;
 }
 
-.container{
-width:55%;
-margin:auto;
-}
+.container{ width:55%; margin:auto; }
 
-h2{
-text-align:center;
-margin-bottom:25px;
-}
+h2{ text-align:center; margin-bottom:25px; }
 
 .card{
 background:white;
@@ -30,41 +24,18 @@ box-shadow:0 4px 12px rgba(0,0,0,0.1);
 display:flex;
 justify-content:space-between;
 align-items:center;
-transition:0.2s;
 }
 
-.card:hover{
-transform:translateY(-2px);
-}
-
-.left{
-display:flex;
-align-items:center;
-gap:12px;
-}
+.left{ display:flex; align-items:center; gap:12px; }
 
 .avatar{
-width:42px;
-height:42px;
-border-radius:50%;
-background:#6366f1;
-color:white;
-display:flex;
-align-items:center;
-justify-content:center;
-font-weight:bold;
-font-size:18px;
+width:42px; height:42px; border-radius:50%;
+background:#6366f1; color:white;
+display:flex; align-items:center; justify-content:center;
+font-weight:bold; font-size:18px;
 }
 
-.name{
-text-decoration:none;
-font-weight:600;
-color:#2563eb;
-}
-
-.name:hover{
-text-decoration:underline;
-}
+.name{ text-decoration:none; font-weight:600; color:#2563eb; }
 
 .btn{
 border:none;
@@ -73,38 +44,27 @@ border-radius:7px;
 cursor:pointer;
 margin-left:6px;
 color:white;
-transition:0.25s;
+font-weight:600;
 }
 
-/* colors */
 .accept{ background:#10b981; }
 .reject{ background:#ef4444; }
-
-/* hover */
-.accept:hover{
-background:#059669;
-transform:scale(1.05);
-}
-
-.reject:hover{
-background:#dc2626;
-transform:scale(1.05);
-}
-
-/* click animation */
-.btn:active{
-transform:scale(0.95);
-}
+.cancel{ background:#6b7280; }
 
 .back{
 text-align:center;
-margin-top:25px;
+margin-top:20px;
 }
 
 .back a{
-text-decoration:none;
+text-decoration:none !important;
 color:#2563eb;
 font-weight:600;
+}
+
+.back a:hover{
+color:red;
+text-decoration:none !important;
 }
 </style>
 </head>
@@ -113,37 +73,41 @@ font-weight:600;
 
 <div class="container">
 
-<h2>Pending Connection Requests</h2>
+<h2>Connection Requests</h2>
 
-<div th:if="${#lists.isEmpty(requests)}" style="text-align:center;">
-No pending requests
+<div th:if="${#lists.isEmpty(requests)}">
+<p style="text-align:center;">No pending requests.</p>
 </div>
 
 <div th:each="req : ${requests}" class="card">
 
 <div class="left">
+
 <div class="avatar"
 th:text="${#strings.substring(req.requester.username,0,1).toUpperCase()}"></div>
 
 <a class="name"
 th:href="@{/profile/{username}(username=${req.requester.username})}"
 th:text="${req.requester.username}"></a>
+
 </div>
 
 <div>
+
+<!-- ACCEPT -->
 <form th:action="@{/connections/accept/{id}(id=${req.id})}"
 method="post"
-style="display:inline;"
-onsubmit="changeAccept(this,event)">
+style="display:inline;">
 <button class="btn accept">Accept</button>
 </form>
 
+<!-- ⭐ DIRECT REJECT (no popup) -->
 <form th:action="@{/connections/reject/{id}(id=${req.id})}"
 method="post"
-style="display:inline;"
-onsubmit="changeReject(this,event)">
+style="display:inline;">
 <button class="btn reject">Reject</button>
 </form>
+
 </div>
 
 </div>
@@ -153,42 +117,6 @@ onsubmit="changeReject(this,event)">
 </div>
 
 </div>
-
-<script>
-function changeAccept(form,event){
-
-event.preventDefault();
-
-if(!confirm("Accept connection?")) return;
-
-let btn=form.querySelector("button");
-
-btn.innerText="Accepted ✓";
-btn.style.background="#9ca3af";
-btn.disabled=true;
-
-setTimeout(()=>{
-form.submit();
-},300);
-}
-
-function changeReject(form,event){
-
-event.preventDefault();
-
-if(!confirm("Reject request?")) return;
-
-let btn=form.querySelector("button");
-
-btn.innerText="Rejected";
-btn.style.background="#9ca3af";
-btn.disabled=true;
-
-setTimeout(()=>{
-form.submit();
-},300);
-}
-</script>
 
 </body>
 </html>
