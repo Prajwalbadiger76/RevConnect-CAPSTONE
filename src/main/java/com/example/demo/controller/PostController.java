@@ -1,71 +1,104 @@
 package com.example.demo.controller;
 
-import com.example.demo.entity.Post;
-import com.example.demo.repo.PostRepository;
-import com.example.demo.service.PostService;
+import com.example.demo.dto.PostDto;
+import com.example.demo.entity.*;
+
+import com.example.demo.service.*;
+
+
+import java.util.*;
+
+
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+
+
 @Controller
-@RequestMapping("/post")
+@RequestMapping("/post")   // IMPORTANT: base path
 public class PostController {
 
     private final PostService postService;
-    private final PostRepository postRepository;
+    private final ProfileService profileService;
+   
+   
 
     public PostController(PostService postService,
-                          PostRepository postRepository) {
-        this.postService = postService;
-        this.postRepository = postRepository;
-    }
+            ProfileService profileService) {
+					this.postService = postService;
+					this.profileService = profileService;
+					}
 
-    // ================= CREATE =================
-
-    @GetMapping("/new")
-    public String createPostPage() {
+    // =========================
+    // SHOW CREATE PAGE (GET)
+    // =========================
+    @GetMapping("/create")
+    public String showCreatePostPage() {
         return "create-post";
     }
 
+    // =========================
+    // CREATE POST (POST)
+    // =========================
     @PostMapping("/create")
     public String createPost(@RequestParam String content,
+                             @RequestParam(required = false) String hashtags,
+                             @RequestParam(required = false) String scheduledAt,
                              Authentication authentication) {
 
-        postService.createPost(authentication.getName(), content);
+        postService.createPost(
+                authentication.getName(),
+                content,
+                hashtags,
+                scheduledAt
+        );
+
         return "redirect:/feed";
     }
 
-    // ================= EDIT =================
+    // =========================
+    // SHOW EDIT PAGE (GET)
+ // =========================
+ // SHOW EDIT PAGE (GET)
+ // =========================
+ @GetMapping("/edit/{id}")
+ public String editPostPage(@PathVariable Long id,
+                            Authentication authentication,
+                            Model model) {
 
-    @GetMapping("/edit/{id}")
-    public String editPostPage(@PathVariable Long id,
-                               Authentication authentication,
-                               Model model) {
+     PostDto post = postService.getPostById(id, authentication.getName());
+     model.addAttribute("post", post);
 
-        Post post = postRepository.findById(id)
-                .orElseThrow();
+     return "edit-post";
+ }
+    public String showEditPage(@PathVariable Long id,
+                               Model model,
+                               Authentication authentication) {
 
-        if (!post.getUser().getUsername()
-                .equals(authentication.getName())) {
-            return "redirect:/feed";
-        }
-
+        PostDto post = postService.getPostById(id, authentication.getName());
         model.addAttribute("post", post);
+
         return "edit-post";
     }
 
+    // =========================
+    // UPDATE POST (POST)
+    // =========================
     @PostMapping("/update/{id}")
     public String updatePost(@PathVariable Long id,
                              @RequestParam String content,
+                             @RequestParam(required = false) String hashtags,
                              Authentication authentication) {
 
-        postService.updatePost(id, content, authentication.getName());
+        postService.updatePost(id, content, hashtags, authentication.getName());
         return "redirect:/feed";
     }
 
-    // ================= DELETE =================
-
+    // =========================
+    // DELETE POST
+    // =========================
     @PostMapping("/delete/{id}")
     public String deletePost(@PathVariable Long id,
                              Authentication authentication) {
@@ -74,8 +107,31 @@ public class PostController {
         return "redirect:/feed";
     }
 
-    // ================= SHARE =================
+    // =========================
+    // PIN POST
+    // =========================
+    @PostMapping("/pin/{id}")
+    public String pinPost(@PathVariable Long id,
+                          Authentication authentication) {
 
+        postService.pinPost(id, authentication.getName());
+        return "redirect:/profile/" + authentication.getName();
+    }
+
+    // =========================
+    // UNPIN POST
+    // =========================
+    @PostMapping("/unpin/{id}")
+    public String unpinPost(@PathVariable Long id,
+                            Authentication authentication) {
+
+        postService.unpinPost(id, authentication.getName());
+        return "redirect:/profile/" + authentication.getName();
+    }
+
+    // =========================
+    // SHARE POST
+    // =========================
     @PostMapping("/share/{id}")
     public String sharePost(@PathVariable Long id,
                             Authentication authentication) {
@@ -83,4 +139,79 @@ public class PostController {
         postService.sharePost(id, authentication.getName());
         return "redirect:/feed";
     }
+
+    // =========================
+    // SEARCH POSTS BY HASHTAG
+    // =========================
+    @GetMapping("/search")
+    public String search(@RequestParam String keyword,
+                         Model model,
+                         Authentication authentication) {
+
+        String currentUsername = authentication.getName();
+        keyword = keyword.trim();
+
+        List<PostDto> posts = new ArrayList<>();
+
+        // ================= HASHTAG SEARCH =================
+        if (keyword.startsWith("#")) {
+
+            String tag = keyword.substring(1);
+
+            posts = postService.searchPostsByHashtag(tag, currentUsername);
+
+            model.addAttribute("posts", posts);
+
+        } 
+        // ================= USER SEARCH ONLY =================
+        else {
+
+            model.addAttribute("results",
+                    profileService.searchUsers(keyword));
+
+            // IMPORTANT: Do NOT search posts here
+            model.addAttribute("posts", new ArrayList<>());
+        }
+
+        model.addAttribute("currentUsername", currentUsername);
+        model.addAttribute("trendingHashtags",
+                postService.getTrendingHashtags());
+        model.addAttribute("showCreateForm", false);
+
+        return "search-results";
+    }
+    
+    @GetMapping("/trending")
+    public String trendingPage(
+            @RequestParam(required = false) String tag,
+            Model model,
+            Authentication authentication) {
+
+        String username = authentication.getName();
+
+        List<String> trendingTags =
+                postService.getTrendingHashtags();
+
+        model.addAttribute("trendingHashtags", trendingTags);
+        model.addAttribute("currentUsername", username);
+
+        // If no tag selected → default to first trending tag
+        if (tag == null && !trendingTags.isEmpty()) {
+            tag = trendingTags.get(0);
+        }
+
+        if (tag != null) {
+            List<PostDto> posts =
+                    postService.searchPostsByHashtag(tag, username);
+
+            model.addAttribute("posts", posts);
+            model.addAttribute("selectedTag", tag);
+        }
+
+        model.addAttribute("showCreateForm", false);
+
+        return "trending";
+    }
+    
+    
 }

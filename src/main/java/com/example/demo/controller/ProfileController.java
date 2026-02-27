@@ -1,75 +1,123 @@
 package com.example.demo.controller;
 
 import com.example.demo.dto.ProfileResponse;
+import com.example.demo.dto.ProfileWithFollowResponse;
 import com.example.demo.dto.UpdateProfileRequest;
 import com.example.demo.service.ConnectionService;
 import com.example.demo.service.ProfileService;
+import com.example.demo.service.UserService;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.security.Principal;
+import java.util.List;
+import java.util.Collections;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 
 @Controller
 @RequestMapping("/profile")
 public class ProfileController {
 
     private final ProfileService profileService;
-    private final ConnectionService connectionService; // ✅ NEW
+    private final ConnectionService connectionService; // ✅ keep existing
+    private final UserService userService;
 
     public ProfileController(ProfileService profileService,
-                             ConnectionService connectionService) { // ✅ UPDATED
+                             ConnectionService connectionService,
+                             UserService userService) {
         this.profileService = profileService;
         this.connectionService = connectionService;
+        this.userService = userService;
     }
 
-    // ================= VIEW MY PROFILE =================
+    // ============================================================
+    // ================= VIEW MY PROFILE ==========================
+    // ============================================================
     @GetMapping
-    public String getMyProfile(Authentication authentication, Model model) {
+    public String getMyProfile(Authentication authentication,
+                               Model model,
+                               @RequestParam(value = "error", required = false) String error) {
+
+        if (authentication == null) {
+            return "redirect:/login";
+        }
 
         String currentUsername = authentication.getName();
 
-        ProfileResponse profile =
+        ProfileResponse  profile =
                 profileService.getProfileWithFollowInfo(
                         currentUsername,
                         currentUsername
                 );
 
         model.addAttribute("profile", profile);
+        model.addAttribute("isOwner", true);
+        model.addAttribute("canView", true);
 
-        // ✅ Add connection count
+        // ✅ keep connection count (your existing feature)
         model.addAttribute("connectionCount",
                 connectionService.getConnectionCount(currentUsername));
+
+        if (error != null) {
+            model.addAttribute("searchError", "No users found.");
+        }
 
         return "profile";
     }
 
-    // ================= VIEW OTHER PROFILE =================
+    // ============================================================
+    // ================= VIEW OTHER PROFILE =======================
+    // ============================================================
     @GetMapping("/{username}")
     public String viewProfile(@PathVariable String username,
                               Authentication authentication,
                               Model model) {
 
+        if (authentication == null) {
+            return "redirect:/login";
+        }
+
         String currentUsername = authentication.getName();
 
-        ProfileResponse profile =
+        ProfileResponse  profile =
                 profileService.getProfileWithFollowInfo(
                         currentUsername,
                         username
                 );
 
-        model.addAttribute("profile", profile);
+        boolean isOwner = currentUsername.equals(username);
 
-        // ✅ Add connection status
+        model.addAttribute("profile", profile);
+        model.addAttribute("isOwner", isOwner);
+
+        // 🔥 privacy control
+        boolean canView = 
+                Boolean.FALSE.equals(profile.isPrivate()) 
+                || profile.isFollowing() 
+                || profile.isOwn();
+
+        model.addAttribute("canView", canView);
+
+        // ✅ keep connection logic (your original feature)
         model.addAttribute("connectionStatus",
                 connectionService.getConnectionStatus(
                         currentUsername,
                         username
                 ));
 
-        // ✅ Add connection count
         model.addAttribute("connectionCount",
                 connectionService.getConnectionCount(username));
-        
+
         Long pendingRequestId =
                 connectionService.getPendingRequestId(
                         currentUsername,
@@ -81,33 +129,139 @@ public class ProfileController {
         return "profile";
     }
 
-    // ================= EDIT PROFILE PAGE =================
+    // ============================================================
+    // ================= EDIT PROFILE PAGE ========================
+    // ============================================================
     @GetMapping("/edit")
-    public String editProfilePage(Authentication authentication, Model model) {
+    public String editProfilePage(Authentication authentication,
+                                  Model model) {
+
+        if (authentication == null) {
+            return "redirect:/login";
+        }
 
         ProfileResponse profile =
                 profileService.getMyProfile(authentication.getName());
 
         model.addAttribute("profile", profile);
-
         return "edit-profile";
     }
 
-    // ================= UPDATE PROFILE =================
+    // ============================================================
+    // ================= UPDATE PROFILE ===========================
+    // ============================================================
     @PostMapping("/edit")
     public String updateProfile(Authentication authentication,
-                                @ModelAttribute UpdateProfileRequest request) {
+                                @ModelAttribute UpdateProfileRequest request,
+                                @RequestParam(value = "profileImage", required = false)
+                                MultipartFile profileImage,
+                                @RequestParam(value = "bannerImageFile", required = false)
+                                MultipartFile bannerImageFile,
+                                @RequestParam(value = "removeProfileImage", required = false)
+                                String removeProfileImage,
+                                RedirectAttributes redirectAttributes) {
 
-        profileService.updateProfile(authentication.getName(), request);
+        if (authentication == null) {
+            return "redirect:/login";
+        }
 
-        return "redirect:/profile";
+        try {
+
+            ProfileResponse existingProfile =
+                    profileService.getMyProfile(authentication.getName());
+
+            String profileImagePath = existingProfile.profilePicture();
+            String bannerImagePath = existingProfile.bannerImage();
+
+            String uploadDir = "uploads/";
+            Path uploadPath = Paths.get(uploadDir);
+
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath);
+            }
+
+            if (removeProfileImage != null) {
+                profileImagePath = null;
+            }
+
+            if (profileImage != null && !profileImage.isEmpty()) {
+
+                String fileName = System.currentTimeMillis() + "_" +
+                        profileImage.getOriginalFilename();
+
+                Path filePath = uploadPath.resolve(fileName);
+                Files.write(filePath, profileImage.getBytes());
+
+                profileImagePath = "/uploads/" + fileName;
+            }
+
+            if (bannerImageFile != null && !bannerImageFile.isEmpty()) {
+
+                String fileName = System.currentTimeMillis() + "_" +
+                        bannerImageFile.getOriginalFilename();
+
+                Path filePath = uploadPath.resolve(fileName);
+                Files.write(filePath, bannerImageFile.getBytes());
+
+                bannerImagePath = "/uploads/" + fileName;
+            }
+
+            UpdateProfileRequest updatedRequest = new UpdateProfileRequest(
+                    request.username(),
+                    request.email(),
+                    request.role(),
+                    request.fullName(),
+                    request.bio(),
+                    profileImagePath,
+                    bannerImagePath,
+                    request.location(),
+                    request.website(),
+                    request.isPrivate(),
+                    request.creatorName(),
+                    request.industry(),
+                    request.instagramLink(),
+                    request.youtubeLink(),
+                    request.twitterLink(),
+                    request.portfolioLink(),
+                    request.skills(),
+                    request.businessName(),
+                    request.category(),
+                    request.contactInfo(),
+                    request.businessAddress(),
+                    request.businessHours(),
+                    request.businessDescription(),
+                    request.servicesOffered(),
+                    request.mapLocationLink()
+            );
+
+            profileService.updateProfile(authentication.getName(), updatedRequest);
+
+            redirectAttributes.addFlashAttribute("success",
+                    "Profile updated successfully!");
+
+            // ✅ FIXED redirect
+            return "redirect:/profile";
+
+        } catch (Exception e) {
+
+            redirectAttributes.addFlashAttribute("error",
+                    "Update failed.");
+
+            return "redirect:/profile/edit";
+        }
     }
 
-    // ================= SEARCH USERS =================
+    // ============================================================
+    // ================= SEARCH USERS =============================
+    // ============================================================
     @GetMapping("/search")
     public String searchUsers(@RequestParam String keyword,
                               Authentication authentication,
                               Model model) {
+
+        if (authentication == null) {
+            return "redirect:/login";
+        }
 
         model.addAttribute("results",
                 profileService.searchUsers(keyword));

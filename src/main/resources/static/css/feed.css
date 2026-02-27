@@ -208,6 +208,169 @@ cursor:pointer;
 font-size:14px;
 }
 
+<<<<<<< HEAD
+=======
+/* SEARCH TRENDING DROPDOWN */
+/* ================= TRENDING BUTTON ================= */
+
+
+#trendingBox {
+    display: none;
+    position: absolute;
+    top: 45px;
+    left: 0;
+    width: 260px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    padding: 8px;
+    z-index: 2000;
+}
+
+
+.trending-btn:hover {
+    background: #2563eb;
+    color: white;
+}
+
+.trending-tags-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 25px;
+}
+
+.trend-pill {
+    padding: 6px 14px;
+    border-radius: 20px;
+    background: #f3f4f6;
+    text-decoration: none;
+    color: #111827;
+    font-size: 14px;
+}
+
+.trend-pill:hover {
+    background: #2563eb;
+    color: white;
+}
+
+.active-tag {
+    background: #2563eb;
+    color: white;
+}
+
+/* Hashtag Suggestions */
+      #hashtagSuggestions {
+          display: none;
+          background: white;
+          border: 1px solid #ddd;
+          border-radius: 8px;
+          padding: 8px;
+          margin-top: 5px;
+          text-align: left;
+      }
+
+      #hashtagSuggestions div:hover {
+          background: #f3f4f6;
+      }
+
+	  /* Overlay */
+	  .schedule-overlay{
+	      display:none;
+	      position:fixed;
+	      inset:0;
+	      background:rgba(0,0,0,0.4);
+	      justify-content:center;
+	      align-items:flex-end;
+	      z-index:2000;
+	  }
+
+	  /* Bottom Sheet */
+	  .schedule-sheet{
+	      background:white;
+	      width:100%;
+	      max-width:480px;
+	      padding:25px;
+	      border-radius:20px 20px 0 0;
+	      box-shadow:0 -5px 25px rgba(0,0,0,0.2);
+	      animation:slideUp 0.3s ease;
+	  }
+
+	  @keyframes slideUp{
+	      from{ transform:translateY(100%); }
+	      to{ transform:translateY(0); }
+	  }
+
+	  .schedule-input{
+	      width:100%;
+	      padding:10px;
+	      margin:15px 0;
+	      border-radius:10px;
+	      border:1px solid #d1d5db;
+	  }
+
+	  .schedule-buttons{
+	      display:flex;
+	      justify-content:space-between;
+	  }
+
+	  .ok-btn{
+	      background:#2563eb;
+	      color:white;
+	      border:none;
+	      padding:8px 20px;
+	      border-radius:8px;
+	      cursor:pointer;
+	  }
+
+	  .cancel-btn{
+	      background:#e5e7eb;
+	      border:none;
+	      padding:8px 20px;
+	      border-radius:8px;
+	      cursor:pointer;
+	  }
+	  /* =========================
+	     APP POPUP 
+	  ========================= */
+
+	  .app-popup-overlay {
+	      position: fixed;
+	      inset: 0;
+	      background: rgba(0,0,0,0.4);
+	      display: none;
+	      justify-content: center;
+	      align-items: center;
+	      z-index: 5000;
+	  }
+
+	  .app-popup {
+	      background: white;
+	      padding: 25px;
+	      width: 320px;
+	      border-radius: 16px;
+	      text-align: center;
+	      box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+	      animation: popupFade 0.2s ease;
+	  }
+
+	  @keyframes popupFade {
+	      from { transform: scale(0.9); opacity: 0; }
+	      to { transform: scale(1); opacity: 1; }
+	  }
+
+	  .app-popup button {
+	      margin-top: 15px;
+	      padding: 8px 20px;
+	      border: none;
+	      border-radius: 20px;
+	      background: #2563eb;
+	      color: white;
+	      cursor: pointer;
+	  }
+	  
+	  
+>>>>>>> origin/develop
 .comment-section{
 margin-top:15px;
 border-top:1px solid #e5e7eb;

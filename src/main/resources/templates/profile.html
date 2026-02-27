@@ -2,132 +2,349 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Profile</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 700px;
-            margin: auto;
-            padding: 20px;
-        }
 
-        .profile-card {
-            border: 1px solid #ddd;
-            padding: 20px;
-            border-radius: 10px;
-        }
-
-        .counts {
-            margin: 15px 0;
-            font-weight: bold;
-        }
-
-        .btn {
-            padding: 8px 15px;
-            border-radius: 5px;
-            text-decoration: none;
-            margin-right: 10px;
-            display: inline-block;
-            border: none;
-            cursor: pointer;
-        }
-
-        .btn-primary {
-            background-color: #007bff;
-            color: white;
-        }
-
-        .btn-danger {
-            background-color: #dc3545;
-            color: white;
-        }
-
-        .btn-secondary {
-            background-color: #6c757d;
-            color: white;
-        }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/global.css}">
+    <link rel="stylesheet" th:href="@{/css/profile.css}">
+    <meta charset="UTF-8">
 </head>
+
 <body>
 
-<div class="profile-card">
+<div class="page-wrapper">
+    <div class="profile-container">
 
-    <h2 th:text="${profile.fullName} ?: ${profile.username}"></h2>
+        <!-- ================= BANNER ================= -->
+        <div class="banner-section">
 
-    <p><strong>@</strong><span th:text="${profile.username}"></span></p>
-    <p><strong>Email:</strong> <span th:text="${profile.email}"></span></p>
-    <p><strong>Role:</strong> <span th:text="${profile.role}"></span></p>
-    <p><strong>Bio:</strong> <span th:text="${profile.bio}"></span></p>
+            <div class="header-overlay">
+                <div th:replace="~{fragments/header_profile :: headerProfile}"></div>
+            </div>
 
-    <div class="counts">
-        Followers: <span th:text="${profile.followerCount}"></span> |
-        Following: <span th:text="${profile.followingCount}"></span> |
-        Connections: <span th:text="${connectionCount}"></span>
+            <img class="banner-img"
+                 th:if="${canView}"
+                 th:src="${profile.bannerImage != null and !profile.bannerImage.isEmpty() 
+                            ? profile.bannerImage 
+                            : 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e'}">
+
+            <div class="banner-camera"
+                 th:if="${isOwner}"
+                 onclick="document.getElementById('bannerFileInput').click();">
+                📷
+            </div>
+
+            <form id="bannerUploadForm"
+                  th:if="${isOwner}"
+                  th:action="@{/api/profile/edit}"
+                  method="post"
+                  enctype="multipart/form-data">
+
+                <input type="file"
+                       id="bannerFileInput"
+                       name="bannerImageFile"
+                       accept="image/*"
+                       style="display:none"
+                       onchange="document.getElementById('bannerUploadForm').submit();">
+            </form>
+
+        </div>
+
+        <!-- ================= PROFILE INFO ================= -->
+        <div class="profile-info-section">
+
+            <div class="profile-image-wrapper">
+                <img class="profile-img"
+                     th:src="${profile.profilePicture != null and !profile.profilePicture.isEmpty() 
+                                ? profile.profilePicture 
+                                : 'https://i.pravatar.cc/150?img=3'}">
+
+                <div class="profile-camera"
+                     th:if="${isOwner}"
+                     onclick="document.getElementById('profileFileInput').click();">
+                    📷
+                </div>
+
+                <form id="profileUploadForm"
+                      th:if="${isOwner}"
+                      th:action="@{/api/profile/edit}"
+                      method="post"
+                      enctype="multipart/form-data">
+
+                    <input type="file"
+                           id="profileFileInput"
+                           name="profileImage"
+                           accept="image/*"
+                           style="display:none"
+                           onchange="document.getElementById('profileUploadForm').submit();">
+                </form>
+            </div>
+
+            <div class="profile-main-info">
+
+                <h2 th:text="${profile.fullName != null ? profile.fullName : profile.username}"></h2>
+
+                <p class="username">
+                    @<span th:text="${profile.username}"></span>
+                </p>
+
+                <!-- PRIVATE MESSAGE -->
+                <div th:if="${!canView}"
+                     style="margin-top:15px;
+                            padding:12px;
+                            background:#fff3f3;
+                            border:1px solid #ffc9c9;
+                            border-radius:8px;
+                            color:#c92a2a;
+                            font-weight:500;">
+                    🔒 This account is private.
+                </div>
+
+                <!-- ================= FULL PROFILE ================= -->
+                <div th:if="${canView}">
+
+                    <p class="bio"
+                       th:text="${profile.bio != null ? profile.bio : 'No bio added'}">
+                    </p>
+
+                    <div class="meta">
+
+                        <span th:if="${profile.location != null}">
+                            📍 <span th:text="${profile.location}"></span>
+                        </span>
+
+                        <span th:if="${profile.website != null}">
+                            🌐 
+                            <a th:href="${profile.website}"
+                               th:text="${profile.website}"
+                               target="_blank"></a>
+                        </span>
+
+                    </div>
+
+					
+					<!-- ================= PERSONAL SECTION ================= -->
+					<div th:if="${profile.role != null and profile.role.name() == 'PERSONAL'}"
+					     style="margin-top:18px; padding-top:10px; border-top:1px solid #eee;">
+
+					    <div>
+					        👤 <strong>Personal Account</strong>
+					    </div>
+
+					    <div th:if="${profile.bio != null}">
+					        📝 <span th:text="${profile.bio}"></span>
+					    </div>
+
+					</div>
+					
+					<!-- ================= CREATOR SECTION ================= -->
+					<div th:if="${profile.role != null and profile.role.name() == 'CREATOR'}"
+					     style="margin-top:18px; padding-top:10px; border-top:1px solid #eee;">
+
+					    <div>
+					        🎨 <strong>Creator Profile</strong>
+					    </div>
+
+					    <div th:if="${profile.industry != null}">
+					        🏷 <strong>Industry:</strong>
+					        <span th:text="${profile.industry}"></span>
+					    </div>
+
+					    <div th:if="${profile.skills != null}">
+					        💡 <strong>Skills:</strong>
+					        <span th:text="${profile.skills}"></span>
+					    </div>
+
+					    <div th:if="${profile.instagramLink != null}">
+					        📸 <a th:href="${profile.instagramLink}" target="_blank">Instagram</a>
+					    </div>
+
+					    <div th:if="${profile.youtubeLink != null}">
+					        ▶ <a th:href="${profile.youtubeLink}" target="_blank">YouTube</a>
+					    </div>
+
+					    <div th:if="${profile.portfolioLink != null}">
+					        🌐 <a th:href="${profile.portfolioLink}" target="_blank">Portfolio</a>
+					    </div>
+
+					</div>
+					
+					<!-- ================= BUSINESS SECTION ================= -->
+					<div th:if="${profile.role != null and profile.role.name() == 'BUSINESS'}"
+					     style="margin-top:18px; padding-top:10px; border-top:1px solid #eee;">
+
+					    <div>
+					        🏢 <strong>Business Profile</strong>
+					    </div>
+
+					    <div th:if="${profile.category != null}">
+					        🏷 <strong>Category:</strong>
+					        <span th:text="${profile.category}"></span>
+					    </div>
+
+					    <div th:if="${profile.contactInfo != null}">
+					        📞 <strong>Contact:</strong>
+					        <span th:text="${profile.contactInfo}"></span>
+					    </div>
+
+					    <div th:if="${profile.businessAddress != null}">
+					        📍 <strong>Business Address:</strong>
+					        <span th:text="${profile.businessAddress}"></span>
+					    </div>
+
+					    <div th:if="${profile.businessHours != null}">
+					        ⏰ <strong>Business Hours:</strong>
+					        <span th:text="${profile.businessHours}"></span>
+					    </div>
+
+					    <div th:if="${profile.servicesOffered != null}">
+					        🛠 <strong>Services:</strong>
+					        <span th:text="${profile.servicesOffered}"></span>
+					    </div>
+
+					</div>
+
+                    <!-- ================= STATS ================= -->
+                    <div class="profile-stats">
+
+                        <a th:href="@{/api/profile/{username}/followers(username=${profile.username})}"
+                           class="stat-item">
+                            <span class="stat-number"
+                                  th:text="${profile.followerCount}">0</span>
+                            <span class="stat-label">Followers</span>
+                        </a>
+
+                        <a th:href="@{/api/profile/{username}/following(username=${profile.username})}"
+                           class="stat-item">
+                            <span class="stat-number"
+                                  th:text="${profile.followingCount}">0</span>
+                            <span class="stat-label">Following</span>
+                        </a>
+
+                        <a class="stat-item">
+                            <span class="stat-number"
+                                  th:text="${profile.postCount}">0</span>
+                            <span class="stat-label">Posts</span>
+                        </a>
+
+                    </div>
+
+                </div>
+
+                <!-- EDIT BUTTON -->
+                <div class="edit-btn-wrapper" th:if="${isOwner}">
+                    <a th:href="@{/api/profile/edit}" class="edit-btn">
+                        ✏ Edit Profile
+                    </a>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ================= TABS (NOW CORRECT POSITION) ================= -->
+        <div class="profile-tabs">
+
+            <a th:href="@{/api/profile/{username}(username=${profile.username}, tab='posts')}"
+               th:classappend="${param.tab == null or param.tab == 'posts'} ? 'active-tab' : ''">
+                Posts
+            </a>
+
+            <a th:href="@{/api/profile/{username}(username=${profile.username}, tab='about')}"
+               th:classappend="${param.tab == 'about'} ? 'active-tab' : ''">
+                About
+            </a>
+
+            <a th:href="@{/api/profile/{username}(username=${profile.username}, tab='connections')}"
+               th:classappend="${param.tab == 'connections'} ? 'active-tab' : ''">
+                Connections
+            </a>
+
+        </div>
+
+        <!-- ================= TAB CONTENT ================= -->
+        <div class="tab-content">
+
+            <div th:if="${activeTab == 'posts'}">
+                <h3>Posts Section</h3>
+            </div>
+
+            <div th:if="${activeTab == 'about'}">
+                <h3>About Section</h3>
+            </div>
+
+            <div th:if="${activeTab == 'connections'}">
+                <h3>Connections Section</h3>
+            </div>
+
+        </div>
+
     </div>
-
-    <!-- Show Edit Button only if own profile -->
-    <div th:if="${profile.isOwnProfile}">
-        <a th:href="@{/profile/edit}" class="btn btn-secondary">Edit Profile</a>
-    </div>
-
-    <!-- Show Follow / Unfollow + Connection only if NOT own profile -->
-    <div th:if="${!profile.isOwnProfile}">
-
-        <!-- Follow Section (UNCHANGED) -->
-        <form th:if="${!profile.isFollowing}"
-              th:action="@{/follow/{username}(username=${profile.username})}"
-              method="post">
-            <button type="submit" class="btn btn-primary">Follow</button>
-        </form>
-
-        <form th:if="${profile.isFollowing}"
-              th:action="@{/follow/unfollow/{username}(username=${profile.username})}"
-              method="post">
-            <button type="submit" class="btn btn-danger">Unfollow</button>
-        </form>
-
-		<!-- ================= CONNECTION SECTION ================= -->
-
-		<!-- Not Connected -->
-		<form th:if="${connectionStatus == 'NONE'}"
-		      th:action="@{/connections/send/{username}(username=${profile.username})}"
-		      method="post">
-		    <button type="submit" class="btn btn-primary">Connect</button>
-		</form>
-
-		<!-- Request Sent -->
-		<button th:if="${connectionStatus == 'PENDING' and pendingRequestId == null}"
-		        class="btn btn-secondary"
-		        disabled>
-		    Pending
-		</button> 	
-
-		<!-- Request Received -->
-		<div th:if="${connectionStatus == 'PENDING' and pendingRequestId != null}">
-		    <form th:action="@{/connections/accept/{id}(id=${pendingRequestId})}"
-		          method="post" style="display:inline;">
-		        <button type="submit" class="btn btn-primary">Accept</button>
-		    </form>
-
-		    <form th:action="@{/connections/reject/{id}(id=${pendingRequestId})}"
-		          method="post" style="display:inline;">
-		        <button type="submit" class="btn btn-danger">Reject</button>
-		    </form>
-		</div>
-
-		<!-- Connected -->
-		<button th:if="${connectionStatus == 'ACCEPTED'}"
-		        class="btn btn-secondary"
-		        disabled>
-		    Connected
-		</button>
-
-    </div>
-
-    <br>
-    <a th:href="@{/feed}" class="btn btn-secondary">Back to Feed</a>
-    <a th:href="@{/logout}" class="btn btn-secondary">Logout</a>
-
 </div>
+
+
+<!-- ================= DROPDOWN SCRIPT ================= -->
+<script>
+
+function toggleDropdown() {
+    var menu = document.getElementById("dropdownMenu");
+    if (!menu) return;
+
+    if (menu.style.display === "flex") {
+        menu.style.display = "none";
+    } else {
+        menu.style.display = "flex";
+    }
+}
+
+window.addEventListener("click", function(event) {
+    var avatar = document.querySelector(".header-avatar");
+    var dropdown = document.getElementById("dropdownMenu");
+
+    if (!dropdown || !avatar) return;
+
+    if (!avatar.contains(event.target) && !dropdown.contains(event.target)) {
+        dropdown.style.display = "none";
+    }
+});
+
+var searchForm = document.getElementById("searchForm");
+
+if (searchForm) {
+    searchForm.addEventListener("submit", function(e) {
+        e.preventDefault();
+
+        var keywordInput = document.getElementById("searchInput");
+        var errorBox = document.getElementById("searchError");
+
+        if (!keywordInput) return;
+
+        var keyword = keywordInput.value.trim();
+        if (!keyword) return;
+
+        fetch("/api/profile/search-api?keyword=" + encodeURIComponent(keyword))
+            .then(function(response) {
+                if (response.status === 200) {
+                    return response.text().then(function(username) {
+                        window.location.href = "/api/profile/" + username;
+                    });
+                } else {
+                    return response.text().then(function(msg) {
+                        if (errorBox) {
+                            errorBox.innerText = "❌ " + msg;
+                            errorBox.style.display = "block";
+                        }
+                    });
+                }
+            })
+            .catch(function() {
+                if (errorBox) {
+                    errorBox.innerText = "❌ Something went wrong";
+                    errorBox.style.display = "block";
+                }
+            });
+
+    });
+}
+
+</script>
 
 </body>
 </html>

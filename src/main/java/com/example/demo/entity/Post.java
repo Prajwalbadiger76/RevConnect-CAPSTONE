@@ -11,74 +11,71 @@ public class Post {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "post_seq")
-    @SequenceGenerator(name = "post_seq", sequenceName = "post_seq", allocationSize = 1)
+    @SequenceGenerator(
+            name = "post_seq",
+            sequenceName = "post_seq",
+            allocationSize = 1
+    )
     private Long id;
 
-    @Column(length = 2000, nullable = false)
+    // ================= BASIC =================
+
+    @Column(nullable = false, length = 2000)
     private String content;
 
-    @Column(nullable = false)
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    // Post owner
+    // ================= USER =================
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    // Hashtags relation
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PostHashtag> postHashtags;
+    // ================= PIN =================
 
-    // Optional social flags
     @Column(name = "is_pinned", nullable = false)
-    private Boolean isPinned = false;
+    private Boolean pinned = false;
 
-    @Column(name = "is_promotional", nullable = false)
-    private Boolean isPromotional = false;
+    @Column(name = "pinned_at")
+    private LocalDateTime pinnedAt;
 
-    public Post() {}
+    // ================= SCHEDULE =================
 
-    // Automatically set timestamp when saved
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-    }
+    @Column(name = "scheduled_at")
+    private LocalDateTime scheduledAt;
 
-    @OneToOne(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    // ================= HASHTAGS =================
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PostHashtag> postHashtags = new ArrayList<>();
+
+    // ================= ANALYTICS =================
+
+    @OneToOne(mappedBy = "post", fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL, orphanRemoval = true)
     private PostAnalytics analytics;
 
-    public PostAnalytics getAnalytics() {
-        return analytics;
-    }
+    // ================= RELATIONS =================
 
-    public void setAnalytics(PostAnalytics analytics) {
-        this.analytics = analytics;
-    }
-    
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Like> likes;
+    private List<Like> likes = new ArrayList<>();
 
-    public List<Like> getLikes() {
-        return likes;
-    }
-
-    public void setLikes(List<Like> likes) {
-        this.likes = likes;
-    }
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Comment> comments;
+    private List<Comment> comments = new ArrayList<>();
 
-    public List<Comment> getComments() {
-        return comments;
-    }
-    
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PostView> views = new ArrayList<>();
 
-    public void setComments(List<Comment> comments) {
-        this.comments = comments;
+    // ================= AUTO TIMESTAMP =================
+
+    @PrePersist
+    protected void onCreate() {
+        if (createdAt == null)
+            createdAt = LocalDateTime.now();
     }
-    // -------- Getters & Setters --------
+
+    // ================= GETTERS & SETTERS =================
 
     public Long getId() {
         return id;
@@ -96,12 +93,40 @@ public class Post {
         return createdAt;
     }
 
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
     public User getUser() {
         return user;
     }
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public Boolean getPinned() {
+        return pinned;
+    }
+
+    public void setPinned(Boolean pinned) {
+        this.pinned = pinned;
+    }
+
+    public LocalDateTime getPinnedAt() {
+        return pinnedAt;
+    }
+
+    public void setPinnedAt(LocalDateTime pinnedAt) {
+        this.pinnedAt = pinnedAt;
+    }
+
+    public LocalDateTime getScheduledAt() {
+        return scheduledAt;
+    }
+
+    public void setScheduledAt(LocalDateTime scheduledAt) {
+        this.scheduledAt = scheduledAt;
     }
 
     public List<PostHashtag> getPostHashtags() {
@@ -112,19 +137,35 @@ public class Post {
         this.postHashtags = postHashtags;
     }
 
-    public Boolean getIsPinned() {
-        return isPinned;
+    public PostAnalytics getAnalytics() {
+        return analytics;
     }
 
-    public void setIsPinned(Boolean pinned) {
-        isPinned = pinned;
+    public void setAnalytics(PostAnalytics analytics) {
+        this.analytics = analytics;
     }
 
-    public Boolean getIsPromotional() {
-        return isPromotional;
+    public List<Like> getLikes() {
+        return likes;
     }
 
-    public void setIsPromotional(Boolean promotional) {
-        isPromotional = promotional;
+    public void setLikes(List<Like> likes) {
+        this.likes = likes;
+    }
+
+    public List<Comment> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<Comment> comments) {
+        this.comments = comments;
+    }
+
+    public List<PostView> getViews() {
+        return views;
+    }
+
+    public void setViews(List<PostView> views) {
+        this.views = views;
     }
 }

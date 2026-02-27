@@ -32,14 +32,22 @@
 <h2>Create New Post</h2>
 
 <form th:action="@{/post/create}" method="post">
+
+    <!-- Content -->
     <textarea name="content"
               rows="5"
               placeholder="What's on your mind?"
               required></textarea>
-    <br>
-    <button type="submit">Post</button>
+
+    <!-- Hashtags -->
+    <input type="text"
+           name="hashtags"
+           placeholder="Add hashtags (comma separated)">
+
+    <!-- Submit -->
+    <button type="submit">Create Post</button>
+
     <a th:href="@{/feed}" class="btn-back">Cancel</a>
-</form>
 
 </body>
 </html>

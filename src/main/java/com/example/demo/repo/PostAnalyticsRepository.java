@@ -90,5 +90,25 @@ public interface PostAnalyticsRepository extends JpaRepository<PostAnalytics, Lo
         where pa.post.id = :postId
     """)
     void incrementReach(@Param("postId") Long postId);
+    
+ // DELETE ANALYTICS WHEN POST IS DELETED
+    @Modifying
+    @Query("delete from PostAnalytics pa where pa.post.id = :postId")
+    void deleteByPostId(@Param("postId") Long postId);
+
+
+    // UNLIKE SUPPORT (DECREASE LIKE COUNT)
+    @Modifying
+    @Query("""
+        update PostAnalytics pa
+        set pa.totalLikes =
+            case
+                when pa.totalLikes <= 0 then 0
+                else pa.totalLikes - 1
+            end,
+            pa.updatedAt = CURRENT_TIMESTAMP
+        where pa.post.id = :postId
+    """)
+    void decrementLikes(@Param("postId") Long postId);
 
 }

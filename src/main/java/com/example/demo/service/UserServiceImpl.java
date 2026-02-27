@@ -2,10 +2,14 @@ package com.example.demo.service;
 
 import com.example.demo.config.JwtUtil;
 import com.example.demo.dto.LoginRequest;
+import com.example.demo.dto.ProfileResponse;
 import com.example.demo.dto.RegisterRequest;
 import com.example.demo.entity.User;
 import com.example.demo.exception.CustomException;
 import com.example.demo.repo.UserRepository;
+
+import java.util.Collections;
+import java.util.List;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -54,6 +58,11 @@ public class UserServiceImpl implements UserService {
         }
 
         return jwtUtil.generateToken(user);
+    }
+    
+    @Override
+    public List<ProfileResponse> searchUsers(String keyword) {
+        return Collections.emptyList();   
     }
 
 }

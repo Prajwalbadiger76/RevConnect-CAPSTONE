@@ -22,7 +22,7 @@ public class FeedController {
     }
 
     @GetMapping("/feed")
-    public String feed(Authentication authentication, Model model) {
+    public String getFeed(Model model, Authentication authentication) {
 
         String username = authentication.getName();
 
@@ -36,6 +36,10 @@ public class FeedController {
 
         model.addAttribute("currentUserRole",
                 user.getRole().name());  // if enum
+        model.addAttribute("posts", postService.getFeedPosts(username));
+        model.addAttribute("trendingHashtags", postService.getTrendingHashtags());  
+        model.addAttribute("currentUsername", username);
+        model.addAttribute("showCreateForm", true);
 
         return "feed";
     }

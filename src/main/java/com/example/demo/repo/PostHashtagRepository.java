@@ -1,8 +1,24 @@
 package com.example.demo.repo;
 
-import com.example.demo.entity.PostHashtag;
-import org.springframework.data.jpa.repository.JpaRepository;
+import java.util.List;
 
-public interface PostHashtagRepository
-        extends JpaRepository<PostHashtag, Long> {
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.example.demo.entity.*;
+import com.example.demo.entity.PostHashtag;
+
+public interface PostHashtagRepository extends JpaRepository<PostHashtag, Long> {
+
+    @Transactional
+    void deleteByPost(Post post);
+    
+    @Query("""
+    	    SELECT ph.hashtag.name, COUNT(ph)
+    	    FROM PostHashtag ph
+    	    GROUP BY ph.hashtag.name
+    	    ORDER BY COUNT(ph) DESC
+    	""")
+    	List<Object[]> findTrendingHashtags();
 }

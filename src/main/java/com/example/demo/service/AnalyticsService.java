@@ -109,6 +109,20 @@ public class AnalyticsService {
             incrementReach(postId);
         }
     }
+    
+ // ================= DELETE ANALYTICS (WHEN POST DELETED) =================
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void deleteAnalytics(Long postId) {
+        analyticsRepository.deleteByPostId(postId);
+    }
+
+    // ================= UNLIKE SUPPORT =================
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void decrementLikes(Long postId) {
+        analyticsRepository.decrementLikes(postId);
+    }
 
     // FETCH ANALYTICS
 

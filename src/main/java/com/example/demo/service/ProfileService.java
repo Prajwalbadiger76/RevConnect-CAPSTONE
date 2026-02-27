@@ -9,12 +9,14 @@ public interface ProfileService {
 
     ProfileResponse getMyProfile(String username);
 
-    ProfileResponse getProfile(String username);
+    ProfileResponse getProfile(String username, String viewerUsername);
 
     ProfileResponse updateProfile(String username, UpdateProfileRequest request);
 
     List<ProfileResponse> searchUsers(String keyword);
     
-    ProfileResponse getProfileWithFollowInfo(String currentUsername, String targetUsername);
+    ProfileResponse  getProfileWithFollowInfo(String currentUsername, String targetUsername);
     
 }
+
+
