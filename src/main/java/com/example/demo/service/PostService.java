@@ -20,4 +20,4 @@ public interface PostService {
     void deletePost(Long postId, String username);
     
     void sharePost(Long id, String username);
-}	
+}

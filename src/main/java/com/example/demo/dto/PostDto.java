@@ -1,133 +1,82 @@
 package com.example.demo.dto;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 public class PostDto {
 
-	private Long id;
-	private String content;
-	private String username;
-	private LocalDateTime createdAt;
+    private Long id;
+    private String content;
+    private String username;
+    private LocalDateTime createdAt;
+    private long likeCount;
+    private boolean likedByCurrentUser;
+    private List<CommentDto> comments;
 
-	private long likeCount;
-	private boolean likedByCurrentUser;
+    public PostDto() {
+    }
 
-	// ⭐ NEVER NULL AGAIN
-	private List<CommentDto> comments = new ArrayList<>();
+    public PostDto(Long id, String content, String username, LocalDateTime createdAt) {
+        this.id = id;
+        this.content = content;
+        this.username = username;
+        this.createdAt = createdAt;
+    }
 
-	// ===== Analytics =====
-	private long totalComments;
-	private long totalShares;
-	private long reachCount;
-	private double engagementRate;
+    public Long getId() {
+        return id;
+    }
 
-	public PostDto() {
-		this.comments = new ArrayList<>();
-	}
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-	public PostDto(Long id, String content, String username, LocalDateTime createdAt) {
-		this.id = id;
-		this.content = content;
-		this.username = username;
-		this.createdAt = createdAt;
-		this.comments = new ArrayList<>();
-	}
+    public String getContent() {
+        return content;
+    }
 
-	// ---------- BASIC ----------
+    public void setContent(String content) {
+        this.content = content;
+    }
 
-	public Long getId() {
-		return id;
-	}
+    public String getUsername() {
+        return username;
+    }
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    public void setUsername(String username) {
+        this.username = username;
+    }
 
-	public String getContent() {
-		return content;
-	}
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
 
-	public void setContent(String content) {
-		this.content = content;
-	}
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
 
-	public String getUsername() {
-		return username;
-	}
+    public long getLikeCount() {
+        return likeCount;
+    }
 
-	public void setUsername(String username) {
-		this.username = username;
-	}
+    public void setLikeCount(long likeCount) {
+        this.likeCount = likeCount;
+    }
 
-	public LocalDateTime getCreatedAt() {
-		return createdAt;
-	}
+    public boolean isLikedByCurrentUser() {
+        return likedByCurrentUser;
+    }
 
-	public void setCreatedAt(LocalDateTime createdAt) {
-		this.createdAt = createdAt;
-	}
+    public void setLikedByCurrentUser(boolean likedByCurrentUser) {
+        this.likedByCurrentUser = likedByCurrentUser;
+    }
+    
 
-	public long getLikeCount() {
-		return likeCount;
-	}
+    public List<CommentDto> getComments() {
+        return comments;
+    }
 
-	public void setLikeCount(long likeCount) {
-		this.likeCount = likeCount;
-	}
-
-	public boolean isLikedByCurrentUser() {
-		return likedByCurrentUser;
-	}
-
-	public void setLikedByCurrentUser(boolean likedByCurrentUser) {
-		this.likedByCurrentUser = likedByCurrentUser;
-	}
-
-	// ⭐ CRITICAL FIX (NULL PROTECTION)
-	public List<CommentDto> getComments() {
-		if (comments == null) {
-			comments = new ArrayList<>();
-		}
-		return comments;
-	}
-
-	public void setComments(List<CommentDto> comments) {
-		this.comments = (comments == null) ? new ArrayList<>() : comments;
-	}
-
-	// ---------- ANALYTICS ----------
-
-	public long getTotalComments() {
-		return totalComments;
-	}
-
-	public void setTotalComments(long totalComments) {
-		this.totalComments = totalComments;
-	}
-
-	public long getTotalShares() {
-		return totalShares;
-	}
-
-	public void setTotalShares(long totalShares) {
-		this.totalShares = totalShares;
-	}
-
-	public long getReachCount() {
-		return reachCount;
-	}
-
-	public void setReachCount(long reachCount) {
-		this.reachCount = reachCount;
-	}
-
-	public double getEngagementRate() {
-		return engagementRate;
-	}
-
-	public void setEngagementRate(double engagementRate) {
-		this.engagementRate = engagementRate;
-	}
+    public void setComments(List<CommentDto> comments) {
+        this.comments = comments;
+    }
 }

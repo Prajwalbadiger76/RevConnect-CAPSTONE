@@ -6,7 +6,7 @@ import com.example.demo.entity.User;
 import com.example.demo.repo.LikeRepository;
 import com.example.demo.repo.PostRepository;
 import com.example.demo.repo.UserRepository;
-import org.springframework.transaction.annotation.Transactional;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 @Service

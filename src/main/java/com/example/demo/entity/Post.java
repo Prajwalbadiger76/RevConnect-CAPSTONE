@@ -2,7 +2,6 @@ package com.example.demo.entity;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -44,40 +43,6 @@ public class Post {
         this.createdAt = LocalDateTime.now();
     }
 
-    @OneToOne(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private PostAnalytics analytics;
-
-    public PostAnalytics getAnalytics() {
-        return analytics;
-    }
-
-    public void setAnalytics(PostAnalytics analytics) {
-        this.analytics = analytics;
-    }
-    
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Like> likes;
-
-    public List<Like> getLikes() {
-        return likes;
-    }
-
-    public void setLikes(List<Like> likes) {
-        this.likes = likes;
-    }
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Comment> comments;
-
-    public List<Comment> getComments() {
-        return comments;
-    }
-    
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PostView> views = new ArrayList<>();
-
-    public void setComments(List<Comment> comments) {
-        this.comments = comments;
-    }
     // -------- Getters & Setters --------
 
     public Long getId() {
