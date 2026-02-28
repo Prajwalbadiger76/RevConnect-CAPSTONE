@@ -294,10 +294,6 @@
 						<button>🔁 Share</button>
 					</form>
 
-					<form th:if="${post.username == currentUsername}" th:action="@{/post/delete/{id}(id=${post.id})}"
-						method="post">
-						<button>🗑 Delete</button>
-					</form>
 
 				</div>
 

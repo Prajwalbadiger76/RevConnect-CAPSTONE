@@ -7,48 +7,60 @@
 </head>
 <body>
 
-<div class="navbar">
-    <h2>RevConnect</h2>
-    <a th:href="@{/feed}">Back to Feed</a>
-</div>
+<div class="trending-page">
 
-<div class="feed-container">
+    <!-- NAVBAR -->
+    <div class="navbar">
+        <h2>RevConnect</h2>
+    </div>
 
-    <!-- Trending Pills -->
-    <div class="trending-tags-row">
-
-        <a th:each="tagItem : ${trendingHashtags}"
-           th:href="@{/post/trending(tag=${tagItem})}"
-           class="trend-pill"
-           th:classappend="${tagItem == selectedTag} ? ' active-tag' : ''"
-           th:text="${'#' + tagItem}">
+    <!-- BACK BUTTON -->
+    <div class="sub-header">
+        <a th:href="@{/feed}" class="back-btn">
+            ← Back to Feed
         </a>
-
     </div>
 
-    <!-- Posts Below -->
-    <div th:each="post : ${posts}" class="post-card">
+    <div class="feed-container">
 
-        <div class="post-top">
+        <!-- Trending Pills -->
+        <div class="trending-tags-row">
 
-            <div class="avatar small">
-                <span th:text="${#strings.substring(post.username,0,1).toUpperCase()}"></span>
-            </div>
-
-            <div class="post-meta">
-                <a th:text="${post.username}"></a>
-                <span th:text="${#temporals.format(post.createdAt,'dd MMM yyyy HH:mm')}"></span>
-            </div>
+            <a th:each="tagItem : ${trendingHashtags}"
+               th:href="@{/post/trending(tag=${tagItem})}"
+               class="trend-pill"
+               th:classappend="${tagItem == selectedTag} ? ' active-tag' : ''"
+               th:text="${'#' + tagItem}">
+            </a>
 
         </div>
 
-        <div class="post-content"
-             th:text="${post.content}">
+        <!-- Posts -->
+        <div th:each="post : ${posts}" class="post-card">
+
+            <div class="post-top">
+
+                <div class="avatar small">
+                    <span th:text="${#strings.substring(post.username,0,1).toUpperCase()}"></span>
+                </div>
+
+                <div class="post-meta">
+                    <a th:text="${post.username}"></a>
+                    <span th:text="${#temporals.format(post.createdAt,'dd MMM yyyy HH:mm')}"></span>
+                </div>
+
+            </div>
+
+            <div class="post-content"
+                 th:text="${post.content}">
+            </div>
+
         </div>
 
     </div>
 
 </div>
+
 
 </body>
 </html>

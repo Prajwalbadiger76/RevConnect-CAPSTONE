@@ -24,7 +24,8 @@ public interface PostService {
 
     void unpinPost(Long postId, String username);
 
-    List<PostDto> getUserPosts(String profileUsername, String currentUsername);
+   
+    List<PostDto> getPostsByUsername(String username, String currentUser);
 
     List<PostDto> getAllPosts();
 
