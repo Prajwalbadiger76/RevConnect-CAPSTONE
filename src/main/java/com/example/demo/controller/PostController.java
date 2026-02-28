@@ -141,26 +141,20 @@ public class PostController {
         keyword = keyword.trim();
 
         List<PostDto> posts = new ArrayList<>();
+        List<?> users = new ArrayList<>();
 
-        // ================= HASHTAG SEARCH =================
         if (keyword.startsWith("#")) {
 
             String tag = keyword.substring(1);
-
             posts = postService.searchPostsByHashtag(tag, currentUsername);
 
-            model.addAttribute("posts", posts);
+        } else {
 
-        } 
-        // ================= USER SEARCH ONLY =================
-        else {
-
-            model.addAttribute("results",
-                    profileService.searchUsers(keyword));
-
-            // IMPORTANT: Do NOT search posts here
-            model.addAttribute("posts", new ArrayList<>());
+            users = profileService.searchUsers(keyword);
         }
+
+        model.addAttribute("posts", posts);
+        model.addAttribute("results", users);   // 🔥 ALWAYS ADD THIS
 
         model.addAttribute("currentUsername", currentUsername);
         model.addAttribute("trendingHashtags",

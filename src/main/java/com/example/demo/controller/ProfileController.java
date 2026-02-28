@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import com.example.demo.dto.PostDto;
 import com.example.demo.dto.ProfileResponse;
 import com.example.demo.dto.ProfileWithFollowResponse;
 import com.example.demo.dto.UpdateProfileRequest;
@@ -44,36 +45,42 @@ public class ProfileController {
     // ================= VIEW MY PROFILE ==========================
     // ============================================================
     @GetMapping
-    public String getMyProfile(Authentication authentication,
-                               Model model,
-                               @RequestParam(value = "error", required = false) String error) {
+	public String getMyProfile(Authentication authentication,
+	                           Model model,
+	                           @RequestParam(value = "error", required = false) String error) {
 
-        if (authentication == null) {
-            return "redirect:/login";
-        }
+	    if (authentication == null) {
+	        return "redirect:/login";
+	    }
 
-        String currentUsername = authentication.getName();
+	    String currentUsername = authentication.getName();
 
-        ProfileResponse  profile =
-                profileService.getProfileWithFollowInfo(
-                        currentUsername,
-                        currentUsername
-                );
+	    ProfileResponse profile =
+	            profileService.getProfileWithFollowInfo(
+	                    currentUsername,
+	                    currentUsername
+	            );
 
-        model.addAttribute("profile", profile);
-        model.addAttribute("isOwner", true);
-        model.addAttribute("canView", true);
+	    model.addAttribute("profile", profile);
+	    model.addAttribute("isOwner", true);
+	    model.addAttribute("canView", true);
 
-        // ✅ keep connection count (your existing feature)
-        model.addAttribute("connectionCount",
-                connectionService.getConnectionCount(currentUsername));
+	    // ✅ FETCH POSTS
+	    List<PostDto> posts =
+	            postService.getUserPosts(currentUsername, currentUsername);
 
-        if (error != null) {
-            model.addAttribute("searchError", "No users found.");
-        }
+	    model.addAttribute("posts", posts);     // 🔥 IMPORTANT
+	    model.addAttribute("activeTab", "posts");
 
-        return "profile";
-    }
+	    model.addAttribute("connectionCount",
+	            connectionService.getConnectionCount(currentUsername));
+
+	    if (error != null) {
+	        model.addAttribute("searchError", "No users found.");
+	    }
+
+	    return "profile";
+	}
 
     // ============================================================
     // ================= VIEW OTHER PROFILE =======================
@@ -83,13 +90,9 @@ public class ProfileController {
                               Authentication authentication,
                               Model model) {
 
-        if (authentication == null) {
-            return "redirect:/login";
-        }
-
         String currentUsername = authentication.getName();
 
-        ProfileResponse  profile =
+        ProfileResponse profile =
                 profileService.getProfileWithFollowInfo(
                         currentUsername,
                         username
@@ -100,15 +103,13 @@ public class ProfileController {
         model.addAttribute("profile", profile);
         model.addAttribute("isOwner", isOwner);
 
-        // 🔥 privacy control
-        boolean canView = 
-                Boolean.FALSE.equals(profile.isPrivate()) 
-                || profile.isFollowing() 
+        boolean canView =
+                Boolean.FALSE.equals(profile.isPrivate())
+                || profile.isFollowing()
                 || profile.isOwn();
 
         model.addAttribute("canView", canView);
 
-        // ✅ keep connection logic (your original feature)
         model.addAttribute("connectionStatus",
                 connectionService.getConnectionStatus(
                         currentUsername,
@@ -125,6 +126,12 @@ public class ProfileController {
                 );
 
         model.addAttribute("pendingRequestId", pendingRequestId);
+
+        // 🔥 ADD THIS
+        List<PostDto> posts =
+                postService.getUserPosts(username, currentUsername);
+
+        model.addAttribute("posts", posts);
 
         return "profile";
     }
