@@ -265,12 +265,9 @@
 			<div class="create-post" th:if="${showCreateForm} ">
 				<form th:action="@{/post/create}" method="post">
 
-					<!-- Row 1: Avatar + Textarea -->
+					<!-- Row 1: Textarea -->
 					<div class="create-row">
 
-						<div class="avatar">
-							<span th:text="${#strings.substring(currentUsername,0,1).toUpperCase()}"></span>
-						</div>
 
 						<textarea name="content" id="postContent" placeholder="What's on your mind?"
 							required></textarea>
@@ -419,9 +416,9 @@
 
 		<div class="notification-sidebar">
 			<div class="sidebar-header">Notifications</div>
-			<div class="notif-title">Read</div>
-			<div id="notifUnread"></div>
 			<div class="notif-title">Unread</div>
+			<div id="notifUnread"></div>
+			<div class="notif-title">Read</div>
 			<div id="notifRead"></div>
 		</div>
 
