@@ -28,8 +28,9 @@ public interface PostService {
 
     List<PostDto> getAllPosts();
 
-    List<PostDto> getFeedPosts(String username);
-
+    // for filter based post
+    List<PostDto> getFeedPosts(String username, String roleFilter);
+    
     // ADD THIS (needed for edit page)
     PostDto getPostById(Long postId, String currentUsername);
 

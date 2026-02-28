@@ -301,6 +301,12 @@
 				   th:href="@{/profile/{username}/analytics(username=${profile.username})}">
 				    Followers Demographics
 				</a>
+				<a th:if="${isOwner}"
+				   th:href="@{/settings/notifications}"
+				   class="tab-link">
+				     Notification Settings
+				</a>
+				
                 <!-- EDIT BUTTON -->
                 <div class="edit-btn-wrapper" th:if="${isOwner}">
                     <a th:href="@{/profile/edit}" class="edit-btn">

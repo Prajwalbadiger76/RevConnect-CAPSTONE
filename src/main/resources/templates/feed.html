@@ -9,15 +9,20 @@
 	<style>
 		/* ====== PAGE LAYOUT ====== */
 		.page-layout {
-			display: flex;
+			display: grid;
+			grid-template-columns: 180px 650px 320px;
+			gap: 125px;
 			justify-content: center;
-			gap: 40px;
 			padding-top: 20px;
+			margin-top: 25px;
 		}
 
 		.feed-container {
 			width: 650px;
 		}
+
+
+
 
 		/* ===== RIGHT SIDEBAR ===== */
 		.notification-sidebar {
@@ -106,6 +111,55 @@
 		}
 	</style>
 
+	<style>
+		/* FILTER COLUMN POSITION */
+		.filter-column {
+			position: sticky;
+			top: 90px;
+			height: fit-content;
+		}
+
+		/* FILTER CARD */
+		.filter-card {
+			background: white;
+			border-radius: 14px;
+			padding: 15px;
+			box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+		}
+
+		/* TITLE */
+		.filter-heading {
+			font-weight: 600;
+			margin-bottom: 12px;
+			font-size: 16px;
+		}
+
+		/* BUTTON STYLE */
+		.filter-btn {
+			width: 100%;
+			text-align: left;
+			padding: 10px 12px;
+			border-radius: 10px;
+			border: none;
+			background: transparent;
+			cursor: pointer;
+			font-size: 14px;
+			margin-bottom: 6px;
+			transition: 0.2s;
+		}
+
+		/* HOVER EFFECT */
+		.filter-btn:hover {
+			background: #eef3ff;
+		}
+
+		/* ACTIVE BUTTON */
+		.filter-btn.active {
+			background: #e0e7ff;
+			font-weight: 600;
+		}
+	</style>
+
 	<meta charset="UTF-8">
 	<title>RevConnect - Feed</title>
 	<link rel="stylesheet" th:href="@{/css/feed.css}">
@@ -122,10 +176,10 @@
 	<div class="navbar">
 
 		<!-- LEFT -->
-		
+
 
 		<div class="navbar-right">
-		<!--<a th:href="@{/connections}">Pending</a>
+			<!--<a th:href="@{/connections}">Pending</a>
 			<a th:href="@{/connections/accepted}">Connections</a>-->
 
 
@@ -146,12 +200,13 @@
 						        color:#ff5722;
 						        text-decoration:none;
 						        font-size:13px;">
-						🔥 Trending Hashtag
 					</a>
 					<div id="trendingBox"></div>
 
 					<button type="submit">Search</button>
 				</form>
+
+
 
 			</div>
 		</div>
@@ -159,52 +214,55 @@
 		<!-- RIGHT -->
 		<div class="navbar-right">
 
-					<div class="notif-bell" onclick="toggleNotifications()">
-						🔔
-						<span id="notifCount" class="notif-count"></span>
-					</div>
 
-					<a th:href="@{/connections}">Pending</a>
-					<a th:href="@{/connections}">Pending Requests</a>
-					<a th:href="@{/connections/sent}">Sent Requests</a>
-					<a th:href="@{/connections/accepted}">Connections</a>
+			<a th:href="@{/connections}">Pending</a>
+			<a th:href="@{/connections}">Pending Requests</a>
+			<a th:href="@{/connections/sent}">Sent Requests</a>
+			<a th:href="@{/connections/accepted}">Connections</a>
 
-					<div class="profile-menu">
-						<div class="profile-circle" onclick="toggleProfileMenu()"
-							th:text="${#strings.substring(currentUsername,0,1).toUpperCase()}">
-						</div>
-
-						<div id="profileDropdown" class="dropdown">
-							<a th:href="@{/profile}">My Profile</a>
-							<a th:href="@{/logout}">Logout</a>
-						</div>
-					</div>
+			<div class="profile-menu">
+				<div class="profile-circle" onclick="toggleProfileMenu()"
+					th:text="${#strings.substring(currentUsername,0,1).toUpperCase()}">
 				</div>
-		
+
+				<div id="profileDropdown" class="dropdown">
+					<a th:href="@{/profile}">My Profile</a>
+					<a th:href="@{/logout}">Logout</a>
+				</div>
+			</div>
+		</div>
+
 	</div>
 
 	<!-- ================= MAIN LAYOUT ================= -->
 
 	<div class="page-layout">
 
-		
+		<!-- FILTER COLUMN -->
+		<div class="filter-column">
 
-		<!-- NOTIFICATIONS PANEL (UNCHANGED) -->
-		<div id="notifPanel" class="notif-panel">
-			<div class="notif-header">
-				</br></br></br>
-				<h3>Notifications</h3>
-				<span class="close-btn" onclick="toggleNotifications()">✖</span>
+			<div class="filter-card">
+				<div class="filter-heading">Filter Post</div>
+
+				<button class="filter-btn" onclick="changeRoleFilter('ALL')">All Posts</button>
+				<button class="filter-btn" onclick="changeRoleFilter('PERSONAL')">Personal</button>
+				<button class="filter-btn" onclick="changeRoleFilter('CREATOR')">Creators</button>
+				<button class="filter-btn" onclick="changeRoleFilter('BUSINESS')">Businesses</button>
+
 			</div>
-			<div id="notifList" class="notif-list"></div>
+
 		</div>
 
+
+
+
 		<!-- FEED -->
-		<div class="feed-container">
+		<div style="margin-top: 6px;" class="feed-container">
+
 
 
 			<!-- CREATE POST -->
-			<div class="create-post" th:if="${showCreateForm}">
+			<div class="create-post" th:if="${showCreateForm} ">
 				<form th:action="@{/post/create}" method="post">
 
 					<!-- Row 1: Avatar + Textarea -->
@@ -338,26 +396,25 @@
 					</div>
 
 				</div>
-				
-				<div th:if="${currentUserRole == 'CREATOR' or currentUserRole == 'BUSINESS'}"
-							     class="analytics-bar">
-								 
-				                <div class="analytics-item">
-				                    👁 <span th:text="${post.reachCount}">0</span>
-				                    <small>Reach</small>
-				                </div>
 
-				                <div class="analytics-item">
-				                    🔁 <span th:text="${post.totalShares}">0</span>
-				                    <small>Shares</small>
-				                </div>
+				<div th:if="${currentUserRole == 'CREATOR' or currentUserRole == 'BUSINESS'}" class="analytics-bar">
 
-				                <div class="analytics-item">
-				                    📊 <span th:text="${#numbers.formatDecimal(post.engagementRate,1,2)}">0</span>%
-				                    <small>Engagement</small>
-				                </div>
+					<div class="analytics-item">
+						👁 <span th:text="${post.reachCount}">0</span>
+						<small>Reach</small>
+					</div>
 
-				            </div>
+					<div class="analytics-item">
+						🔁 <span th:text="${post.totalShares}">0</span>
+						<small>Shares</small>
+					</div>
+
+					<div class="analytics-item">
+						📊 <span th:text="${#numbers.formatDecimal(post.engagementRate,1,2)}">0</span>%
+						<small>Engagement</small>
+					</div>
+
+				</div>
 
 			</div>
 		</div>
@@ -462,7 +519,7 @@
 
 	<!-- SCRIPT (UNCHANGED) -->
 	<script>
-		
+
 
 		function toggleComments(postId) {
 			let section = document.getElementById("comments-" + postId);
@@ -688,6 +745,28 @@
 			}, 2000);
 		}
 
+
+	</script>
+
+	<!--this is the filter type post-->
+
+	<script>
+		function changeRoleFilter(role) {
+			if (role === "ALL")
+				window.location.href = "/feed";
+			else
+				window.location.href = "/feed?role=" + role;
+		}
+	</script>
+
+	<script th:inline="javascript">
+		let selected = "[[${selectedRole}]]";
+		if (!selected) selected = "ALL";
+
+		document.querySelectorAll(".filter-btn").forEach(btn => {
+			if (btn.innerText.toUpperCase().includes(selected))
+				btn.classList.add("active");
+		});
 	</script>
 
 </body>
