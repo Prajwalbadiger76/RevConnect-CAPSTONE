@@ -208,31 +208,28 @@ public class PostServiceImpl implements PostService {
         User currentUser = userRepository.findByUsername(username).orElseThrow();
         LocalDateTime now = LocalDateTime.now();
 
-        // Step 1: always get followed users
-        List<User> followedUsers = followRepository.findByFollower(currentUser)
-                .stream()
-                .map(Follow::getFollowing)
-                .toList();
-
-        // include self posts
-        List<User> feedUsers = new ArrayList<>(followedUsers);
-        feedUsers.add(currentUser);
-
         List<Post> posts;
 
-        // ================= ROLE FILTER =================
+        // ================= FILTER APPLIED =================
         if (roleFilter != null && !roleFilter.equalsIgnoreCase("ALL")) {
 
             Role selectedRole = Role.valueOf(roleFilter.toUpperCase());
 
-            // get posts only from feed users having selected role
-            posts = postRepository.findFeedPosts(feedUsers, now)
-                    .stream()
-                    .filter(p -> p.getUser().getRole() == selectedRole)
-                    .toList();
+            // show only selected role posts
+            posts = postRepository.findPostsByAuthorRole(selectedRole, now);
+
         }
-        // ================= NORMAL FEED =================
+        // ================= DEFAULT NORMAL FEED =================
         else {
+
+            List<User> followedUsers = followRepository.findByFollower(currentUser)
+                    .stream()
+                    .map(Follow::getFollowing)
+                    .toList();
+
+            List<User> feedUsers = new ArrayList<>(followedUsers);
+            feedUsers.add(currentUser);
+
             posts = postRepository.findFeedPosts(feedUsers, now);
         }
 
