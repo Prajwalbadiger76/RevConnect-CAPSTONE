@@ -275,29 +275,12 @@
 						</a>
 					</div>
 
-<<<<<<< HEAD
 				</div>
 			</div>
 
 			<!-- ================= TABS (NOW CORRECT POSITION) ================= -->
 			<div class="profile-tabs">
-=======
-                        <a th:href="@{/profile/{username}/followers(username=${profile.username})}"
-
-                           class="stat-item">
-                            <span class="stat-number"
-                                  th:text="${profile.followerCount}">0</span>
-                            <span class="stat-label">Followers</span>
-                        </a>
-
-                        <a th:href="@{/profile/{username}/following(username=${profile.username})}"
-
-                           class="stat-item">
-                            <span class="stat-number"
-                                  th:text="${profile.followingCount}">0</span>
-                            <span class="stat-label">Following</span>
-                        </a>
->>>>>>> origin/develop
+                        
 
 				<a th:href="@{/api/profile/{username}(username=${profile.username}, tab='posts')}"
 					th:classappend="${param.tab == null or param.tab == 'posts'} ? 'active-tab' : ''">
@@ -314,12 +297,10 @@
 					Connections
 				</a>
 
-<<<<<<< HEAD
 				<a sec:authorize="hasAnyRole('CREATOR','BUSINESS')"
 				   th:href="@{/profile/{username}/analytics(username=${profile.username})}">
 				    Followers Demographics
 				</a>
-=======
                 <!-- EDIT BUTTON -->
                 <div class="edit-btn-wrapper" th:if="${isOwner}">
                     <a th:href="@{/profile/edit}" class="edit-btn">
@@ -327,45 +308,11 @@
                         ✏ Edit Profile
                     </a>
                 </div>
->>>>>>> origin/develop
 
 			</div>
 
 			<!-- ================= TAB CONTENT ================= -->
-			<div class="tab-content">
-
-<<<<<<< HEAD
-				<div th:if="${activeTab == 'posts'}">
-					<h3>Posts Section</h3>
-				</div>
-
-				<div th:if="${activeTab == 'about'}">
-					<h3>About Section</h3>
-				</div>
-
-				<div th:if="${activeTab == 'connections'}">
-					<h3>Connections Section</h3>
-				</div>
-=======
-            <a th:href="@{/profile/{username}(username=${profile.username}, tab='posts')}"
-
-               th:classappend="${param.tab == null or param.tab == 'posts'} ? 'active-tab' : ''">
-                Posts
-            </a>
-
-            <a th:href="@{/profile/{username}(username=${profile.username}, tab='about')}"
-
-               th:classappend="${param.tab == 'about'} ? 'active-tab' : ''">
-                About
-            </a>
-
-            <a th:href="@{/profile/{username}(username=${profile.username}, tab='connections')}"
-
-               th:classappend="${param.tab == 'connections'} ? 'active-tab' : ''">
-                Connections
-            </a>
-
-        </div>
+			
 
         <!-- ================= TAB CONTENT ================= -->
         <div class="tab-content">
@@ -386,7 +333,6 @@
 
     </div>
 </div>
->>>>>>> origin/develop
 
 
 
