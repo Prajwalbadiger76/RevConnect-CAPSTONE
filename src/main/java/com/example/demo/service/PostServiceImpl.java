@@ -3,6 +3,7 @@ package com.example.demo.service;
 import com.example.demo.dto.CommentDto;
 import com.example.demo.dto.PostDto;
 import com.example.demo.entity.*;
+import com.example.demo.mapper.PostMapper;
 import com.example.demo.repo.*;
 
 import jakarta.transaction.Transactional;
@@ -24,6 +25,7 @@ public class PostServiceImpl implements PostService {
     private final LikeRepository likeRepository;
     private final CommentRepository commentRepository;
     private final NotificationService notificationService;
+    private final PostMapper postMapper;
 
     public PostServiceImpl(PostRepository postRepository,
                            HashtagRepository hashtagRepository,
@@ -32,7 +34,8 @@ public class PostServiceImpl implements PostService {
                            FollowRepository followRepository,
                            LikeRepository likeRepository,
                            CommentRepository commentRepository,
-                           NotificationService notificationService) {
+                           NotificationService notificationService,
+                           PostMapper postMapper) {
 
         this.postRepository = postRepository;
         this.hashtagRepository = hashtagRepository;
@@ -42,6 +45,7 @@ public class PostServiceImpl implements PostService {
         this.likeRepository = likeRepository;
         this.commentRepository = commentRepository;
         this.notificationService = notificationService;
+        this.postMapper=postMapper;
     }
 
     // ================= CREATE POST =================
@@ -184,6 +188,7 @@ public class PostServiceImpl implements PostService {
 
     // ================= GET POST BY ID =================
 
+
     @Override
     public PostDto getPostById(Long postId, String currentUsername) {
 
@@ -193,8 +198,33 @@ public class PostServiceImpl implements PostService {
         Post post = postRepository.findById(postId)
                 .orElseThrow();
 
-        return map(post, currentUser);
+        long likeCount = likeRepository.countByPost(post);
+
+        boolean liked = likeRepository
+                .findByUserAndPost(currentUser, post)
+                .isPresent();
+
+        List<CommentDto> comments =
+                commentRepository
+                        .findByPostOrderByCreatedAtAsc(post)
+                        .stream()
+                        .map(comment -> {
+                            CommentDto cd = new CommentDto();
+                            cd.setId(comment.getId());
+                            cd.setUsername(comment.getUser().getUsername());
+                            cd.setContent(comment.getContent());
+                            cd.setCreatedAt(comment.getCreatedAt());
+                            cd.setOwnedByCurrentUser(
+                                    comment.getUser().getUsername()
+                                            .equals(currentUsername)
+                            );
+                            return cd;
+                        })
+                        .toList();
+
+        return postMapper.toDto(post, currentUser, likeCount, liked, comments);
     }
+
 
     // ================= SEARCH BY HASHTAG =================
     @Override
@@ -211,25 +241,83 @@ public class PostServiceImpl implements PostService {
                 );
 
         return posts.stream()
-                .map(post -> map(post, currentUser))
+                .map(post -> {
+
+                    long likeCount = likeRepository.countByPost(post);
+
+                    boolean liked =
+                            likeRepository.findByUserAndPost(currentUser, post)
+                                    .isPresent();
+
+                    List<CommentDto> comments =
+                            commentRepository
+                                    .findByPostOrderByCreatedAtAsc(post)
+                                    .stream()
+                                    .map(comment -> {
+                                        CommentDto cd = new CommentDto();
+                                        cd.setId(comment.getId());
+                                        cd.setUsername(comment.getUser().getUsername());
+                                        cd.setContent(comment.getContent());
+                                        cd.setCreatedAt(comment.getCreatedAt());
+                                        cd.setOwnedByCurrentUser(
+                                                comment.getUser().getUsername()
+                                                        .equals(currentUser.getUsername())
+                                        );
+                                        return cd;
+                                    })
+                                    .toList();
+
+                    return postMapper.toDto(post, currentUser, likeCount, liked, comments);
+                })
                 .toList();
     }
 
     // ================= USER POSTS =================
 
     @Override
-    public List<PostDto> getUserPosts(String username) {
+    public List<PostDto> getUserPosts(String profileUsername, String currentUsername) {
 
-        User currentUser = userRepository.findByUsername(username)
+        User profileUser = userRepository.findByUsername(profileUsername)
                 .orElseThrow();
 
-        return postRepository.findByUserAndCreatedAtLessThanEqualOrderByPinnedDescCreatedAtDesc(
-                currentUser,
-                LocalDateTime.now()
-        )
+        User currentUser = userRepository.findByUsername(currentUsername)
+                .orElseThrow();
+
+        return postRepository
+                .findByUserAndCreatedAtLessThanEqualOrderByPinnedDescCreatedAtDesc(
+                        profileUser,
+                        LocalDateTime.now()
+                )
                 .stream()
-                .map(post -> map(post, currentUser))
-                .collect(Collectors.toList());
+                .map(post -> {
+
+                    long likeCount = likeRepository.countByPost(post);
+
+                    boolean liked = likeRepository
+                            .findByUserAndPost(currentUser, post)
+                            .isPresent();
+
+                    List<CommentDto> comments =
+                            commentRepository
+                                    .findByPostOrderByCreatedAtAsc(post)
+                                    .stream()
+                                    .map(comment -> {
+                                        CommentDto cd = new CommentDto();
+                                        cd.setId(comment.getId());
+                                        cd.setUsername(comment.getUser().getUsername());
+                                        cd.setContent(comment.getContent());
+                                        cd.setCreatedAt(comment.getCreatedAt());
+                                        cd.setOwnedByCurrentUser(
+                                                comment.getUser().getUsername()
+                                                        .equals(currentUsername)
+                                        );
+                                        return cd;
+                                    })
+                                    .toList();
+
+                    return postMapper.toDto(post, currentUser, likeCount, liked, comments);
+                })
+                .toList();
     }
 
     // ================= ALL POSTS =================
@@ -237,12 +325,37 @@ public class PostServiceImpl implements PostService {
     @Override
     public List<PostDto> getAllPosts() {
 
-        return postRepository.findAllByCreatedAtLessThanEqualOrderByCreatedAtDesc(
-                LocalDateTime.now()
-        )
+        return postRepository
+                .findAllByCreatedAtLessThanEqualOrderByCreatedAtDesc(
+                        LocalDateTime.now()
+                )
                 .stream()
-                .map(post -> map(post, post.getUser()))
-                .collect(Collectors.toList());
+                .map(post -> {
+
+                    User user = post.getUser();
+
+                    long likeCount = likeRepository.countByPost(post);
+
+                    boolean liked = false; // no current user context here
+
+                    List<CommentDto> comments =
+                            commentRepository
+                                    .findByPostOrderByCreatedAtAsc(post)
+                                    .stream()
+                                    .map(comment -> {
+                                        CommentDto cd = new CommentDto();
+                                        cd.setId(comment.getId());
+                                        cd.setUsername(comment.getUser().getUsername());
+                                        cd.setContent(comment.getContent());
+                                        cd.setCreatedAt(comment.getCreatedAt());
+                                        cd.setOwnedByCurrentUser(false);
+                                        return cd;
+                                    })
+                                    .toList();
+
+                    return postMapper.toDto(post, user, likeCount, liked, comments);
+                })
+                .toList();
     }
 
     // ================= FEED =================
@@ -257,7 +370,7 @@ public class PostServiceImpl implements PostService {
                 .findByFollower(currentUser)
                 .stream()
                 .map(Follow::getFollowing)
-                .collect(Collectors.toList());
+                .toList();
 
         List<User> feedUsers = new ArrayList<>(followedUsers);
         feedUsers.add(currentUser);
@@ -265,54 +378,38 @@ public class PostServiceImpl implements PostService {
         return postRepository
                 .findFeedPosts(feedUsers, LocalDateTime.now())
                 .stream()
-                .map(post -> map(post, currentUser))
+                .map(post -> {
+
+                    long likeCount = likeRepository.countByPost(post);
+
+                    boolean liked =
+                            likeRepository.findByUserAndPost(currentUser, post)
+                                    .isPresent();
+
+                    List<CommentDto> comments =
+                            commentRepository
+                                    .findByPostOrderByCreatedAtAsc(post)
+                                    .stream()
+                                    .map(comment -> {
+                                        CommentDto cd = new CommentDto();
+                                        cd.setId(comment.getId());
+                                        cd.setUsername(comment.getUser().getUsername());
+                                        cd.setContent(comment.getContent());
+                                        cd.setCreatedAt(comment.getCreatedAt());
+                                        cd.setOwnedByCurrentUser(
+                                                comment.getUser().getUsername()
+                                                        .equals(username)
+                                        );
+                                        return cd;
+                                    })
+                                    .toList();
+
+                    return postMapper.toDto(post, currentUser, likeCount, liked, comments);
+                })
                 .toList();
     }
 
-    // ================= DTO MAPPER =================
-
-    private PostDto map(Post post, User currentUser) {
-
-        PostDto dto = new PostDto();
-        dto.setId(post.getId());
-        dto.setContent(post.getContent());
-        dto.setCreatedAt(post.getCreatedAt());
-        dto.setUsername(post.getUser().getUsername());
-
-        dto.setLikeCount(likeRepository.countByPost(post));
-        dto.setLikedByCurrentUser(
-                likeRepository.findByUserAndPost(currentUser, post).isPresent()
-        );
-
-        dto.setHashtags(
-                post.getPostHashtags()
-                        .stream()
-                        .map(ph -> ph.getHashtag().getName())
-                        .collect(Collectors.toList())
-        );
-
-        List<CommentDto> commentDtos = commentRepository
-                .findByPostOrderByCreatedAtAsc(post)
-                .stream()
-                .map(comment -> {
-                    CommentDto cd = new CommentDto();
-                    cd.setId(comment.getId());
-                    cd.setUsername(comment.getUser().getUsername());
-                    cd.setContent(comment.getContent());
-                    cd.setCreatedAt(comment.getCreatedAt());
-                    cd.setOwnedByCurrentUser(
-                            comment.getUser().getUsername()
-                                    .equals(currentUser.getUsername())
-                    );
-                    return cd;
-                })
-                .collect(Collectors.toList());
-
-        dto.setComments(commentDtos);
-
-        return dto;
-    }
-
+    
     // ================= SAVE HASHTAGS =================
 
     private void saveHashtags(Post post, String hashtags) {
@@ -378,32 +475,17 @@ public class PostServiceImpl implements PostService {
         postRepository.save(post);
     }
 
+
     @Override
     public List<String> getTrendingHashtags() {
 
-        List<Post> posts = postRepository.findAll();
+        List<Object[]> results = postHashtagRepository.findTrendingHashtags();
 
-        Map<String, Integer> countMap = new HashMap<>();
-
-        for (Post post : posts) {
-
-            for (PostHashtag ph : post.getPostHashtags()) {
-
-                String tagName = ph.getHashtag().getName();
-
-                countMap.put(tagName,
-                        countMap.getOrDefault(tagName, 0) + 1);
-            }
-        }
-
-        return countMap.entrySet()
-                .stream()
-                .sorted((a, b) -> b.getValue().compareTo(a.getValue()))
-                .map(Map.Entry::getKey)
-                .limit(10)
+        return results.stream()
+                .limit(3)   // ✅ Top 3 only
+                .map(row -> (String) row[0])  // hashtag name
                 .toList();
     }
-    
    
     @Override
     public List<PostDto> searchPostsByContent(String keyword, String username) {
@@ -421,12 +503,38 @@ public class PostServiceImpl implements PostService {
                 .filter(post ->
                         post.getContent() != null &&
                         post.getContent().toLowerCase()
-                                .contains(keyword.toLowerCase()))
-                .map(post -> map(post, currentUser))
+                                .contains(keyword.toLowerCase())
+                )
+                .map(post -> {
+
+                    long likeCount = likeRepository.countByPost(post);
+
+                    boolean liked =
+                            likeRepository.findByUserAndPost(currentUser, post)
+                                    .isPresent();
+
+                    List<CommentDto> comments =
+                            commentRepository
+                                    .findByPostOrderByCreatedAtAsc(post)
+                                    .stream()
+                                    .map(comment -> {
+                                        CommentDto cd = new CommentDto();
+                                        cd.setId(comment.getId());
+                                        cd.setUsername(comment.getUser().getUsername());
+                                        cd.setContent(comment.getContent());
+                                        cd.setCreatedAt(comment.getCreatedAt());
+                                        cd.setOwnedByCurrentUser(
+                                                comment.getUser().getUsername()
+                                                        .equals(currentUser.getUsername())
+                                        );
+                                        return cd;
+                                    })
+                                    .toList();
+
+                    return postMapper.toDto(post, currentUser, likeCount, liked, comments);
+                })
                 .toList();
     }
-   
-    
 }
  
 

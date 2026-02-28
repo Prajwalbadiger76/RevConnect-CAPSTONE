@@ -5,6 +5,10 @@ import com.example.demo.dto.UpdateProfileRequest;
 import com.example.demo.service.ConnectionService;
 import com.example.demo.service.PostService;
 import com.example.demo.service.ProfileService;
+import com.example.demo.service.UserService;
+
+import java.util.List;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,17 +18,22 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/profile")
 public class ProfileController {
 
-    private final ProfileService profileService;
-    private final ConnectionService connectionService; // ✅ NEW
-    private final PostService postService;
+	private final ProfileService profileService;
+	private final ConnectionService connectionService;
+	private final UserService userService;
+	private final  PostService postService;
 
-    public ProfileController(ProfileService profileService,
-                             ConnectionService connectionService,
-                             PostService postService) { // ✅ UPDATED
-        this.profileService = profileService;
-        this.connectionService = connectionService;
-        this.postService=postService;
-    }
+
+	public ProfileController(ProfileService profileService,
+            ConnectionService connectionService,
+            UserService userService,
+            PostService postService) {
+
+this.profileService = profileService;
+this.connectionService = connectionService;
+this.userService = userService;
+this.postService = postService;   // ✅ IMPORTANT
+}
 
     // ================= VIEW MY PROFILE =================
     @GetMapping
@@ -61,19 +70,27 @@ public class ProfileController {
                         username
                 );
 
-        model.addAttribute("profile", profile);
+        boolean isOwner = currentUsername.equals(username);
 
-        // ✅ Add connection status
+        model.addAttribute("profile", profile);
+        model.addAttribute("isOwner", isOwner);
+
+        boolean canView =
+                Boolean.FALSE.equals(profile.isPrivate())
+                || profile.isFollowing()
+                || profile.isOwn();
+
+        model.addAttribute("canView", canView);
+
         model.addAttribute("connectionStatus",
                 connectionService.getConnectionStatus(
                         currentUsername,
                         username
                 ));
 
-        // ✅ Add connection count
         model.addAttribute("connectionCount",
                 connectionService.getConnectionCount(username));
-        
+
         Long pendingRequestId =
                 connectionService.getPendingRequestId(
                         currentUsername,
@@ -81,6 +98,12 @@ public class ProfileController {
                 );
 
         model.addAttribute("pendingRequestId", pendingRequestId);
+
+        // 🔥 ADD THIS
+        List<PostDto> posts =
+                postService.getUserPosts(username, currentUsername);
+
+        model.addAttribute("posts", posts);
 
         return "profile";
     }
