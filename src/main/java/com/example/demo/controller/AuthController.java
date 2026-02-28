@@ -67,14 +67,24 @@ public class AuthController {
     
  // ================= LOGOUT =================
     @GetMapping("/logout")
-    public String logout(HttpServletResponse response) {
+    public String logout(HttpServletResponse response,
+                         jakarta.servlet.http.HttpServletRequest request) {
 
+        // Delete JWT cookie
         Cookie cookie = new Cookie("JWT", null);
         cookie.setHttpOnly(true);
         cookie.setPath("/");
-        cookie.setMaxAge(0); // delete cookie
-
+        cookie.setMaxAge(0);
         response.addCookie(cookie);
+
+        // Clear SecurityContext
+        org.springframework.security.core.context.SecurityContextHolder.clearContext();
+
+        // Invalidate session (if exists)
+        jakarta.servlet.http.HttpSession session = request.getSession(false);
+        if (session != null) {
+            session.invalidate();
+        }
 
         return "redirect:/login";
     }
