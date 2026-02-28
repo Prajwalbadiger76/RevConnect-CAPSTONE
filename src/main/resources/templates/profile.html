@@ -319,27 +319,176 @@
 
 			<!-- ================= TAB CONTENT ================= -->
 			
+        <!-- ================= TABS (NOW CORRECT POSITION) ================= -->
+        <div class="profile-tabs">
 
-        <!-- ================= TAB CONTENT ================= -->
-        <div class="tab-content">
+            <a th:href="@{/profile/{username}(username=${profile.username}, tab='posts')}"
 
-            <div th:if="${activeTab == 'posts'}">
-                <h3>Posts Section</h3>
-            </div>
+               th:classappend="${tab == 'posts'} ? 'active-tab' : ''">
+                Posts
+            </a>
 
-            <div th:if="${activeTab == 'about'}">
-                <h3>About Section</h3>
-            </div>
+            <a th:href="@{/profile/{username}(username=${profile.username}, tab='about')}"
 
-            <div th:if="${activeTab == 'connections'}">
-                <h3>Connections Section</h3>
-            </div>
+               th:classappend="${tab == 'about'} ? 'active-tab' : ''">
+                About
+            </a>
+
+            <a th:href="@{/profile/{username}(username=${profile.username}, tab='connections')}"
+
+              th:classappend="${tab == 'connections'} ? 'active-tab' : ''">
+                Connections
+            </a>
 
         </div>
 
-    </div>
-</div>
+        <!-- ================= TAB CONTENT ================= -->
+		<div class="tab-content">
 
+		    <div th:if="${error}" 
+		         style="color:red; margin-bottom:15px;">
+		        <span th:text="${error}"></span>
+		    </div>
+
+			<div th:if="${tab == 'posts'}">
+
+			<div th:if="${posts == null or #lists.isEmpty(posts)}"
+			     class="empty-posts">
+			    No posts yet.
+			</div>
+
+			<div th:each="post : ${posts}" 
+			     class="profile-post-card"
+			     style="position:relative;">
+
+			    <!-- PIN BADGE -->
+			    <div th:if="${post.pinned}" class="pinned-badge">
+			        📌 
+			    </div>
+
+			    <!-- HEADER -->
+			    <div class="profile-post-header">
+
+			        <img class="profile-post-avatar"
+			             th:src="${profile.profilePicture != null && !profile.profilePicture.isEmpty()
+			                      ? profile.profilePicture
+			                      : 'https://i.pravatar.cc/150?img=3'}">
+
+			        <div class="profile-post-user">
+			            <strong th:text="${post.username}"></strong>
+
+			            <div class="profile-post-time"
+			                 th:text="${#temporals.format(post.createdAt,'dd MMM yyyy HH:mm')}">
+			            </div>
+			        </div>
+
+			        <!-- 3 DOT MENU -->
+			        <div class="profile-post-menu" th:if="${isOwner}">
+			            <button onclick="togglePostMenu(this)">⋮</button>
+
+			            <div class="profile-post-dropdown">
+
+			                <a th:href="@{/post/edit/{id}(id=${post.id})}">Edit</a>
+
+							<button type="button"
+							        th:attr="onclick=|openDeleteModal(${post.id})|">
+							    🗑 Delete
+							</button>
+			                <form th:if="${!post.pinned}"
+			                      th:action="@{/post/pin/{id}(id=${post.id})}"
+			                      method="post">
+			                    <button type="submit">📌 Pin</button>
+			                </form>
+
+			                <form th:if="${post.pinned}"
+			                      th:action="@{/post/unpin/{id}(id=${post.id})}"
+			                      method="post">
+			                    <button type="submit">📍 Unpin</button>
+			                </form>
+
+			            </div>
+			        </div>
+
+			    </div>
+
+			    <!-- CONTENT -->
+			    <div class="profile-post-content"
+			         th:text="${post.content}">
+			    </div>
+
+				<div class="profile-post-tags"
+				     th:if="${post.hashtags != null and !#lists.isEmpty(post.hashtags)}">
+
+				    <span th:each="tag : ${post.hashtags}">
+				        <a th:href="@{/post/search(keyword=${'#' + tag})}"
+				           style="color:#2563eb; text-decoration:none; font-weight:500;">
+				            <span th:text="${'#' + tag}"></span>
+				        </a>
+				    </span>
+
+				</div>
+			    <!-- ACTIONS -->
+			    <div class="profile-post-actions">
+
+			        <form th:action="@{/like/{postId}(postId=${post.id})}"
+			              method="post">
+			            <button type="submit">🤍 Like</button>
+			        </form>
+
+			        <span th:text="${post.likeCount} + ' likes'"></span>
+
+			        <form th:action="@{/post/share/{id}(id=${post.id})}"
+			              method="post">
+			            <button type="submit">🔁 Share</button>
+			        </form>
+
+			        <!-- COMMENT TOGGLE -->
+			        <button type="button"
+			                class="comment-toggle-btn"
+			                th:attr="onclick=|toggleComments(${post.id})|">
+			            💬 <span th:text="${#lists.size(post.comments)}"></span> Comments
+			        </button>
+
+			    </div>
+
+			    <!-- COMMENT SECTION -->
+			    <div class="profile-post-comment-section"
+			         th:id="'comments-' + ${post.id}"
+			         style="display:none; margin-top:10px;">
+
+			        <div th:each="comment : ${post.comments}"
+			             class="profile-comment"
+			             style="margin-bottom:6px;">
+
+			            <strong th:text="${comment.username}"></strong>
+			            <span th:text="${comment.content}"></span>
+
+			        </div>
+
+			        <!-- ADD COMMENT -->
+			        <form th:action="@{/comment/{postId}(postId=${post.id})}"
+			              method="post"
+			              class="profile-comment-form"
+			              style="display:flex; gap:8px; margin-top:8px;">
+
+			            <input type="text"
+			                   name="content"
+			                   placeholder="Write a comment..."
+			                   required
+			                   style="flex:1; padding:6px; border-radius:6px; border:1px solid #ddd;">
+
+			            <button type="submit"
+			                    style="padding:6px 12px; border:none; border-radius:6px; background:#2563eb; color:white;">
+			                Post
+			            </button>
+			        </form>
+
+			    </div>
+
+			</div>
+       </div>
+		       
+</div>
 
 
 
@@ -437,6 +586,78 @@
 
 	</script>
 
+<script>
+function togglePostMenu(btn) {
+    const dropdown = btn.nextElementSibling;
+    const allDropdowns = document.querySelectorAll(".profile-post-dropdown");
+
+    allDropdowns.forEach(d => {
+        if (d !== dropdown) d.style.display = "none";
+    });
+
+    dropdown.style.display =
+        dropdown.style.display === "flex" ? "none" : "flex";
+}
+
+
+
+
+window.addEventListener("click", function(e) {
+    if (!e.target.closest(".profile-post-menu")) {
+        document.querySelectorAll(".profile-post-dropdown")
+            .forEach(d => d.style.display = "none");
+    }
+});
+</script>
+<script>
+function toggleComments(postId) {
+    const section = document.getElementById("comments-" + postId);
+    if (!section) return;
+
+    section.style.display =
+        section.style.display === "block" ? "none" : "block";
+}
+</script>
+
+<!-- DELETE MODAL -->
+<div id="deleteModal" class="custom-modal" style="display:none;">
+
+    <div class="modal-content">
+
+        <h3>Delete Post</h3>
+        <p>Are You sure</p>
+
+        <div class="modal-actions">
+            <button type="button"
+                    onclick="closeDeleteModal()"
+                    class="cancel-btn">
+                Cancel
+            </button>
+
+            <form id="deleteForm" method="post">
+                <button type="submit" class="delete-btn">
+                    Delete
+                </button>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+<script>
+function openDeleteModal(postId) {
+    const modal = document.getElementById("deleteModal");
+    const deleteForm = document.getElementById("deleteForm");
+
+    deleteForm.action = "/post/delete/" + postId;
+
+    modal.style.display = "flex";
+}
+
+function closeDeleteModal() {
+    document.getElementById("deleteModal").style.display = "none";
+}
+</script>
 </body>
 
 </html>

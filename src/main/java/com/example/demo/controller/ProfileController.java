@@ -1,11 +1,13 @@
 package com.example.demo.controller;
 
 import com.example.demo.dto.FollowerGrowthDTO;
+import com.example.demo.dto.PostDto;
 import com.example.demo.dto.ProfileResponse;
 import com.example.demo.dto.ProfileWithFollowResponse;
 import com.example.demo.dto.UpdateProfileRequest;
 import com.example.demo.service.AnalyticsService;
 import com.example.demo.service.ConnectionService;
+import com.example.demo.service.PostService;
 import com.example.demo.service.ProfileService;
 import com.example.demo.service.UserService;
 
@@ -32,70 +34,78 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class ProfileController {
 
     private final ProfileService profileService;
-    private final ConnectionService connectionService; // ✅ keep existing
+    private final ConnectionService connectionService;
     private final UserService userService;
     private final AnalyticsService analyticsService;
+    private final  PostService postService;
+
 
     public ProfileController(ProfileService profileService,
             ConnectionService connectionService,
             UserService userService,
-            AnalyticsService analyticsService) {
+            AnalyticsService analyticsService,PostService postService) {
 this.profileService = profileService;
 this.connectionService = connectionService;
 this.userService = userService;
 this.analyticsService = analyticsService;
+this.postService = postService;  
+
 }
 
     // ============================================================
     // ================= VIEW MY PROFILE ==========================
     // ============================================================
     @GetMapping
-    public String getMyProfile(Authentication authentication,
-                               Model model,
-                               @RequestParam(value = "error", required = false) String error) {
+	public String getMyProfile(Authentication authentication,
+	                           Model model,
+	                           @RequestParam(defaultValue = "posts") String tab,
+	                           @RequestParam(value = "error", required = false) String error) {
 
-        if (authentication == null) {
-            return "redirect:/login";
-        }
+	    if (authentication == null) {
+	        return "redirect:/login";
+	    }
 
-        String currentUsername = authentication.getName();
+	    String currentUsername = authentication.getName();
 
-        ProfileResponse  profile =
-                profileService.getProfileWithFollowInfo(
-                        currentUsername,
-                        currentUsername
-                );
+	    ProfileResponse profile =
+	            profileService.getProfileWithFollowInfo(
+	                    currentUsername,
+	                    currentUsername
+	            );
 
-        model.addAttribute("profile", profile);
-        model.addAttribute("isOwner", true);
-        model.addAttribute("canView", true);
+	    model.addAttribute("profile", profile);
+	    model.addAttribute("isOwner", true);
+	    model.addAttribute("canView", true);
 
-        // ✅ keep connection count (your existing feature)
-        model.addAttribute("connectionCount",
-                connectionService.getConnectionCount(currentUsername));
+	    // FETCH POSTS
+	    List<PostDto> posts =
+	            postService.getPostsByUsername(currentUsername, currentUsername);
 
-        if (error != null) {
-            model.addAttribute("searchError", "No users found.");
-        }
+	    model.addAttribute("posts", posts);   
+	    model.addAttribute("tab", tab); 
 
-        return "profile";
-    }
+	    model.addAttribute("connectionCount",
+	            connectionService.getConnectionCount(currentUsername));
+
+	    if (error != null) {
+	        model.addAttribute("searchError", "No users found.");
+	    }
+
+	    return "profile";
+	}
 
     // ============================================================
     // ================= VIEW OTHER PROFILE =======================
     // ============================================================
     @GetMapping("/{username}")
     public String viewProfile(@PathVariable String username,
+                              @RequestParam(defaultValue = "posts") String tab,
                               Authentication authentication,
                               Model model) {
 
-        if (authentication == null) {
-            return "redirect:/login";
-        }
-
         String currentUsername = authentication.getName();
 
-        ProfileResponse  profile =
+        ProfileResponse profile =
                 profileService.getProfileWithFollowInfo(
                         currentUsername,
                         username
@@ -106,15 +116,16 @@ this.analyticsService = analyticsService;
         model.addAttribute("profile", profile);
         model.addAttribute("isOwner", isOwner);
 
-        // 🔥 privacy control
-        boolean canView = 
-                Boolean.FALSE.equals(profile.isPrivate()) 
-                || profile.isFollowing() 
+        boolean canView =
+                Boolean.FALSE.equals(profile.isPrivate())
+                || profile.isFollowing()
                 || profile.isOwn();
 
         model.addAttribute("canView", canView);
 
-        // ✅ keep connection logic (your original feature)
+        // ✅ NOW tab exists
+        model.addAttribute("tab", tab);
+
         model.addAttribute("connectionStatus",
                 connectionService.getConnectionStatus(
                         currentUsername,
@@ -131,6 +142,15 @@ this.analyticsService = analyticsService;
                 );
 
         model.addAttribute("pendingRequestId", pendingRequestId);
+
+        // 🔥 LOAD POSTS
+        List<PostDto> posts = Collections.emptyList();
+
+        if (canView) {
+            posts = postService.getPostsByUsername(username, currentUsername);
+        }
+
+        model.addAttribute("posts", posts);
 
         return "profile";
     }
