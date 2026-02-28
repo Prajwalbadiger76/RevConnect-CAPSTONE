@@ -1,0 +1,511 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f4f6f8;
+}
+
+.profile-container {
+    width: 85%;
+    margin: 30px auto;
+}
+
+.back-link {
+    text-decoration: none;
+    color: #555;
+    font-size: 14px;
+}
+
+/* ================= BANNER ================= */
+
+.banner-section {
+    position: relative;
+    height: 300px;
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.banner-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Header overlay on banner */
+.header-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 20;
+}
+
+/* Make header transparent */
+.header-overlay header,
+.header-overlay .navbar,
+.header-overlay .header {
+    background: rgba(0,0,0,0.4) !important;
+    backdrop-filter: blur(6px);
+}
+
+/* Banner Camera */
+.banner-camera {
+    position: absolute;
+    right: 20px;
+    bottom: 20px;
+    background: white;
+    padding: 8px 10px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+/* ================= PROFILE INFO ================= */
+
+.profile-info-section {
+    display: flex;
+    align-items: flex-start;
+    background: white;
+    padding: 30px;
+    border-radius: 0 0 15px 15px;
+    position: relative;
+}
+
+.profile-image-wrapper {
+    position: relative;
+    margin-top: -80px;
+}
+
+.profile-img {
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    border: 6px solid white;
+    object-fit: cover;
+}
+
+.profile-camera {
+    position: absolute;
+    bottom: 17px;
+    right: 17px;
+    background: #2563eb;
+    color: white;
+    padding: 6px 8px;
+    border-radius: 50%;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.profile-main-info {
+    margin-left: 30px;
+    flex: 1;
+}
+
+.username {
+    color: gray;
+}
+
+.bio {
+    margin-top: 10px;
+}
+
+.meta span {
+    margin-right: 20px;
+    color: #555;
+}
+
+.follow-row {
+    margin-top: 15px;
+    font-size: 15px;
+}
+
+.follow-row strong {
+    margin-right: 5px;
+}
+
+.edit-btn-wrapper {
+    position: absolute;
+    right: 30px;
+    top: 30px;
+}
+
+.edit-btn {
+    background: #2563eb;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 20px;
+    text-decoration: none;
+}
+
+/* ================= TABS ================= */
+
+.profile-tabs {
+    background: white;
+    margin-top: 15px;
+    padding: 15px 30px;
+    border-radius: 15px;
+    display: flex;
+    gap: 30px;
+    font-weight: bold;
+}
+
+.active-tab {
+    border-bottom: 3px solid #2563eb;
+    padding-bottom: 5px;
+}
+/* Avatar */
+.header-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid white;
+}
+
+/* Dropdown wrapper */
+.profile-dropdown {
+    position: relative;
+}
+
+/* Dropdown menu */
+.dropdown-menu {
+    position: absolute;
+    right: 0;
+    top: 55px;
+    background: white;
+    border-radius: 10px;
+    width: 180px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 1000;
+}
+
+.dropdown-menu a {
+    padding: 12px 15px;
+    text-decoration: none;
+    color: #333;
+    font-size: 14px;
+    transition: 0.2s;
+}
+
+.dropdown-menu a:hover {
+    background: #f4f6f8;
+}
+
+/* ================= SEARCH PAGE ================= */
+
+.search-container {
+    padding: 30px;
+}
+
+.search-title {
+    margin-bottom: 20px;
+    font-size: 22px;
+    font-weight: 600;
+}
+
+.search-error-card {
+    padding: 14px 18px;
+    background: #fff1f2;
+    color: #dc2626;
+    border-radius: 10px;
+    font-weight: 500;
+    margin-bottom: 20px;
+    border-left: 4px solid #dc2626;
+}
+
+.search-card {
+    background: white;
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    transition: 0.2s;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+.search-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+}
+
+.search-user {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.search-user-link {
+    text-decoration: none;
+    color: inherit;
+}
+
+.search-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.search-info h3 {
+    margin: 0;
+    font-size: 16px;
+}
+
+.search-info p {
+    margin: 4px 0 0 0;
+    color: #64748b;
+}
+
+/* ================= SEARCH PAGE ================= */
+
+.search-container {
+    padding: 30px;
+}
+
+/* Title */
+.search-title {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 25px;
+    color: #1e293b;
+}
+
+/* ================= ERROR MESSAGE ================= */
+
+.search-error-card {
+    padding: 14px 18px;
+    background: #fff1f2;
+    color: #dc2626;
+    border-left: 4px solid #dc2626;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    font-weight: 500;
+    width: fit-content;
+}
+
+/* ================= SEARCH CARD ================= */
+
+.search-card {
+    background: white;
+    padding: 16px;
+    border-radius: 14px;
+    margin-bottom: 18px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.05);
+    transition: all 0.25s ease;
+}
+
+.search-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+}
+
+/* Link remove underline */
+.search-user-link {
+    text-decoration: none;
+    color: inherit;
+}
+
+/* User row */
+.search-user {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+/* Avatar */
+.search-avatar {
+    width: 65px;
+    height: 65px;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* Info section */
+.search-info h3 {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.search-info p {
+    margin: 5px 0 0 0;
+    font-size: 14px;
+    color: #64748b;
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 768px) {
+    .search-user {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .search-avatar {
+        width: 80px;
+        height: 80px;
+    }
+}
+.search-inline-error {
+    margin-top: 6px;
+    padding: 6px 12px;
+    background: #fff1f2;
+    color: #dc2626;
+    border-radius: 6px;
+    font-size: 13px;
+    border-left: 4px solid #dc2626;
+}
+.search-inline-error {
+    margin-top: 6px;
+    padding: 6px 12px;
+    background: #fff1f2;
+    color: #dc2626;
+    border-radius: 6px;
+    font-size: 13px;
+    border-left: 4px solid #dc2626;
+}
+
+/* ================= PROFILE STATS ================= */
+
+/* ================= PROFILE STATS ================= */
+
+.profile-stats {
+    display: flex;
+    gap: 40px;
+    margin-top: 20px;
+    align-items: center;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.stat-item:hover {
+    transform: translateY(-3px);
+}
+
+.stat-number {
+    font-size: 20px;
+    font-weight: 700;
+    color: #111;
+}
+
+.stat-label {
+    font-size: 14px;
+    color: #666;
+    margin-top: 4px;
+}
+
+.stat-item:hover .stat-number,
+.stat-item:hover .stat-label {
+    color: #2563eb;
+}
+
+
+/* ================= TABS (FIXED STRUCTURE) ================= */
+
+.profile-tabs {
+    margin-top: 25px;
+    padding: 0 30px; /* Align with profile padding */
+    display: flex;
+    gap: 40px;
+    border-bottom: 1px solid #e5e7eb;
+    background: transparent; /* removed white card */
+    box-shadow: none;        /* removed floating effect */
+    border-radius: 0;        /* removed rounded card */
+}
+
+.profile-tabs a {
+    text-decoration: none;
+    font-weight: 600;
+    color: #666;
+    padding: 12px 0;
+    position: relative;
+    transition: color 0.2s ease;
+}
+
+.profile-tabs a:hover {
+    color: #2563eb;
+}
+
+.active-tab {
+    color: #2563eb;
+}
+
+.active-tab::after {
+    content: "";
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background-color: #2563eb;
+    border-radius: 3px;
+}
+
+
+/* ================= TAB CONTENT ================= */
+
+.tab-content {
+    padding: 30px;
+    background: white;
+    border-radius: 0 0 20px 20px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.05);
+    margin-top: 0;
+}
+
+/* ================= ACTION BUTTONS ================= */
+
+.action-buttons {
+    margin-top: 15px;
+    display: flex;
+    gap: 12px;
+}
+
+.btn-follow,
+.btn-following,
+.btn-connect,
+.btn-pending,
+.btn-connected {
+    border: none;
+    padding: 8px 18px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.btn-follow {
+    background: #2563eb;
+    color: white;
+}
+
+.btn-following {
+    background: #e5e7eb;
+}
+
+.btn-connect {
+    background: #10b981;
+    color: white;
+}
+
+.btn-pending {
+    background: #f59e0b;
+    color: white;
+}
+
+.btn-connected {
+    background: #6366f1;
+    color: white;
+}
+
+.action-buttons button:hover {
+    opacity: 0.9;
+}

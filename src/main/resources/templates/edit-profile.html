@@ -2,38 +2,221 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Edit Profile</title>
+    <link rel="stylesheet" th:href="@{/css/edit-profile.css}">
 </head>
+
 <body>
 
-<h2>Edit Profile</h2>
+<div class="edit-container">
+    <div class="edit-card">
 
-<form th:action="@{/profile/edit}" method="post">
+        <h2>Edit Profile</h2>
 
-    <label>Full Name:</label><br/>
-    <input type="text" name="fullName"
-           th:value="${profile.fullName}"/><br/><br/>
+        <p style="color:red; font-weight:bold;"
+           th:if="${error}"
+           th:text="${error}">
+        </p>
 
-    <label>Bio:</label><br/>
-    <textarea name="bio"
-              th:text="${profile.bio}"></textarea><br/><br/>
+        <form th:action="@{/profile/edit}"
 
-    <label>Location:</label><br/>
-    <input type="text" name="location"
-           th:value="${profile.location}"/><br/><br/>
+              method="post"
+              enctype="multipart/form-data">
 
-    <label>Website:</label><br/>
-    <input type="text" name="website"
-           th:value="${profile.website}"/><br/><br/>
+            <!-- ================= BANNER IMAGE ================= -->
+            <div class="form-group">
+                <label>Banner Image</label><br/>
 
-    <label>Private Profile:</label>
-    <input type="checkbox" name="isPrivate"
-           th:checked="${profile.private}"/><br/><br/>
+                <img th:src="${profile.bannerImage != null ? profile.bannerImage : 'https://images.unsplash.com/photo-1521737604893-d14cc237f11d'}"
+                     alt="Banner"
+                     style="width:100%; height:150px; object-fit:cover; border-radius:10px; margin-bottom:10px;">
 
-    <button type="submit">Save Changes</button>
-</form>
+                <input type="file" name="bannerImageFile" accept="image/*">
+            </div>
 
-<br/>
-<a th:href="@{/profile/me}">Back to Profile</a>
+            <!-- ================= PROFILE IMAGE ================= -->
+            <div class="form-group">
+                <label>Profile Picture</label><br/>
+
+                <img th:src="${profile.profilePicture != null ? profile.profilePicture : 'https://i.pravatar.cc/150?1'}"
+                     alt="Profile"
+                     width="150"
+                     height="150"
+                     style="border-radius:50%; object-fit:cover; margin-bottom:10px;">
+
+                <input type="file" name="profileImage" accept="image/*">
+
+                <label style="display:block; margin-top:10px;">
+                    <input type="checkbox" name="removeProfileImage">
+                    Remove Profile Picture
+                </label>
+            </div>
+
+            <!-- ================= PERSONAL INFO ================= -->
+
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" name="fullName"
+                       th:value="${profile.fullName}" required>
+            </div>
+
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" name="username"
+                       th:value="${profile.username}" required>
+            </div>
+
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" name="email"
+                       th:value="${profile.email}">
+            </div>
+
+            <div class="form-group">
+                <label>Bio</label>
+                <textarea name="bio"
+                          th:text="${profile.bio}"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Location</label>
+                <input type="text" name="location"
+                       th:value="${profile.location}">
+            </div>
+
+            <div class="form-group">
+                <label>Website</label>
+                <input type="text" name="website"
+                       th:value="${profile.website}">
+            </div>
+
+            <!-- ================= CREATOR SECTION ================= -->
+
+            <div th:if="${profile.role != null and profile.role.name() == 'CREATOR'}">
+
+                <h3>Creator Information</h3>
+
+                <div class="form-group">
+                    <label>Creator Name</label>
+                    <input type="text" name="creatorName"
+                           th:value="${profile.creatorName}">
+                </div>
+
+                <div class="form-group">
+                    <label>Industry</label>
+                    <input type="text" name="industry"
+                           th:value="${profile.industry}">
+                </div>
+
+                <div class="form-group">
+                    <label>Instagram</label>
+                    <input type="text" name="instagramLink">
+                </div>
+
+                <div class="form-group">
+                    <label>YouTube</label>
+                    <input type="text" name="youtubeLink">
+                </div>
+
+                <div class="form-group">
+                    <label>Twitter</label>
+                    <input type="text" name="twitterLink">
+                </div>
+
+                <div class="form-group">
+                    <label>Portfolio</label>
+                    <input type="text" name="portfolioLink">
+                </div>
+
+                <div class="form-group">
+                    <label>Skills</label>
+                    <input type="text" name="skills">
+                </div>
+
+            </div>
+
+            <!-- ================= BUSINESS SECTION ================= -->
+
+            <div th:if="${profile.role != null and profile.role.name() == 'BUSINESS'}">
+
+                <h3>Business Information</h3>
+
+                <div class="form-group">
+                    <label>Business Name</label>
+                    <input type="text" name="businessName">
+                </div>
+
+                <div class="form-group">
+                    <label>Category</label>
+                    <input type="text" name="category"
+                           th:value="${profile.category}">
+                </div>
+
+                <div class="form-group">
+                    <label>Contact Info</label>
+                    <input type="text" name="contactInfo"
+                           th:value="${profile.contactInfo}">
+                </div>
+
+                <div class="form-group">
+                    <label>Business Address</label>
+                    <input type="text" name="businessAddress"
+                           th:value="${profile.businessAddress}">
+                </div>
+
+                <div class="form-group">
+                    <label>Business Hours</label>
+                    <input type="text" name="businessHours"
+                           th:value="${profile.businessHours}">
+                </div>
+
+                <div class="form-group">
+                    <label>Business Description</label>
+                    <textarea name="businessDescription"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Services Offered</label>
+                    <textarea name="servicesOffered"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Google Map Link</label>
+                    <input type="text" name="mapLocationLink">
+                </div>
+
+            </div>
+
+            <!-- ================= PRIVACY ================= -->
+
+            <div class="form-group">
+                <label>
+                    <input type="checkbox"
+                           name="isPrivate"
+                           th:checked="${profile.isPrivate}">
+                    Private Profile
+                </label>
+            </div>
+
+			<div class="form-actions">
+
+			    <button type="submit" class="btn-save">
+			        Save Changes
+			    </button>
+
+<<<<<<< HEAD
+			    <a th:href="@{/profile}" class="btn-cancel">
+=======
+			    <a th:href="@{/api/profile/me}" class="btn-cancel">
+>>>>>>> e9b0322bdea9f04ea8eaa3d96625f2ab8b692a26
+			        Cancel
+			    </a>
+
+			</div>
+
+        </form>
+
+    </div>
+</div>
 
 </body>
 </html>

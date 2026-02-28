@@ -1,5 +1,14 @@
 package com.example.demo.service;
 
+import static org.junit.jupiter.api.Assertions.*;
+
+import static org.mockito.Mockito.*;
+
+//import com.example.demo.dto.PostRequestDTO;
+import com.example.demo.entity.*;
+import com.example.demo.entity.Post;
+
+import com.example.demo.repo.PostRepository;
 import com.example.demo.entity.Post;
 import com.example.demo.entity.User;
 import com.example.demo.repo.*;
@@ -43,6 +52,33 @@ public class PostServiceTest {
     @InjectMocks
     private PostServiceImpl postService;
 
+    
+    
+//    @Test
+//    void testSavePost_Success() {
+//        // 1. Setup Data
+//        PostRequestDTO dto = new PostRequestDTO();
+//        dto.setContent("Testing without logging");
+//        Long userId = 1L;
+//
+//        Post mockSavedPost = new Post();
+//        mockSavedPost.setId(99L);
+//        mockSavedPost.setContent(dto.getContent());
+//
+//        // 2. Define Mock Behavior
+//        when(postRepository.save(any(Post.class))).thenReturn(mockSavedPost);
+//
+//        // 3. Execute
+//        Post result = postService.savePost(dto, userId);
+//
+//        // 4. Verify results (JUnit)
+//        assertNotNull(result);
+//        assertEquals(99L, result.getId());
+//        assertEquals("Testing without logging", result.getContent());
+//        
+//        // Ensure the repository was actually called
+//        verify(postRepository, times(1)).save(any(Post.class));
+//    }
     @Test
     void testCreatePost_Success() {
 
@@ -57,7 +93,7 @@ public class PostServiceTest {
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
         // 2️⃣ Call service
-        postService.createPost("testuser", "Testing post content");
+        postService.createPost("testuser", "Testing post content", "trend", "");
 
         // 3️⃣ Verify save was called
         verify(postRepository, times(1)).save(any(Post.class));
