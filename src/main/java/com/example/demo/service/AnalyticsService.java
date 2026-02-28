@@ -1,5 +1,18 @@
 package com.example.demo.service;
 
+import com.example.demo.dto.FollowerGrowthDTO;
+import com.example.demo.entity.Post;
+import com.example.demo.entity.PostAnalytics;
+import com.example.demo.entity.PostView;
+import com.example.demo.entity.User;
+import com.example.demo.repo.FollowRepository;
+import com.example.demo.repo.PostAnalyticsRepository;
+import com.example.demo.repo.PostRepository;
+import com.example.demo.repo.PostViewRepository;
+import com.example.demo.repo.UserRepository;
+
+import java.util.ArrayList;
+import java.util.List;
 import com.example.demo.entity.Post;
 import com.example.demo.entity.PostAnalytics;
 import com.example.demo.entity.PostView;
@@ -17,14 +30,21 @@ public class AnalyticsService {
     private final PostAnalyticsRepository analyticsRepository;
     private final PostRepository postRepository;
     private final PostViewRepository postViewRepository;
+    private final FollowRepository followRepository;
+    private final UserRepository userRepository;
+
 
     public AnalyticsService(PostAnalyticsRepository analyticsRepository,
                             PostRepository postRepository,
-                            PostViewRepository postViewRepository) {
+                            PostViewRepository postViewRepository,FollowRepository followRepository,UserRepository userRepository) {
         this.analyticsRepository = analyticsRepository;
         this.postRepository = postRepository;
         this.postViewRepository = postViewRepository;
+        this.followRepository = followRepository;
+        this.userRepository = userRepository;
+
     }
+
 
     // CREATE ANALYTICS ROW (When post is created)
 
@@ -129,4 +149,26 @@ public class AnalyticsService {
     public PostAnalytics getAnalyticsByPostId(Long postId) {
         return analyticsRepository.findByPost_Id(postId).orElse(null);
     }
+    
+    // followers count analysis
+    public List<FollowerGrowthDTO> getFollowerGrowth(String username) {
+
+        // convert username → userId here
+    	User user = userRepository.findByUsername(username)
+    	        .orElseThrow(() -> new RuntimeException("User not found"));
+
+        List<Object[]> rows = followRepository.getFollowerGrowth(user.getId());
+
+        List<FollowerGrowthDTO> result = new ArrayList<>();
+
+        for (Object[] r : rows) {
+            result.add(new FollowerGrowthDTO(
+                    r[0].toString(),
+                    ((Number) r[1]).longValue()
+            ));
+        }
+
+        return result;
+    }
+
 }

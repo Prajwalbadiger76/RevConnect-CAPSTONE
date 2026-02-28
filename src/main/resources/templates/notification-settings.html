@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Notification Settings</title>
+</head>
+<body>
+
+<a th:href="@{/feed}">Back</a>
+
+<h2>Notification Preferences</h2>
+
+<label>
+    <input type="checkbox" id="likeToggle">
+    Enable Like Notifications
+</label>
+<br><br>
+
+<label>
+    <input type="checkbox" id="commentToggle">
+    Enable Comment Notifications
+</label>
+<br><br>
+
+<label>
+    <input type="checkbox" id="followToggle">
+    Enable Follow Notifications
+</label>
+
+<script>
+
+async function loadPreferences() {
+
+    const response = await fetch("/notification-preferences");
+    const pref = await response.json();
+
+    document.getElementById("likeToggle").checked = pref.likeEnabled;
+    document.getElementById("commentToggle").checked = pref.commentEnabled;
+    document.getElementById("followToggle").checked = pref.followEnabled;
+}
+
+async function updatePreferences() {
+
+    await fetch("/notification-preferences", {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            likeEnabled: document.getElementById("likeToggle").checked,
+            commentEnabled: document.getElementById("commentToggle").checked,
+            followEnabled: document.getElementById("followToggle").checked
+        })
+    });
+
+    alert("Preferences Updated!");
+}
+
+document.getElementById("likeToggle").addEventListener("change", updatePreferences);
+document.getElementById("commentToggle").addEventListener("change", updatePreferences);
+document.getElementById("followToggle").addEventListener("change", updatePreferences);
+
+loadPreferences();
+
+</script>
+
+</body>
+</html>

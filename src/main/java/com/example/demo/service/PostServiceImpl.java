@@ -81,7 +81,7 @@ public class PostServiceImpl implements PostService {
         // analytics row
         analyticsService.createPostAnalytics(savedPost);
 
-        // 🔥 parse hashtags from FIELD (NOT content)
+        // parse hashtags from FIELD (NOT content)
         if (hashtags != null && !hashtags.isBlank()) {
             parseHashtags(savedPost, hashtags);
         }
@@ -203,29 +203,43 @@ public class PostServiceImpl implements PostService {
     // =========================================================
 
     @Override
-    public List<PostDto> getFeedPosts(String username) {
+    public List<PostDto> getFeedPosts(String username, String roleFilter) {
 
         User currentUser = userRepository.findByUsername(username).orElseThrow();
+        LocalDateTime now = LocalDateTime.now();
 
-        List<User> followedUsers = followRepository.findByFollower(currentUser)
-                .stream()
-                .map(Follow::getFollowing)
-                .toList();
+        List<Post> posts;
 
-        List<User> feedUsers = new ArrayList<>(followedUsers);
-        feedUsers.add(currentUser);
-        
-       
+        // ================= FILTER APPLIED =================
+        if (roleFilter != null && !roleFilter.equalsIgnoreCase("ALL")) {
 
-        return postRepository.findFeedPosts(feedUsers, LocalDateTime.now())
-                .stream()
+            Role selectedRole = Role.valueOf(roleFilter.toUpperCase());
+
+            // show only selected role posts
+            posts = postRepository.findPostsByAuthorRole(selectedRole, now);
+
+        }
+        // ================= DEFAULT NORMAL FEED =================
+        else {
+
+            List<User> followedUsers = followRepository.findByFollower(currentUser)
+                    .stream()
+                    .map(Follow::getFollowing)
+                    .toList();
+
+            List<User> feedUsers = new ArrayList<>(followedUsers);
+            feedUsers.add(currentUser);
+
+            posts = postRepository.findFeedPosts(feedUsers, now);
+        }
+
+        return posts.stream()
                 .map(post -> {
                     analyticsService.recordView(post.getId(), currentUser.getId());
                     return map(post, currentUser);
                 })
                 .toList();
     }
-
     // =========================================================
     // GET POST BY ID
     // =========================================================
