@@ -461,3 +461,51 @@ body {
     box-shadow: 0 8px 25px rgba(0,0,0,0.05);
     margin-top: 0;
 }
+
+/* ================= ACTION BUTTONS ================= */
+
+.action-buttons {
+    margin-top: 15px;
+    display: flex;
+    gap: 12px;
+}
+
+.btn-follow,
+.btn-following,
+.btn-connect,
+.btn-pending,
+.btn-connected {
+    border: none;
+    padding: 8px 18px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.btn-follow {
+    background: #2563eb;
+    color: white;
+}
+
+.btn-following {
+    background: #e5e7eb;
+}
+
+.btn-connect {
+    background: #10b981;
+    color: white;
+}
+
+.btn-pending {
+    background: #f59e0b;
+    color: white;
+}
+
+.btn-connected {
+    background: #6366f1;
+    color: white;
+}
+
+.action-buttons button:hover {
+    opacity: 0.9;
+}

@@ -1,40 +1,143 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
-<meta charset="UTF-8">
-<title>RevConnect - Feed</title>
-<link rel="stylesheet" th:href="@{/css/feed.css}">
+	<meta charset="UTF-8">
+	<title>RevConnect - Feed</title>
+	<link rel="stylesheet" th:href="@{/css/feed.css}">
+
+	<style>
+		/* ====== PAGE LAYOUT ====== */
+		.page-layout {
+			display: flex;
+			justify-content: center;
+			gap: 40px;
+			padding-top: 20px;
+		}
+
+		.feed-container {
+			width: 650px;
+		}
+
+		/* ===== RIGHT SIDEBAR ===== */
+		.notification-sidebar {
+			width: 320px;
+			height: calc(100vh - 80px);
+			position: sticky;
+			top: 70px;
+			background: #ffffff;
+			border-radius: 12px;
+			box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+			padding: 15px;
+			overflow-y: auto;
+		}
+
+		.sidebar-header {
+			font-size: 20px;
+			font-weight: 600;
+			margin-bottom: 10px;
+		}
+
+		.notif-title {
+			font-size: 14px;
+			color: #666;
+			margin: 15px 0 8px 0;
+			font-weight: 600;
+		}
+
+		.notif-item {
+			padding: 12px;
+			border-radius: 10px;
+			margin-bottom: 8px;
+			cursor: pointer;
+			transition: 0.2s;
+		}
+
+		.notif-item:hover {
+			background: #f5f7fb;
+		}
+
+		.notif-item.unread {
+			background: #eef3ff;
+		}
+
+		.notif-item.read {
+			background: #fafafa;
+		}
+
+		.notif-text {
+			font-size: 14px;
+		}
+
+		.empty-text {
+			font-size: 13px;
+			color: #888;
+			text-align: center;
+		}
+
+		/* ===== ANALYTICS BAR ===== */
+
+		.analytics-bar {
+			display: flex;
+			justify-content: space-around;
+			align-items: center;
+			margin-top: 12px;
+			padding: 10px;
+			background: linear-gradient(90deg, #eef2ff, #f8f9ff);
+			border-radius: 10px;
+			font-size: 14px;
+			border: 1px solid #e5e8f0;
+		}
+
+		.analytics-item {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+		}
+
+		.analytics-item span {
+			font-weight: 600;
+			font-size: 16px;
+		}
+
+		.analytics-item small {
+			font-size: 11px;
+			color: #777;
+		}
+	</style>
+
+	<meta charset="UTF-8">
+	<title>RevConnect - Feed</title>
+	<link rel="stylesheet" th:href="@{/css/feed.css}">
 </head>
 
 <body>
 
-<div id="overlay" class="overlay" onclick="toggleNotifications()"></div>
+	<!-- ================= NAVBAR ================= -->
+
+	<div id="overlay" class="overlay" onclick="toggleNotifications()"></div>
 
 
-<!-- NAVBAR -->
-<div class="navbar">
+	<!-- NAVBAR -->
+	<div class="navbar">
 
-    <!-- LEFT -->
-    <div class="navbar-left">
+		<!-- LEFT -->
+		
 
-        <h2>RevConnect</h2>
+		<div class="navbar-right">
+		<!--<a th:href="@{/connections}">Pending</a>
+			<a th:href="@{/connections/accepted}">Connections</a>-->
 
-        <div style="position:relative;">
 
-            <form th:action="@{/post/search}"
-                  method="get"
-                  class="search-form">
+			<h2>RevConnect</h2>
 
-				  <input type="text"
-				         name="keyword"
-				         id="searchInput"
-				         placeholder="Search users or hashtags..."
-				         oninput="handleSearchInput()"
-				         autocomplete="off"
-				         required>
-						 <a id="dynamicTrendingBtn"
-						    href="/post/trending"
-						    style="
+			<div style="position:relative;">
+
+				<form th:action="@{/post/search}" method="get" class="search-form">
+
+					<input type="text" name="keyword" id="searchInput" placeholder="Search users or hashtags..."
+						oninput="handleSearchInput()" autocomplete="off" required>
+					<a id="dynamicTrendingBtn" href="/post/trending" style="
 						        display:none;
 						        margin-left:10px;
 						        padding:5px 12px;
@@ -43,535 +146,601 @@
 						        color:#ff5722;
 						        text-decoration:none;
 						        font-size:13px;">
-						    🔥 Trending Hashtag
-						 </a>
-				  <div id="trendingBox"></div>
+						🔥 Trending Hashtag
+					</a>
+					<div id="trendingBox"></div>
 
-                <button type="submit">Search</button>
-            </form>
+					<button type="submit">Search</button>
+				</form>
 
-        </div>
-    </div>
-
-    <!-- RIGHT -->
-    <div class="navbar-right">
-
-        <div class="notif-bell" onclick="toggleNotifications()">
-            🔔
-            <span id="notifCount" class="notif-count"></span>
-        </div>
-
-        <a th:href="@{/connections}">Pending</a>
-        <a th:href="@{/connections}">Pending Requests</a>
-        <a th:href="@{/connections/sent}">Sent Requests</a>
-        <a th:href="@{/connections/accepted}">Connections</a>
-
-        <div class="profile-menu">
-            <div class="profile-circle"
-                 onclick="toggleProfileMenu()"
-                 th:text="${#strings.substring(currentUsername,0,1).toUpperCase()}">
-            </div>
-
-            <div id="profileDropdown" class="dropdown">
-                <a th:href="@{/profile}">My Profile</a>
-                <a th:href="@{/logout}">Logout</a>
-            </div>
-        </div>
-
-    </div>
-
-</div>
-
-<!-- NOTIFICATIONS PANEL (UNCHANGED) -->
-<div id="notifPanel" class="notif-panel">
-    <div class="notif-header">
-		</br></br></br>
-        <h3>Notifications</h3>
-        <span class="close-btn" onclick="toggleNotifications()">✖</span>
-    </div>
-    <div id="notifList" class="notif-list"></div>
-</div>
-
-<!-- FEED -->
-<div class="feed-container">
-	
-	
-	<!-- CREATE POST -->
-	<div class="create-post" th:if="${showCreateForm}">
-	    <form th:action="@{/post/create}" method="post">
-
-	        <!-- Row 1: Avatar + Textarea -->
-	        <div class="create-row">
-
-	            <div class="avatar">
-	                <span th:text="${#strings.substring(currentUsername,0,1).toUpperCase()}"></span>
-	            </div>
-
-	            <textarea name="content"
-	                      id="postContent"
-	                      placeholder="What's on your mind?"
-	                      required></textarea>
-
-	        </div>
-
-	        <!-- Hashtag Suggestions (outside flex row) -->
-	        <div id="hashtagSuggestions"></div>
-
-	        <!-- Row 2: Hashtag input -->
-	        <div style="margin-top:15px;">
-	            <input type="text"
-	                   name="hashtags"
-	                   placeholder="Add hashtags (comma separated)"
-	                   style="width:100%; padding:10px; border-radius:12px; border:1px solid #d1d5db;">
-	        </div>
-
-	        <!-- Hidden field -->
-	        <input type="hidden" name="scheduledAt" id="scheduledAtInput">
-
-	        <!-- Row 3: Buttons -->
-	        <div class="create-actions">
-
-	            <button type="submit">
-	                Create Post
-	            </button>
-
-	            <button type="button"
-	                    onclick="openSchedule()"
-	                    style="background:#111827;">
-	                Schedule Post
-	            </button>
-
-	        </div>
-
-	    </form>
-	</div>
-	
-	
-    <!-- POSTS -->
-    <div th:each="post : ${posts}" class="post-card">
-
-        <div class="post-top">
-
-            <div class="avatar small">
-                <span th:text="${#strings.substring(post.username,0,1).toUpperCase()}"></span>
-            </div>
-
-            <div class="post-meta">
-                <a th:href="@{/profile/{username}(username=${post.username})}"
-                   th:text="${post.username}"></a>
-
-                <span th:text="${#temporals.format(post.createdAt,'dd MMM yyyy HH:mm')}"></span>
-            </div>
-
-        </div>
-
-        <div th:if="${!#strings.startsWith(post.content,'🔁 Shared from')}"
-             class="post-content"
-             th:text="${post.content}">
-        </div>
-		<div th:if="${post.hashtags != null}">
-		            <span th:each="tag : ${post.hashtags}">
-		                <a th:href="@{/post/search(keyword=${'#' + tag})}"
-		                   style="color:#2563eb; text-decoration:none; margin-right:8px;">
-		                    <span th:text="${'#' + tag}"></span>
-		                </a>
-		            </span>
-		        </div>
-
-        <div th:if="${#strings.startsWith(post.content,'🔁 Shared from')}"
-             class="shared-box"
-             th:text="${post.content}">
-        </div>
-
-        <div class="post-actions">
-
-            <form th:action="@{/like/{postId}(postId=${post.id})}" method="post">
-                <button th:text="${post.likedByCurrentUser ? '❤️ Unlike' : '🤍 Like'}"></button>
-            </form>
-
-            <span th:text="${post.likeCount} + ' likes'"></span>
-			
-			<!-- COMMENT COUNT BUTTON -->
-			<span class="comment-toggle"
-                th:attr="onclick=|toggleComments(${post.id})|">
-                💬 <span th:text="${#lists.size(post.comments)}"></span> Comments
-            </span>
-
-            <form th:action="@{/post/share/{id}(id=${post.id})}" method="post">
-                <button>🔁 Share</button>
-            </form>
-
-            <form th:if="${post.username == currentUsername}"
-                  th:action="@{/post/delete/{id}(id=${post.id})}" method="post">
-                <button>🗑 Delete</button>
-            </form>
-
-        </div>
-
-		<div class="comment-section">
-
-		    <!-- EXISTING COMMENTS (TOGGLE THIS ONLY) -->
-		    <div class="comments-list"
-		         th:id="'comments-' + ${post.id}"
-		         style="display:none;">
-
-		        <div th:each="comment : ${post.comments}" class="comment">
-
-		            <div class="comment-left">
-		                <strong>
-		                    <a th:href="@{/profile/{username}(username=${comment.username})}"
-		                       th:text="${comment.username}"></a>
-		                </strong>
-		                <span th:text="${comment.content}"></span>
-		            </div>
-
-		            <form th:if="${comment.ownedByCurrentUser}"
-		                  th:action="@{/comment/delete/{commentId}(commentId=${comment.id})}"
-		                  method="post">
-		                <button class="delete-btn">Delete</button>
-		            </form>
-
-		        </div>
-
-		    </div>
-
-		    <!-- COMMENT FORM (ALWAYS VISIBLE) -->
-		    <div class="comment-form">
-		        <form th:action="@{/comment/{postId}(postId=${post.id})}" method="post">
-		            <input type="text" name="content" placeholder="Write a comment..." required>
-		            <button type="submit">Post</button>
-		        </form>
-		    </div>
-
+			</div>
 		</div>
 
-        </div>
-
-    </div>
-
-</div>
-
-<!-- ================= SCHEDULE ================= -->
-<!-- Schedule Overlay -->
-<div id="scheduleOverlay" class="schedule-overlay">
-
-    <div class="schedule-sheet">
-
-        <h3 style="margin-top:0;">Schedule Post</h3>
-
-        <input type="datetime-local"
-               id="schedulePicker"
-               class="schedule-input">
-
-        <div class="schedule-buttons">
-            <button onclick="confirmSchedule()" class="ok-btn">
-                OK
-            </button>
-
-            <button onclick="closeSchedule()" class="cancel-btn">
-                Cancel
-            </button>
-        </div>
-
-    </div>
-</div>
-
-<!-- App Popup -->
-<div id="appPopupOverlay" class="app-popup-overlay">
-    <div class="app-popup">
-        <div id="appPopupMessage"></div>
-        <button onclick="closeAppPopup()">OK</button>
-    </div>
-</div>
-
-
-<!-- SCRIPT (UNCHANGED) -->
-<script>
-	function toggleNotifications(){
-	let panel=document.getElementById("notifPanel");
-	let overlay=document.getElementById("overlay");
-	panel.classList.toggle("active");
-	overlay.classList.toggle("active");
-	}
-	
-	function toggleProfileMenu(){
-	let dropdown=document.getElementById("profileDropdown");
-	dropdown.classList.toggle("show");
-	}
-	
-	window.onclick=function(e){
-	if(!e.target.closest('.profile-menu')){
-	let dropdown=document.getElementById("profileDropdown");
-	if(dropdown) dropdown.classList.remove("show");
-	}
-	}
-	
-	function loadNotifications(){
-	fetch('/notifications')
-	.then(res=>res.json())
-	.then(data=>{
-	let list=document.getElementById("notifList");
-	list.innerHTML="";
-	let unread=data.filter(n=>!n.read);
-	
-	data.forEach(n=>{
-	let div=document.createElement("div");
-	div.className="notif-item "+(!n.read?"unread":"");
-	div.innerText=n.message;
-	div.onclick=function(){
-	fetch('/notifications/read/'+n.id,{method:'POST'})
-	.then(()=>{
-	loadNotifications();
-	if(n.type==="FOLLOW"){
-	window.location.href="/profile/"+n.senderUsername;
-	}else{
-	window.location.href="/feed";
-	}
-	});
-	};
-	list.appendChild(div);
-	});
-	
-	let badge=document.getElementById("notifCount");
-	if(unread.length>0){
-	badge.style.display="inline";
-	badge.innerText=unread.length;
-	}else{
-	badge.style.display="none";
-	}
-	});
-	}
-	setInterval(loadNotifications,5000);
-	loadNotifications();
-	
-	function toggleComments(postId){
-	    let section = document.getElementById("comments-" + postId);
-	    if(section.style.display === "none"){
-	        section.style.display = "block";
-	    } else {
-	        section.style.display = "none";
-	    }
-	}
-</script>
+		<!-- RIGHT -->
+		<div class="navbar-right">
 
-<script th:inline="javascript">
+					<div class="notif-bell" onclick="toggleNotifications()">
+						🔔
+						<span id="notifCount" class="notif-count"></span>
+					</div>
 
-let trendingTags = /*[[${trendingHashtags}]]*/ [];
-if (!trendingTags) {
-    trendingTags = [];
-}
+					<a th:href="@{/connections}">Pending Requests</a>
+					<a th:href="@{/connections/sent}">Sent Requests</a>
+					<a th:href="@{/connections/accepted}">Connections</a>
 
-/* ==============================
-   SEARCH BOX TRENDING (# only)
-============================== */
+					<div class="profile-menu">
+						<div class="profile-circle" onclick="toggleProfileMenu()"
+							th:text="${#strings.substring(currentUsername,0,1).toUpperCase()}">
+						</div>
 
-function handleSearchInput() {
+						<div id="profileDropdown" class="dropdown">
+							<a th:href="@{/profile}">My Profile</a>
+							<a th:href="@{/logout}">Logout</a>
+						</div>
+					</div>
+				</div>
+		
+	</div>
 
-    let input = document.getElementById("searchInput").value.trim();
-    let box = document.getElementById("trendingBox");
-	
-	let trendingBtn = document.getElementById("dynamicTrendingBtn");
+	<!-- ================= MAIN LAYOUT ================= -->
 
-	if (input.startsWith("#")) {
+	<div class="page-layout">
 
-	    trendingBtn.style.display = "inline-block";
+		
 
-	} else {
+		<!-- NOTIFICATIONS PANEL (UNCHANGED) -->
+		<div id="notifPanel" class="notif-panel">
+			<div class="notif-header">
+				</br></br></br>
+				<h3>Notifications</h3>
+				<span class="close-btn" onclick="toggleNotifications()">✖</span>
+			</div>
+			<div id="notifList" class="notif-list"></div>
+		</div>
 
-	    trendingBtn.style.display = "none";
-	}
+		<!-- FEED -->
+		<div class="feed-container">
 
-    // If not starting with #
-    if (!input.startsWith("#")) {
-        box.style.display = "none";
-        return;
-    }
 
-    let keyword = input.substring(1).toLowerCase();
+			<!-- CREATE POST -->
+			<div class="create-post" th:if="${showCreateForm}">
+				<form th:action="@{/post/create}" method="post">
 
-    let filtered = trendingTags.filter(tag =>
-        tag.toLowerCase().startsWith(keyword)
-    );
+					<!-- Row 1: Textarea -->
+					<div class="create-row">
 
-    if (filtered.length === 0) {
-        box.style.display = "none";
-        return;
-    }
 
-    box.innerHTML = "";
+						<textarea name="content" id="postContent" placeholder="What's on your mind?"
+							required></textarea>
 
-    filtered.forEach(tag => {
+					</div>
 
-        let a = document.createElement("a");
-        a.href = "/post/trending?tag=" + tag;
-        a.innerText = "#" + tag;
-        a.style.display = "block";
-        a.style.padding = "8px";
-        a.style.textDecoration = "none";
-        a.style.color = "#111827";
+					<!-- Hashtag Suggestions (outside flex row) -->
+					<div id="hashtagSuggestions"></div>
 
-        a.onmouseover = () => a.style.background = "#f3f4f6";
-        a.onmouseout = () => a.style.background = "transparent";
+					<!-- Row 2: Hashtag input -->
+					<div style="margin-top:15px;">
+						<input type="text" name="hashtags" placeholder="Add hashtags (comma separated)"
+							style="width:100%; padding:10px; border-radius:12px; border:1px solid #d1d5db;">
+					</div>
 
-        box.appendChild(a);
-    });
+					<!-- Hidden field -->
+					<input type="hidden" name="scheduledAt" id="scheduledAtInput">
 
-    box.style.display = "block";
-}
+					<!-- Row 3: Buttons -->
+					<div class="create-actions">
 
-document.addEventListener("click", function(event) {
+						<button type="submit">
+							Create Post
+						</button>
 
-    let searchInput = document.getElementById("searchInput");
-    let box = document.getElementById("trendingBox");
+						<button type="button" onclick="openSchedule()" style="background:#111827;">
+							Schedule Post
+						</button>
 
-    if (!searchInput.contains(event.target) &&
-        !box.contains(event.target)) {
+					</div>
 
-        box.style.display = "none";
-    }
-});
-/* ==============================
-   POST TEXTAREA HASHTAG SUGGEST
-============================== */
-function suggestHashtags() {
+				</form>
+			</div>
 
-    let textarea = document.getElementById("postContent");
-    let value = textarea.value;
-    let suggestionBox = document.getElementById("hashtagSuggestions");
 
-    let match = value.match(/#(\w*)$/);
+			<!-- POSTS -->
+			<div th:each="post : ${posts}" class="post-card">
 
-    if (!match) {
-        suggestionBox.style.display = "none";
-        return;
-    }
+				<div class="post-top">
 
-    let keyword = match[1].toLowerCase();
+					<div class="avatar small">
+						<span th:text="${#strings.substring(post.username,0,1).toUpperCase()}"></span>
+					</div>
 
-    let filtered = trendingTags.filter(tag =>
-        tag.toLowerCase().startsWith(keyword)
-    );
+					<div class="post-meta">
+						<a th:href="@{/profile/{username}(username=${post.username})}" th:text="${post.username}"></a>
 
-    if (filtered.length === 0) {
-        suggestionBox.style.display = "none";
-        return;
-    }
+						<span th:text="${#temporals.format(post.createdAt,'dd MMM yyyy HH:mm')}"></span>
+					</div>
+
+				</div>
+
+				<div th:if="${!#strings.startsWith(post.content,'🔁 Shared from')}" class="post-content"
+					th:text="${post.content}">
+				</div>
+				<div th:if="${post.hashtags != null}">
+					<span th:each="tag : ${post.hashtags}">
+						<a th:href="@{/post/search(keyword=${'#' + tag})}"
+							style="color:#2563eb; text-decoration:none; margin-right:8px;">
+							<span th:text="${'#' + tag}"></span>
+						</a>
+					</span>
+				</div>
+
+				<div th:if="${#strings.startsWith(post.content,'🔁 Shared from')}" class="shared-box"
+					th:text="${post.content}">
+				</div>
+
+				<div class="post-actions">
+
+					<form th:action="@{/like/{postId}(postId=${post.id})}" method="post">
+						<button th:text="${post.likedByCurrentUser ? '❤️ Unlike' : '🤍 Like'}"></button>
+					</form>
+
+					<span th:text="${post.likeCount} + ' likes'"></span>
+
+					<!-- COMMENT COUNT BUTTON -->
+					<span class="comment-toggle" th:attr="onclick=|toggleComments(${post.id})|">
+						💬 <span th:text="${#lists.size(post.comments)}"></span> Comments
+					</span>
+
+					<form th:action="@{/post/share/{id}(id=${post.id})}" method="post">
+						<button>🔁 Share</button>
+					</form>
+
+					<form th:if="${post.username == currentUsername}" th:action="@{/post/delete/{id}(id=${post.id})}"
+						method="post">
+						<button>🗑 Delete</button>
+					</form>
+
+				</div>
+
+				<div class="comment-section">
+
+					<!-- EXISTING COMMENTS (TOGGLE THIS ONLY) -->
+					<div class="comments-list" th:id="'comments-' + ${post.id}" style="display:none;">
+
+						<div th:each="comment : ${post.comments}" class="comment">
+
+							<div class="comment-left">
+								<strong>
+									<a th:href="@{/profile/{username}(username=${comment.username})}"
+										th:text="${comment.username}"></a>
+								</strong>
+								<span th:text="${comment.content}"></span>
+							</div>
+
+							<form th:if="${comment.ownedByCurrentUser}"
+								th:action="@{/comment/delete/{commentId}(commentId=${comment.id})}" method="post">
+								<button class="delete-btn">Delete</button>
+							</form>
+
+						</div>
+
+					</div>
+
+					<!-- COMMENT FORM (ALWAYS VISIBLE) -->
+					<div class="comment-form">
+						<form th:action="@{/comment/{postId}(postId=${post.id})}" method="post">
+							<input type="text" name="content" placeholder="Write a comment..." required>
+							<button type="submit">Post</button>
+						</form>
+					</div>
+
+				</div>
+				
+				<div th:if="${currentUserRole == 'CREATOR' or currentUserRole == 'BUSINESS'}"
+							     class="analytics-bar">
+								 
+				                <div class="analytics-item">
+				                    👁 <span th:text="${post.reachCount}">0</span>
+				                    <small>Reach</small>
+				                </div>
+
+				                <div class="analytics-item">
+				                    🔁 <span th:text="${post.totalShares}">0</span>
+				                    <small>Shares</small>
+				                </div>
+
+				                <div class="analytics-item">
+				                    📊 <span th:text="${#numbers.formatDecimal(post.engagementRate,1,2)}">0</span>%
+				                    <small>Engagement</small>
+				                </div>
+
+				            </div>
+
+			</div>
+		</div>
+
+		<!-- ================= NOTIFICATION SIDEBAR ================= -->
+
+		<div class="notification-sidebar">
+			<div class="sidebar-header">Notifications</div>
+			<div class="notif-title">Unread</div>
+			<div id="notifUnread"></div>
+			<div class="notif-title">Read</div>
+			<div id="notifRead"></div>
+		</div>
+
+	</div>
+
+	<script>
+
+		function toggleProfileMenu() {
+			document.getElementById("profileDropdown").classList.toggle("show");
+		}
+
+		function fetchNotifications() {
+			fetch('/notifications')
+				.then(res => res.json())
+				.then(data => {
+					let unread = data.filter(n => !n.read);
+					let read = data.filter(n => n.read);
+					renderNotifications(unread, read);
+				});
+		}
+
+		function renderNotifications(unread, read) {
+
+			const unreadBox = document.getElementById("notifUnread");
+			const readBox = document.getElementById("notifRead");
+
+			unreadBox.innerHTML = "";
+			readBox.innerHTML = "";
+
+			unread.forEach(n => unreadBox.appendChild(createItem(n, true)));
+			read.forEach(n => readBox.appendChild(createItem(n, false)));
+		}
+
+		function createItem(n, unread) {
+
+			let div = document.createElement("div");
+			div.className = "notif-item " + (unread ? "unread" : "read");
+
+			div.innerHTML = `<div class="notif-text">${n.message}</div>`;
+
+			div.onclick = function () {
+				fetch('/notifications/read/' + n.id, {method: 'POST'})
+					.then(() => fetchNotifications());
+			};
+
+			return div;
+		}
+
+		setInterval(fetchNotifications, 5000);
+		fetchNotifications();
+
+		function toggleComments(postId) {
+			let section = document.getElementById("comments-" + postId);
+			if (!section) return;
+			section.style.display =
+				(section.style.display === "none" || section.style.display === "")
+					? "block" : "none";
+		}
+	</script>
+	<!-- ================= SCHEDULE ================= -->
+	<!-- Schedule Overlay -->
+	<div id="scheduleOverlay" class="schedule-overlay">
+
+		<div class="schedule-sheet">
+
+			<h3 style="margin-top:0;">Schedule Post</h3>
+
+			<input type="datetime-local" id="schedulePicker" class="schedule-input">
+
+			<div class="schedule-buttons">
+				<button onclick="confirmSchedule()" class="ok-btn">
+					OK
+				</button>
+
+				<button onclick="closeSchedule()" class="cancel-btn">
+					Cancel
+				</button>
+			</div>
+
+		</div>
+	</div>
+
+	<!-- App Popup -->
+	<div id="appPopupOverlay" class="app-popup-overlay">
+		<div class="app-popup">
+			<div id="appPopupMessage"></div>
+			<button onclick="closeAppPopup()">OK</button>
+		</div>
+	</div>
+
+
+	<!-- SCRIPT (UNCHANGED) -->
+	<script>
+		function toggleNotifications() {
+			let panel = document.getElementById("notifPanel");
+			let overlay = document.getElementById("overlay");
+			panel.classList.toggle("active");
+			overlay.classList.toggle("active");
+		}
+
+		function toggleProfileMenu() {
+			let dropdown = document.getElementById("profileDropdown");
+			dropdown.classList.toggle("show");
+		}
+
+		window.onclick = function (e) {
+			if (!e.target.closest('.profile-menu')) {
+				let dropdown = document.getElementById("profileDropdown");
+				if (dropdown) dropdown.classList.remove("show");
+			}
+		}
+
+		function loadNotifications() {
+			fetch('/notifications')
+				.then(res => res.json())
+				.then(data => {
+					let list = document.getElementById("notifList");
+					list.innerHTML = "";
+					let unread = data.filter(n => !n.read);
+
+					data.forEach(n => {
+						let div = document.createElement("div");
+						div.className = "notif-item " + (!n.read ? "unread" : "");
+						div.innerText = n.message;
+						div.onclick = function () {
+							fetch('/notifications/read/' + n.id, {method: 'POST'})
+								.then(() => {
+									loadNotifications();
+									if (n.type === "FOLLOW") {
+										window.location.href = "/profile/" + n.senderUsername;
+									} else {
+										window.location.href = "/feed";
+									}
+								});
+						};
+						list.appendChild(div);
+					});
+
+					let badge = document.getElementById("notifCount");
+					if (unread.length > 0) {
+						badge.style.display = "inline";
+						badge.innerText = unread.length;
+					} else {
+						badge.style.display = "none";
+					}
+				});
+		}
+		setInterval(loadNotifications, 5000);
+		loadNotifications();
+
+		function toggleComments(postId) {
+			let section = document.getElementById("comments-" + postId);
+			if (section.style.display === "none") {
+				section.style.display = "block";
+			} else {
+				section.style.display = "none";
+			}
+		}
+	</script>
+
+	<script th:inline="javascript">
+
+		let trendingTags = /*[[${trendingHashtags}]]*/[];
+		if (!trendingTags) {
+			trendingTags = [];
+		}
+
+
+		function handleSearchInput() {
+
+			let input = document.getElementById("searchInput").value.trim();
+			let box = document.getElementById("trendingBox");
+
+			let trendingBtn = document.getElementById("dynamicTrendingBtn");
+
+			if (input.startsWith("#")) {
+
+				trendingBtn.style.display = "inline-block";
+
+			} else {
+
+				trendingBtn.style.display = "none";
+			}
+
+			// If not starting with #
+			if (!input.startsWith("#")) {
+				box.style.display = "none";
+				return;
+			}
+
+			let keyword = input.substring(1).toLowerCase();
+
+			let filtered = trendingTags.filter(tag =>
+				tag.toLowerCase().startsWith(keyword)
+			);
+
+			if (filtered.length === 0) {
+				box.style.display = "none";
+				return;
+			}
+
+			box.innerHTML = "";
+
+			filtered.forEach(tag => {
+
+				let a = document.createElement("a");
+				a.href = "/post/trending?tag=" + tag;
+				a.innerText = "#" + tag;
+				a.style.display = "block";
+				a.style.padding = "8px";
+				a.style.textDecoration = "none";
+				a.style.color = "#111827";
+
+				a.onmouseover = () => a.style.background = "#f3f4f6";
+				a.onmouseout = () => a.style.background = "transparent";
+
+				box.appendChild(a);
+			});
+
+			box.style.display = "block";
+		}
+
+		document.addEventListener("click", function (event) {
+
+			let searchInput = document.getElementById("searchInput");
+			let box = document.getElementById("trendingBox");
+
+			if (!searchInput.contains(event.target) &&
+				!box.contains(event.target)) {
+
+				box.style.display = "none";
+			}
+		});
+		/* ==============================
+		   POST TEXTAREA HASHTAG SUGGEST
+		============================== */
+		function suggestHashtags() {
+
+			let textarea = document.getElementById("postContent");
+			let value = textarea.value;
+			let suggestionBox = document.getElementById("hashtagSuggestions");
+
+			let match = value.match(/#(\w*)$/);
+
+			if (!match) {
+				suggestionBox.style.display = "none";
+				return;
+			}
+
+			let keyword = match[1].toLowerCase();
 
-    suggestionBox.innerHTML = "";
-
-    filtered.forEach(tag => {
-
-        let div = document.createElement("div");
-        div.innerText = "#" + tag;
-        div.style.padding = "6px";
-        div.style.cursor = "pointer";
-
-        div.onclick = function() {
-            textarea.value =
-                value.replace(/#(\w*)$/, "#" + tag + " ");
-            suggestionBox.style.display = "none";
-        };
-
-        suggestionBox.appendChild(div);
-    });
-
-    suggestionBox.style.display = "block";
-}
-
-</script>
-<script>
-
-function openSchedule() {
-
-    let content = document.getElementById("postContent").value.trim();
-
-    // ❌ If content empty
-    if (content === "") {
-        showAppPopup("Content is required to schedule a post.");
-        return;
-    }
-
-    // ✅ Show bottom sheet
-    document.getElementById("scheduleOverlay").style.display = "flex";
-}
-
-function closeSchedule() {
-    document.getElementById("scheduleOverlay").style.display = "none";
-}
-
-function confirmSchedule() {
-
-    let dateTime = document.getElementById("schedulePicker").value;
-
-   
-    if (!dateTime) {
-        showAppPopup("Please select date and time.");
-        return;
-    }
-
-    // Set hidden input
-    document.getElementById("scheduledAtInput").value = dateTime;
-
-    closeSchedule();
-
-    // Show success toast
-    showToast("Post scheduled successfully!");
-
-    // Submit form after small delay (better UX)
-    setTimeout(() => {
-        document.querySelector(".create-post form").submit();
-    }, 800);
-}
-
-
-/* =========================
-   APP POPUP (Error Style)
-========================= */
-
-function showAppPopup(message) {
-
-    document.getElementById("appPopupMessage").innerText = message;
-    document.getElementById("appPopupOverlay").style.display = "flex";
-}
-
-function closeAppPopup() {
-    document.getElementById("appPopupOverlay").style.display = "none";
-}
-
-
-/* =========================
-   TOAST SUCCESS MESSAGE
-========================= */
-
-function showToast(message) {
-
-    let toast = document.createElement("div");
-
-    toast.innerText = message;
-    toast.style.position = "fixed";
-    toast.style.bottom = "30px";
-    toast.style.left = "50%";
-    toast.style.transform = "translateX(-50%)";
-    toast.style.background = "#111827";
-    toast.style.color = "white";
-    toast.style.padding = "10px 20px";
-    toast.style.borderRadius = "20px";
-    toast.style.boxShadow = "0 4px 15px rgba(0,0,0,0.3)";
-    toast.style.zIndex = "3000";
-    toast.style.opacity = "0";
-    toast.style.transition = "opacity 0.3s ease";
-
-    document.body.appendChild(toast);
-
-    setTimeout(() => toast.style.opacity = "1", 50);
-
-    setTimeout(() => {
-        toast.style.opacity = "0";
-        setTimeout(() => toast.remove(), 300);
-    }, 2000);
-}
-
-</script>
+			let filtered = trendingTags.filter(tag =>
+				tag.toLowerCase().startsWith(keyword)
+			);
+
+			if (filtered.length === 0) {
+				suggestionBox.style.display = "none";
+				return;
+			}
+
+			suggestionBox.innerHTML = "";
+
+			filtered.forEach(tag => {
+
+				let div = document.createElement("div");
+				div.innerText = "#" + tag;
+				div.style.padding = "6px";
+				div.style.cursor = "pointer";
+
+				div.onclick = function () {
+					textarea.value =
+						value.replace(/#(\w*)$/, "#" + tag + " ");
+					suggestionBox.style.display = "none";
+				};
+
+				suggestionBox.appendChild(div);
+			});
+
+			suggestionBox.style.display = "block";
+		}
+
+	</script>
+	<script>
+
+		function openSchedule() {
+
+			let content = document.getElementById("postContent").value.trim();
+
+			// ❌ If content empty
+			if (content === "") {
+				showAppPopup("Content is required to schedule a post.");
+				return;
+			}
+
+			// ✅ Show bottom sheet
+			document.getElementById("scheduleOverlay").style.display = "flex";
+		}
+
+		function closeSchedule() {
+			document.getElementById("scheduleOverlay").style.display = "none";
+		}
+
+		function confirmSchedule() {
+
+			let dateTime = document.getElementById("schedulePicker").value;
+
+
+			if (!dateTime) {
+				showAppPopup("Please select date and time.");
+				return;
+			}
+
+			// Set hidden input
+			document.getElementById("scheduledAtInput").value = dateTime;
+
+			closeSchedule();
+
+			// Show success toast
+			showToast("Post scheduled successfully!");
+
+			// Submit form after small delay (better UX)
+			setTimeout(() => {
+				document.querySelector(".create-post form").submit();
+			}, 800);
+		}
+
+
+		/* =========================
+		   APP POPUP (Error Style)
+		========================= */
+
+		function showAppPopup(message) {
+
+			document.getElementById("appPopupMessage").innerText = message;
+			document.getElementById("appPopupOverlay").style.display = "flex";
+		}
+
+		function closeAppPopup() {
+			document.getElementById("appPopupOverlay").style.display = "none";
+		}
+
+
+		/* =========================
+		   TOAST SUCCESS MESSAGE
+		========================= */
+
+		function showToast(message) {
+
+			let toast = document.createElement("div");
+
+			toast.innerText = message;
+			toast.style.position = "fixed";
+			toast.style.bottom = "30px";
+			toast.style.left = "50%";
+			toast.style.transform = "translateX(-50%)";
+			toast.style.background = "#111827";
+			toast.style.color = "white";
+			toast.style.padding = "10px 20px";
+			toast.style.borderRadius = "20px";
+			toast.style.boxShadow = "0 4px 15px rgba(0,0,0,0.3)";
+			toast.style.zIndex = "3000";
+			toast.style.opacity = "0";
+			toast.style.transition = "opacity 0.3s ease";
+
+			document.body.appendChild(toast);
+
+			setTimeout(() => toast.style.opacity = "1", 50);
+
+			setTimeout(() => {
+				toast.style.opacity = "0";
+				setTimeout(() => toast.remove(), 300);
+			}, 2000);
+		}
+
+	</script>
 
 </body>
+
 </html>

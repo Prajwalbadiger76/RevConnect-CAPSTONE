@@ -1,6 +1,7 @@
 package com.example.demo.dto;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 public class PostDto {
@@ -13,13 +14,29 @@ public class PostDto {
     private long likeCount;
     private boolean likedByCurrentUser;
 
+    // social media features
     private boolean pinned;
+    private List<String> hashtags = new ArrayList<>();
 
-    private List<String> hashtags;
-    private List<CommentDto> comments;
+    // comments
+    private List<CommentDto> comments = new ArrayList<>();
 
+    // analytics
+    private long totalComments;
+    private long totalShares;
+    private long reachCount;
+    private double engagementRate;
 
-    // ================= Getters & Setters =================
+    public PostDto() {}
+
+    public PostDto(Long id, String content, String username, LocalDateTime createdAt) {
+        this.id = id;
+        this.content = content;
+        this.username = username;
+        this.createdAt = createdAt;
+    }
+
+    // ================= BASIC =================
 
     public Long getId() {
         return id;
@@ -53,6 +70,8 @@ public class PostDto {
         this.createdAt = createdAt;
     }
 
+    // ================= LIKES =================
+
     public long getLikeCount() {
         return likeCount;
     }
@@ -69,6 +88,8 @@ public class PostDto {
         this.likedByCurrentUser = likedByCurrentUser;
     }
 
+    // ================= PIN =================
+
     public boolean isPinned() {
         return pinned;
     }
@@ -77,19 +98,57 @@ public class PostDto {
         this.pinned = pinned;
     }
 
+    // ================= HASHTAGS =================
+
     public List<String> getHashtags() {
         return hashtags;
     }
 
     public void setHashtags(List<String> hashtags) {
-        this.hashtags = hashtags;
+        this.hashtags = (hashtags == null) ? new ArrayList<>() : hashtags;
     }
+
+    // ================= COMMENTS =================
 
     public List<CommentDto> getComments() {
         return comments;
     }
 
     public void setComments(List<CommentDto> comments) {
-        this.comments = comments;
+        this.comments = (comments == null) ? new ArrayList<>() : comments;
+    }
+
+    // ================= ANALYTICS =================
+
+    public long getTotalComments() {
+        return totalComments;
+    }
+
+    public void setTotalComments(long totalComments) {
+        this.totalComments = totalComments;
+    }
+
+    public long getTotalShares() {
+        return totalShares;
+    }
+
+    public void setTotalShares(long totalShares) {
+        this.totalShares = totalShares;
+    }
+
+    public long getReachCount() {
+        return reachCount;
+    }
+
+    public void setReachCount(long reachCount) {
+        this.reachCount = reachCount;
+    }
+
+    public double getEngagementRate() {
+        return engagementRate;
+    }
+
+    public void setEngagementRate(double engagementRate) {
+        this.engagementRate = engagementRate;
     }
 }

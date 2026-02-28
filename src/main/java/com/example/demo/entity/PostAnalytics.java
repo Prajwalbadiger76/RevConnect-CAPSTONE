@@ -1,51 +1,41 @@
 package com.example.demo.entity;
 
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
-
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "post_analytics")
 public class PostAnalytics {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "post_analytics_seq")
+	@SequenceGenerator(name = "post_analytics_seq", sequenceName = "post_analytics_seq", allocationSize = 1)
 	private Long id;
 
 	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "post_id", nullable = false, unique = true)
-	private Post posts;
+	private Post post;
 
-	private long totalLikes;
-	private long totalComments;
-	private long totalShares;
-	private long reachCount;
+	private long totalLikes = 0;
+	private long totalComments = 0;
+	private long totalShares = 0;
+	private long reachCount = 0;
+	private double engagementRate = 0.0;
 
-	private LocalDateTime updatedAt;
+	private LocalDateTime updatedAt = LocalDateTime.now();
 
-	// getters & setters
+	// ===== Getters & Setters =====
 
 	public Long getId() {
 		return id;
 	}
 
-	public void setId(Long id) {
-		this.id = id;
-	}
-
 	public Post getPost() {
-		return posts;
+		return post;
 	}
 
-	public void setPost(Post posts) {
-		this.posts = posts;
+	public void setPost(Post post) {
+		this.post = post;
 	}
 
 	public long getTotalLikes() {
@@ -54,6 +44,7 @@ public class PostAnalytics {
 
 	public void setTotalLikes(long totalLikes) {
 		this.totalLikes = totalLikes;
+		this.updatedAt = LocalDateTime.now();
 	}
 
 	public long getTotalComments() {
@@ -62,6 +53,7 @@ public class PostAnalytics {
 
 	public void setTotalComments(long totalComments) {
 		this.totalComments = totalComments;
+		this.updatedAt = LocalDateTime.now();
 	}
 
 	public long getTotalShares() {
@@ -70,6 +62,7 @@ public class PostAnalytics {
 
 	public void setTotalShares(long totalShares) {
 		this.totalShares = totalShares;
+		this.updatedAt = LocalDateTime.now();
 	}
 
 	public long getReachCount() {
@@ -78,15 +71,17 @@ public class PostAnalytics {
 
 	public void setReachCount(long reachCount) {
 		this.reachCount = reachCount;
+		this.updatedAt = LocalDateTime.now();
 	}
 
 	public LocalDateTime getUpdatedAt() {
 		return updatedAt;
 	}
-
-	public void setUpdatedAt(LocalDateTime updatedAt) {
-		this.updatedAt = updatedAt;
+	public double getEngagementRate() {
+	    return engagementRate;
 	}
 
+	public void setEngagementRate(double engagementRate) {
+	    this.engagementRate = engagementRate;
+	}
 }
-

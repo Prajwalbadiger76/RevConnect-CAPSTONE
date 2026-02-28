@@ -208,6 +208,8 @@ cursor:pointer;
 font-size:14px;
 }
 
+<<<<<<< HEAD
+=======
 /* SEARCH TRENDING DROPDOWN */
 /* ================= TRENDING BUTTON ================= */
 
@@ -368,6 +370,7 @@ font-size:14px;
 	  }
 	  
 	  
+>>>>>>> origin/develop
 .comment-section{
 margin-top:15px;
 border-top:1px solid #e5e7eb;

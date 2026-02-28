@@ -60,8 +60,19 @@ public class PostController {
 
     // =========================
     // SHOW EDIT PAGE (GET)
-    // =========================
-    @GetMapping("/edit/{id}")
+ // =========================
+ // SHOW EDIT PAGE (GET)
+ // =========================
+ @GetMapping("/edit/{id}")
+ public String editPostPage(@PathVariable Long id,
+                            Authentication authentication,
+                            Model model) {
+
+     PostDto post = postService.getPostById(id, authentication.getName());
+     model.addAttribute("post", post);
+
+     return "edit-post";
+ }
     public String showEditPage(@PathVariable Long id,
                                Model model,
                                Authentication authentication) {
