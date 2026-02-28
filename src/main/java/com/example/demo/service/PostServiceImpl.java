@@ -3,6 +3,7 @@ package com.example.demo.service;
 import com.example.demo.dto.CommentDto;
 import com.example.demo.dto.PostDto;
 import com.example.demo.entity.*;
+import com.example.demo.mapper.PostMapper;
 import com.example.demo.repo.*;
 
 import org.springframework.stereotype.Service;
@@ -26,6 +27,7 @@ public class PostServiceImpl implements PostService {
     private final CommentRepository commentRepository;
     private final NotificationService notificationService;
     private final AnalyticsService analyticsService;
+    private final PostMapper postMapper;
 
     public PostServiceImpl(PostRepository postRepository,
                            HashtagRepository hashtagRepository,
@@ -35,7 +37,8 @@ public class PostServiceImpl implements PostService {
                            LikeRepository likeRepository,
                            CommentRepository commentRepository,
                            NotificationService notificationService,
-                           AnalyticsService analyticsService) {
+                           AnalyticsService analyticsService,
+                           PostMapper postMapper) {
 
         this.postRepository = postRepository;
         this.hashtagRepository = hashtagRepository;
@@ -46,6 +49,7 @@ public class PostServiceImpl implements PostService {
         this.commentRepository = commentRepository;
         this.notificationService = notificationService;
         this.analyticsService = analyticsService;
+        this.postMapper=postMapper;
     }
 
     // =========================================================
@@ -53,11 +57,10 @@ public class PostServiceImpl implements PostService {
     // =========================================================
 
     @Override
-    public void createPost(String username, String content, String hashtags, String scheduledAt) {
-        createPost(username, content, scheduledAt);
-    }
-
-    public void createPost(String username, String content, String scheduledAt) {
+    public void createPost(String username,
+                           String content,
+                           String hashtags,
+                           String scheduledAt) {
 
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -67,6 +70,7 @@ public class PostServiceImpl implements PostService {
         post.setUser(user);
         post.setCreatedAt(LocalDateTime.now());
         post.setPinned(false);
+        post.setPinnedAt(null);
 
         if (scheduledAt != null && !scheduledAt.isBlank()) {
             post.setScheduledAt(LocalDateTime.parse(scheduledAt));
@@ -77,29 +81,38 @@ public class PostServiceImpl implements PostService {
         // analytics row
         analyticsService.createPostAnalytics(savedPost);
 
-        // auto hashtags
-        parseHashtags(savedPost, content);
+        // 🔥 parse hashtags from FIELD (NOT content)
+        if (hashtags != null && !hashtags.isBlank()) {
+            parseHashtags(savedPost, hashtags);
+        }
     }
-
     // =========================================================
     // UPDATE POST
     // =========================================================
-
     @Override
-    public void updatePost(Long postId, String content, String hashtags, String username) {
+    @Transactional
+    public void updatePost(Long postId,
+                           String content,
+                           String hashtags,
+                           String username) {
 
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new RuntimeException("Post not found"));
 
-        if (!post.getUser().getUsername().equals(username))
+        if (!post.getUser().getUsername().equals(username)) {
             throw new RuntimeException("You cannot edit this post");
+        }
 
         post.setContent(content);
         postRepository.save(post);
 
-        // re-parse hashtags
+        // 🔥 DELETE OLD HASHTAGS
         postHashtagRepository.deleteByPost(post);
-        parseHashtags(post, content);
+
+        // 🔥 PARSE FROM HASHTAG FIELD
+        if (hashtags != null && !hashtags.isBlank()) {
+            parseHashtags(post, hashtags);
+        }
     }
 
     // =========================================================
@@ -107,18 +120,19 @@ public class PostServiceImpl implements PostService {
     // =========================================================
 
     @Override
+    @Transactional
     public void deletePost(Long postId, String username) {
 
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new RuntimeException("Post not found"));
 
-        if (!post.getUser().getUsername().equals(username))
+        // Security check: only owner can delete
+        if (!post.getUser().getUsername().equals(username)) {
             throw new RuntimeException("You cannot delete this post");
+        }
 
-        analyticsService.deleteAnalytics(postId);
         postRepository.delete(post);
     }
-
     // =========================================================
     // LIKE / UNLIKE
     // =========================================================
@@ -200,6 +214,8 @@ public class PostServiceImpl implements PostService {
 
         List<User> feedUsers = new ArrayList<>(followedUsers);
         feedUsers.add(currentUser);
+        
+       
 
         return postRepository.findFeedPosts(feedUsers, LocalDateTime.now())
                 .stream()
@@ -227,18 +243,52 @@ public class PostServiceImpl implements PostService {
     // USER POSTS
     // =========================================================
 
-    @Override
-    public List<PostDto> getUserPosts(String username) {
 
-        User user = userRepository.findByUsername(username).orElseThrow();
+    @Override
+    public List<PostDto> getPostsByUsername(String profileUsername, String currentUsername) {
+
+        User profileUser = userRepository.findByUsername(profileUsername)
+                .orElseThrow();
+
+        User currentUser = userRepository.findByUsername(currentUsername)
+                .orElseThrow();
 
         return postRepository
-                .findByUserAndCreatedAtLessThanEqualOrderByPinnedDescCreatedAtDesc(user, LocalDateTime.now())
+                .findByUserAndCreatedAtLessThanEqualOrderByPinnedDescCreatedAtDesc(
+                        profileUser,
+                        LocalDateTime.now()
+                )
                 .stream()
-                .map(post -> map(post, user))
+                .map(post -> {
+
+                    long likeCount = likeRepository.countByPost(post);
+
+                    boolean liked = likeRepository
+                            .findByUserAndPost(currentUser, post)
+                            .isPresent();
+
+                    List<CommentDto> comments =
+                            commentRepository
+                                    .findByPostOrderByCreatedAtAsc(post)
+                                    .stream()
+                                    .map(comment -> {
+                                        CommentDto cd = new CommentDto();
+                                        cd.setId(comment.getId());
+                                        cd.setUsername(comment.getUser().getUsername());
+                                        cd.setContent(comment.getContent());
+                                        cd.setCreatedAt(comment.getCreatedAt());
+                                        cd.setOwnedByCurrentUser(
+                                                comment.getUser().getUsername()
+                                                        .equals(currentUsername)
+                                        );
+                                        return cd;
+                                    })
+                                    .toList();
+
+                    return postMapper.toDto(post, currentUser, likeCount, liked, comments);
+                })
                 .toList();
     }
-
     // =========================================================
     // ALL POSTS
     // =========================================================
@@ -260,6 +310,15 @@ public class PostServiceImpl implements PostService {
     @Override
     public void pinPost(Long postId, String username) {
 
+        User user = userRepository.findByUsername(username).orElseThrow();
+
+        long pinnedCount = postRepository
+                .countByUserAndPinnedTrue(user);
+
+        if (pinnedCount >= 3) {
+            throw new RuntimeException("Maximum 3 pinned posts allowed");
+        }
+
         Post post = postRepository.findById(postId).orElseThrow();
 
         if (!post.getUser().getUsername().equals(username))
@@ -267,6 +326,7 @@ public class PostServiceImpl implements PostService {
 
         post.setPinned(true);
         post.setPinnedAt(LocalDateTime.now());
+
         postRepository.save(post);
     }
 
@@ -286,15 +346,25 @@ public class PostServiceImpl implements PostService {
     // =========================================================
     // SEARCH
     // =========================================================
-
     @Override
     public List<PostDto> searchPostsByHashtag(String tag, String username) {
 
-        User user = userRepository.findByUsername(username).orElseThrow();
+        if (tag == null || tag.isBlank()) {
+            return Collections.emptyList();
+        }
+
+        // Remove # if present
+        tag = tag.trim().toLowerCase();
+        if (tag.startsWith("#")) {
+            tag = tag.substring(1);
+        }
+
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
         return postRepository
                 .findByPostHashtags_Hashtag_NameAndCreatedAtLessThanEqualOrderByCreatedAtDesc(
-                        tag.toLowerCase(), LocalDateTime.now())
+                        tag, LocalDateTime.now())
                 .stream()
                 .map(post -> map(post, user))
                 .toList();
@@ -333,7 +403,7 @@ public class PostServiceImpl implements PostService {
         return count.entrySet()
                 .stream()
                 .sorted((a,b)->b.getValue()-a.getValue())
-                .limit(10)
+                .limit(3)
                 .map(Map.Entry::getKey)
                 .toList();
     }
@@ -350,6 +420,13 @@ public class PostServiceImpl implements PostService {
         dto.setContent(post.getContent());
         dto.setCreatedAt(post.getCreatedAt());
         dto.setUsername(post.getUser().getUsername());
+        dto.setPinned(post.getPinned());
+        dto.setHashtags(
+        	    post.getPostHashtags()
+        	        .stream()
+        	        .map(ph -> ph.getHashtag().getName())
+        	        .toList()
+        	);
 
         dto.setLikeCount(likeRepository.countByPost(post));
         dto.setLikedByCurrentUser(likeRepository.findByUserAndPost(currentUser, post).isPresent());
@@ -382,26 +459,31 @@ public class PostServiceImpl implements PostService {
     // HASHTAG PARSER
     // =========================================================
 
-    private void parseHashtags(Post post, String content) {
+    private void parseHashtags(Post post, String hashtags) {
 
-        Pattern pattern = Pattern.compile("#(\\w+)");
-        Matcher matcher = pattern.matcher(content);
+        String[] tags = hashtags.split("\\s+");
 
-        while (matcher.find()) {
+        for (String rawTag : tags) {
 
-            String tag = matcher.group(1).toLowerCase();
+            String tag = rawTag.replace("#", "")
+                               .trim()
+                               .toLowerCase();
 
-            Hashtag hashtag = hashtagRepository.findByName(tag)
+            if (tag.isEmpty()) continue;
+
+            Hashtag hashtag = hashtagRepository
+                    .findByName(tag)
                     .orElseGet(() -> {
                         Hashtag newTag = new Hashtag();
                         newTag.setName(tag);
                         return hashtagRepository.save(newTag);
                     });
 
-            PostHashtag ph = new PostHashtag();
-            ph.setPost(post);
-            ph.setHashtag(hashtag);
-            postHashtagRepository.save(ph);
+            PostHashtag postHashtag = new PostHashtag();
+            postHashtag.setPost(post);
+            postHashtag.setHashtag(hashtag);
+
+            postHashtagRepository.save(postHashtag);
         }
     }
 }

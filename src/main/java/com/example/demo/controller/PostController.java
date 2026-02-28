@@ -5,7 +5,7 @@ import com.example.demo.entity.*;
 
 import com.example.demo.service.*;
 
-
+import java.security.Principal;
 import java.util.*;
 
 
@@ -13,6 +13,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 
 
@@ -101,10 +102,11 @@ public class PostController {
     // =========================
     @PostMapping("/delete/{id}")
     public String deletePost(@PathVariable Long id,
-                             Authentication authentication) {
+                             Principal principal) {
 
-        postService.deletePost(id, authentication.getName());
-        return "redirect:/feed";
+        postService.deletePost(id, principal.getName());
+
+        return "redirect:/profile";
     }
 
     // =========================
@@ -112,12 +114,18 @@ public class PostController {
     // =========================
     @PostMapping("/pin/{id}")
     public String pinPost(@PathVariable Long id,
-                          Authentication authentication) {
+                          Authentication authentication,
+                          RedirectAttributes redirectAttributes) {
 
-        postService.pinPost(id, authentication.getName());
-        return "redirect:/profile/" + authentication.getName();
+        try {
+            postService.pinPost(id, authentication.getName());
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("error",
+                    "You can only pin maximum 3 posts.");
+        }
+
+        return "redirect:/profile/" + authentication.getName() + "?tab=posts";
     }
-
     // =========================
     // UNPIN POST
     // =========================
@@ -126,7 +134,8 @@ public class PostController {
                             Authentication authentication) {
 
         postService.unpinPost(id, authentication.getName());
-        return "redirect:/profile/" + authentication.getName();
+
+        return "redirect:/profile/" + authentication.getName() + "?tab=posts";
     }
 
     // =========================
@@ -137,7 +146,8 @@ public class PostController {
                             Authentication authentication) {
 
         postService.sharePost(id, authentication.getName());
-        return "redirect:/feed";
+
+        return "redirect:/profile/" + authentication.getName() + "?tab=posts";
     }
 
     // =========================
@@ -156,17 +166,21 @@ public class PostController {
 
         if (keyword.startsWith("#")) {
 
-            String tag = keyword.substring(1);
+            String tag = keyword.substring(1).toLowerCase();
             posts = postService.searchPostsByHashtag(tag, currentUsername);
+
+            model.addAttribute("searchType", "hashtag");
+            model.addAttribute("searchedKeyword", keyword);
 
         } else {
 
             users = profileService.searchUsers(keyword);
+            model.addAttribute("searchType", "user");
+            model.addAttribute("searchedKeyword", keyword);
         }
 
         model.addAttribute("posts", posts);
-        model.addAttribute("results", users);   // 🔥 ALWAYS ADD THIS
-
+        model.addAttribute("results", users);
         model.addAttribute("currentUsername", currentUsername);
         model.addAttribute("trendingHashtags",
                 postService.getTrendingHashtags());

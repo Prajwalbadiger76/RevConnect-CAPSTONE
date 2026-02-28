@@ -5,6 +5,7 @@ import com.example.demo.dto.ProfileResponse;
 import com.example.demo.dto.ProfileWithFollowResponse;
 import com.example.demo.dto.UpdateProfileRequest;
 import com.example.demo.service.ConnectionService;
+import com.example.demo.service.PostService;
 import com.example.demo.service.ProfileService;
 import com.example.demo.service.UserService;
 
@@ -30,16 +31,20 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class ProfileController {
 
     private final ProfileService profileService;
-    private final ConnectionService connectionService; // ✅ keep existing
+    private final ConnectionService connectionService;
     private final UserService userService;
+    private final  PostService postService;
 
-    public ProfileController(ProfileService profileService,
-                             ConnectionService connectionService,
-                             UserService userService) {
-        this.profileService = profileService;
-        this.connectionService = connectionService;
-        this.userService = userService;
-    }
+	public ProfileController(ProfileService profileService,
+            ConnectionService connectionService,
+            UserService userService,
+            PostService postService) {
+
+this.profileService = profileService;
+this.connectionService = connectionService;
+this.userService = userService;
+this.postService = postService;   // ✅ IMPORTANT
+}
 
     // ============================================================
     // ================= VIEW MY PROFILE ==========================
@@ -47,6 +52,7 @@ public class ProfileController {
     @GetMapping
 	public String getMyProfile(Authentication authentication,
 	                           Model model,
+	                           @RequestParam(defaultValue = "posts") String tab,
 	                           @RequestParam(value = "error", required = false) String error) {
 
 	    if (authentication == null) {
@@ -67,10 +73,10 @@ public class ProfileController {
 
 	    // ✅ FETCH POSTS
 	    List<PostDto> posts =
-	            postService.getUserPosts(currentUsername, currentUsername);
+	            postService.getPostsByUsername(currentUsername, currentUsername);
 
 	    model.addAttribute("posts", posts);     // 🔥 IMPORTANT
-	    model.addAttribute("activeTab", "posts");
+	    model.addAttribute("tab", tab); 
 
 	    model.addAttribute("connectionCount",
 	            connectionService.getConnectionCount(currentUsername));
@@ -87,6 +93,7 @@ public class ProfileController {
     // ============================================================
     @GetMapping("/{username}")
     public String viewProfile(@PathVariable String username,
+                              @RequestParam(defaultValue = "posts") String tab,
                               Authentication authentication,
                               Model model) {
 
@@ -110,6 +117,9 @@ public class ProfileController {
 
         model.addAttribute("canView", canView);
 
+        // ✅ NOW tab exists
+        model.addAttribute("tab", tab);
+
         model.addAttribute("connectionStatus",
                 connectionService.getConnectionStatus(
                         currentUsername,
@@ -127,9 +137,12 @@ public class ProfileController {
 
         model.addAttribute("pendingRequestId", pendingRequestId);
 
-        // 🔥 ADD THIS
-        List<PostDto> posts =
-                postService.getUserPosts(username, currentUsername);
+        // 🔥 LOAD POSTS
+        List<PostDto> posts = Collections.emptyList();
+
+        if (canView) {
+            posts = postService.getPostsByUsername(username, currentUsername);
+        }
 
         model.addAttribute("posts", posts);
 
