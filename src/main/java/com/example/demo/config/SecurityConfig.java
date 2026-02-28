@@ -29,7 +29,7 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
 
             .sessionManagement(session ->
-                   session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                   session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
 
             //  URL Authorization Rules
