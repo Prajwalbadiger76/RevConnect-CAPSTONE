@@ -232,13 +232,13 @@
 						<!-- ================= STATS ================= -->
 						<div class="profile-stats">
 
-							<a th:href="@{/api/profile/{username}/followers(username=${profile.username})}"
+							<a th:href="@{/follow/followers/{username}(username=${profile.username})}"
 								class="stat-item">
 								<span class="stat-number" th:text="${profile.followerCount}">0</span>
 								<span class="stat-label">Followers</span>
 							</a>
 
-							<a th:href="@{/api/profile/{username}/following(username=${profile.username})}"
+							<a th:href="@{/follow/following/{username}(username=${profile.username})}"
 								class="stat-item">
 								<span class="stat-number" th:text="${profile.followingCount}">0</span>
 								<span class="stat-label">Following</span>
