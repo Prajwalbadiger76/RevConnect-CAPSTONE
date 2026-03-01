@@ -483,4 +483,50 @@ body {
     .search-form input {
         width: 100%;
     }
+
+/* =====================================================
+   POOST BODY BLOCK
+===================================================== */
+.post-body {
+    background: #f8fafc;        /* very light blue-gray */
+    padding: 16px;
+    border-radius: 12px;
+    margin: 15px 0;
+    border: 1px solid #e2e8f0;
+    transition: background 0.2s ease;
+}
+
+.post-body:hover {
+    background: #f1f5f9;        /* slight hover effect */
+}
+
+.post-content {
+    line-height: 1.6;
+    font-size: 15px;
+    color: #1f2937;
+}
+
+/* Shared post slightly different tone */
+.shared-post {
+    background: #eef2ff;
+    border: 1px solid #c7d2fe;
+}
+
+/* =====================================================
+   SHARE HEADER (LinkedIn Style)
+===================================================== */
+.share-header {
+    font-size: 14px;
+    margin: 10px 0 6px 0;
+    color: #64748b;
+}
+
+.share-header a {
+    color: #2563eb;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.share-header a:hover {
+    text-decoration: underline;
 }
