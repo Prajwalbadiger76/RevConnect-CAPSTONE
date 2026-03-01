@@ -320,15 +320,6 @@
 
 				</div>
 
-				<div th:if="${post.hashtags != null}">
-					<span th:each="tag : ${post.hashtags}">
-						<a th:href="@{/post/search(keyword=${'#' + tag})}"
-							style="color:#2563eb; text-decoration:none; margin-right:8px;">
-							<span th:text="${'#' + tag}"></span>
-						</a>
-					</span>
-				</div>
-
 				<!-- SHARE HEADER -->
 				<div th:if="${post.sharedFromUsername != null}" class="share-header">
 				    🔁 Shared from 
@@ -343,6 +334,15 @@
 				         th:text="${post.content}">
 				    </div>
 				</div>
+				
+				<div th:if="${post.hashtags != null}">
+									<span th:each="tag : ${post.hashtags}">
+										<a th:href="@{/post/search(keyword=${'#' + tag})}"
+											style="color:#2563eb; text-decoration:none; margin-right:8px;">
+											<span th:text="${'#' + tag}"></span>
+										</a>
+									</span>
+				</div>				
 
 				<div class="post-actions">
 
