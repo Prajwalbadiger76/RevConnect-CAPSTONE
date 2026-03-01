@@ -55,6 +55,20 @@ public class Post {
     @OneToOne(mappedBy = "post", fetch = FetchType.LAZY,
             cascade = CascadeType.ALL, orphanRemoval = true)
     private PostAnalytics analytics;
+    
+ // ================= SHARE TRACKING =================
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "original_post_id")
+    private Post originalPost;
+
+    public Post getOriginalPost() {
+        return originalPost;
+    }
+
+    public void setOriginalPost(Post originalPost) {
+        this.originalPost = originalPost;
+    }
 
     // ================= RELATIONS =================
 
