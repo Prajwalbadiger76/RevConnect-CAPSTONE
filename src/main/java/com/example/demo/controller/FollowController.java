@@ -35,7 +35,7 @@ public class FollowController {
     
     @GetMapping("/followers/{username}")
     public String followers(@PathVariable String username, Model model){
-
+    
         model.addAttribute("followers",
                 followService.getFollowers(username));
 

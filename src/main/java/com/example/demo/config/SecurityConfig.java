@@ -42,6 +42,9 @@ public class SecurityConfig {
                             "/css/**",
                             "/js/**"
                     ).permitAll()
+                    .requestMatchers("/api/**").authenticated()
+                    .requestMatchers("/follow/**").authenticated()
+                    .requestMatchers("/profile/**").permitAll()
                     
                     .requestMatchers("/creator/**").hasRole("CREATOR")
                     .requestMatchers("/business/**").hasRole("BUSINESS")
