@@ -147,7 +147,7 @@ public class PostController {
 
         postService.sharePost(id, authentication.getName());
 
-        return "redirect:/profile/" + authentication.getName() + "?tab=posts";
+        return "redirect:/feed";
     }
 
     // =========================

@@ -87,6 +87,28 @@ public class PostDto {
     public void setLikedByCurrentUser(boolean likedByCurrentUser) {
         this.likedByCurrentUser = likedByCurrentUser;
     }
+    
+ // ================= RE-SHARE POST =================
+    
+    private boolean sharedByCurrentUser;
+
+    public boolean isSharedByCurrentUser() {
+        return sharedByCurrentUser;
+    }
+
+    public void setSharedByCurrentUser(boolean sharedByCurrentUser) {
+        this.sharedByCurrentUser = sharedByCurrentUser;
+    }
+    
+    private String sharedFromUsername;
+
+    public String getSharedFromUsername() {
+        return sharedFromUsername;
+    }
+
+    public void setSharedFromUsername(String sharedFromUsername) {
+        this.sharedFromUsername = sharedFromUsername;
+    }
 
     // ================= PIN =================
 
