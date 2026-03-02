@@ -1,188 +1,361 @@
-# 📦 RevConnect – Module Assignment & Responsibilities
+✅ MODULE 1 – Authentication & Security
+🎯 Goal:
 
-This document defines feature ownership and module breakdown for the RevConnect project.
+User authentication, authorization, and secure access control.
 
-Each team member is responsible for their assigned module.
+🔹 1. User Registration
 
----
+Register with:
 
-# 🟢 MODULE 1 – Authentication & Security
+Email (unique)
 
-## 🔹 Features to Build
+Username (unique)
 
-- Register (Personal / Creator / Business)
-- Login (email/username + password)
-- Password encryption (BCrypt)
-- JWT-based authentication
-- Role-Based Access Control (PERSONAL, CREATOR, BUSINESS)
-- Logout
-- Profile privacy (public/private)
-- Authorization filters
-- Exception handling (401, 403)
-- Secure endpoints
-- Token validation middleware
-- Global error handling
+Password (hashed using BCrypt)
 
-## 🔹 Deliverables
+Account Type:
 
-- `AuthController`
-- `SecurityConfig`
-- `JwtService`
-- `UserDetailsService`
-- Password Encoder configuration
-- Role-based access implementation
+PERSONAL
 
+CREATOR
 
----
+BUSINESS
 
-# 🟢 MODULE 2 – User Profile Management
+🔹 2. Login
 
-## 🔹 Personal User Profile Features
+Login using:
 
-- Create profile
-- Edit profile
-- Upload profile picture
-- View own profile
-- View other users' profiles
-- Search users by name/username
-- Set profile privacy
+Email OR Username
 
-## 🔹 Creator/Business Enhanced Profile
+Password
 
-- Add category/industry
-- Contact information
-- Website & social links
-- Business address
-- Business hours
-- Multiple external links
-- Showcase products/services
+Generate session / JWT (depending on your design)
 
-## 🔹 Deliverables
+🔹 3. Role-Based Access Control (RBAC)
 
-- `ProfileController`
-- `UserProfile` entity
-- File upload service
-- Profile DTOs
-- Privacy handling logic
+Define roles:
 
+ROLE_PERSONAL
 
----
+ROLE_CREATOR
 
-# 🟢 MODULE 3 – Post Management
+ROLE_BUSINESS
 
-## 🔹 Features
+Restrict endpoints based on role
 
-- Create post (text + hashtags)
-- Edit post
-- Delete post
-- View posts on profile
-- Share/Repost with attribution
-- Schedule posts
-- Pin posts
-- Promotional posts
-- CTA buttons ("Learn More", "Shop Now")
-- Tag products/services
+🔹 4. Password Security
 
-## 🔹 Deliverables
+Encrypt password (BCrypt)
 
-- `PostController`
-- `Post` entity
-- Hashtag logic
-- Share logic
-- Scheduling service
-- Pin post logic
+Validate password rules
 
+🔹 5. Session / Token Management
 
----
+Maintain login session
 
-# 🟢 MODULE 4 – Social Interactions
+Logout functionality
 
-## 🔹 Features
+Token expiration handling (if JWT)
 
-- Like post
-- Unlike post
-- Comment on post
-- View comments
-- Delete own comment
-- Respond to comments (business/creator accounts)
-- Engagement tracking
+🔹 6. Account Privacy
 
-## 🔹 Deliverables
+Public / Private profile flag
 
-- `Like` entity
-- `Comment` entity
-- `SocialInteractionController`
-- Engagement calculation logic
+Restrict profile visibility for private accounts
 
-👤 **Assigned To:** Member 4
+🔹 7. Basic Security Setup
 
----
+Spring Security configuration
 
-# 🟢 MODULE 5 – Network & Follow System
+CSRF protection
 
-## 🔹 Features
+Secure endpoints
 
-- Send connection request
-- Accept / Reject request
-- View pending sent/received requests
-- View connections list
-- Remove connection
-- Follow accounts
-- Unfollow accounts
-- View followers list
-- View following list
+Exception handling for:
 
-## 🔹 Deliverables
+Invalid credentials
 
-- `Connection` entity
-- `Follow` entity
-- `NetworkController`
-- Status management logic
+Unauthorized access
 
+Forbidden access
 
----
+✅ MODULE 2 – User Profile Management
+🎯 Goal:
 
-# 🟢 MODULE 6 – Feed, Notifications & Analytics
+Profile creation, editing, and viewing.
 
-## 🔹 Feed Features
+🔹 1. Basic Profile (Personal Users)
 
-- Personalized feed
-- Trending hashtags
-- Filter by user type
-- Search posts by hashtag
+Name
 
-## 🔹 Notification Features
+Bio/About
 
-- In-app notifications
-- Unread notification count
-- Mark notifications as read
-- Notification history
-- Notification preferences
+Profile Picture
 
-## 🔹 Analytics (Creator/Business Accounts)
+Location
 
-- Post analytics (likes, comments, shares)
-- Engagement metrics
-- Follower demographics
-- Reach count
+Website link (optional)
 
-## 🔹 Deliverables
+View own profile
 
-- Feed service
-- `Notification` entity
-- Analytics service
-- Trending algorithm
-- Notification listener system
+View other users’ profiles
 
+🔹 2. Search Users
 
----
+Search by:
 
-# 🎯 Team Workflow Reminder
+Name
 
-- Each member works in their own `feature/*` branch.
-- All features must merge into `develop` first.
-- Only stable code is merged into `main`.
-- Keep modules isolated and avoid modifying other members’ domains without discussion.
+Username
 
----
+🔹 3. Enhanced Profile (Creator & Business)
 
+(Everything in Personal + below)
+
+Creator:
+
+Creator name
+
+Category/Industry
+
+Detailed bio
+
+Contact information
+
+Social media links
+
+Multiple external links (endorsements)
+
+Business:
+
+Business name
+
+Category/Industry
+
+Detailed bio
+
+Contact information
+
+Website
+
+Business address
+
+Business hours
+
+Showcase products/services
+
+✅ MODULE 3 – Post Management
+🎯 Goal:
+
+Creating and managing content.
+
+🔹 1. Create Post
+
+Text content
+
+Optional hashtags
+
+Post type:
+
+Normal
+
+Promotional (creator/business)
+
+Call-to-action buttons (Creator/Business)
+
+Learn More
+
+Shop Now
+
+🔹 2. View Posts
+
+View own posts (profile page)
+
+View post details
+
+🔹 3. Edit Post
+
+Only author can edit
+
+🔹 4. Delete Post
+
+Only author can delete
+
+🔹 5. Advanced (Creator/Business Only)
+
+Tag products/services
+
+Schedule posts (store scheduled time)
+
+Pin posts to profile
+
+✅ MODULE 4 – Social Interactions
+🎯 Goal:
+
+User engagement features.
+
+🔹 1. Like System
+
+Like posts
+
+Unlike posts
+
+Prevent duplicate likes
+
+Like count per post
+
+🔹 2. Comment System
+
+Add comment
+
+View all comments on a post
+
+Delete own comment
+
+Comment count
+
+🔹 3. Share/Repost
+
+Repost content
+
+Attribute original author
+
+Track share count
+
+🔹 4. Business/Creator Interaction
+
+Respond to comments
+
+Promotional engagement handling
+
+✅ MODULE 5 – Network & Follow System
+🎯 Goal:
+
+Build user relationships.
+
+🔹 1. Connection System (Personal Users Only)
+
+Send connection request
+
+Accept request
+
+Reject request
+
+Cancel sent request
+
+View:
+
+Sent requests
+
+Received requests
+
+View connections list
+
+Remove connection
+
+🔹 2. Follow System
+
+Follow creator/business accounts
+
+Unfollow accounts
+
+View followers list
+
+View following list
+
+🔹 3. Privacy Logic
+
+Private accounts:
+
+Must accept connection before viewing posts
+
+✅ MODULE 6 – Feed, Notifications & Analytics
+🎯 Goal:
+
+Dynamic experience and engagement tracking.
+
+🔹 A. Feed System
+Personalized Feed:
+
+Posts from:
+
+Connections
+
+Followed accounts
+
+Own posts
+
+Sorted by latest or relevance
+
+Discovery:
+
+Trending hashtags
+
+Trending posts
+
+Search posts by hashtag
+
+Filter feed:
+
+By user type
+
+By post type
+
+🔹 B. Notification System
+Trigger Notifications For:
+
+Connection request received
+
+Connection accepted
+
+New follower
+
+Post liked
+
+Post commented
+
+Post shared
+
+Features:
+
+Unread notification count
+
+Mark as read
+
+Notification history
+
+Notification preferences (enable/disable by type)
+
+🔹 C. Analytics (Creator/Business Only)
+Post Analytics:
+
+Total likes
+
+Total comments
+
+Total shares
+
+Reach (unique viewers)
+
+Engagement Metrics:
+
+Engagement rate
+
+Total followers growth
+
+Follower Demographics:
+
+Based on:
+
+Location
+
+Account type
+
+🎯 Final Module Summary (Clean View)
+Module	Main Focus
+Module 1	Authentication, Roles, Security
+Module 2	Profile Management
+Module 3	Post Management
+Module 4	Likes, Comments, Shares
+Module 5	Connections & Follow System
+Module 6	Feed, Notifications, Analytics
