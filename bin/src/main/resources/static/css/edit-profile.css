@@ -1,0 +1,153 @@
+/* ================= BODY ================= */
+
+body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(to right, #f5f7fa, #e4ecf7);
+}
+
+/* ================= CONTAINER ================= */
+
+.edit-container {
+    display: flex;
+    justify-content: center;
+    padding: 40px 20px;
+}
+
+.edit-card {
+    width: 100%;
+    max-width: 800px;
+    background: #ffffff;
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+/* ================= HEADINGS ================= */
+
+.edit-card h2 {
+    margin-bottom: 25px;
+    font-size: 28px;
+    font-weight: 600;
+    color: #333;
+}
+
+.edit-card h3 {
+    margin-top: 30px;
+    margin-bottom: 15px;
+    font-size: 20px;
+    color: #444;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 8px;
+}
+
+/* ================= FORM GROUP ================= */
+
+.form-group {
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    margin-bottom: 6px;
+    font-weight: 500;
+    color: #555;
+}
+
+/* ================= INPUTS ================= */
+
+input[type="text"],
+input[type="email"],
+textarea {
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+input:focus,
+textarea:focus {
+    border-color: #4a90e2;
+    outline: none;
+    box-shadow: 0 0 5px rgba(74, 144, 226, 0.3);
+}
+
+/* ================= FILE INPUT ================= */
+
+input[type="file"] {
+    margin-top: 5px;
+}
+
+/* ================= IMAGES ================= */
+
+img {
+    display: block;
+}
+
+/* ================= CHECKBOX ================= */
+
+input[type="checkbox"] {
+    margin-right: 6px;
+}
+
+/* ================= FORM ACTION BUTTONS ================= */
+
+.form-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.btn-save {
+    background: #2563eb;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.2s ease;
+}
+
+.btn-save:hover {
+    background: #1d4ed8;
+}
+
+.btn-cancel {
+    background: #f1f5f9;
+    color: #333;
+    padding: 10px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: 0.2s ease;
+    border: 1px solid #e2e8f0;
+}
+
+.btn-cancel:hover {
+    background: #e2e8f0;
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 600px) {
+
+    .edit-card {
+        padding: 20px;
+    }
+
+    .edit-card h2 {
+        font-size: 22px;
+    }
+
+    .edit-card h3 {
+        font-size: 18px;
+    }
+}

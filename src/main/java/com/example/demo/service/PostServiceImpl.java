@@ -3,6 +3,7 @@ package com.example.demo.service;
 import com.example.demo.dto.CommentDto;
 import com.example.demo.dto.PostDto;
 import com.example.demo.entity.*;
+import com.example.demo.exception.InvalidScheduleException;
 import com.example.demo.mapper.PostMapper;
 import com.example.demo.repo.*;
 
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.regex.*;
 import java.util.stream.Collectors;
@@ -73,9 +75,28 @@ public class PostServiceImpl implements PostService {
         post.setPinnedAt(null);
 
         if (scheduledAt != null && !scheduledAt.isBlank()) {
-            post.setScheduledAt(LocalDateTime.parse(scheduledAt));
-        }
 
+            DateTimeFormatter formatter =
+                    DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
+
+            LocalDateTime scheduledDateTime =
+                    LocalDateTime.parse(scheduledAt, formatter);
+
+            if (!scheduledDateTime.isAfter(LocalDateTime.now())) {
+                throw new InvalidScheduleException(
+                        "Scheduled time must be in the future"
+                );
+            }
+
+            post.setScheduledAt(scheduledDateTime);
+
+            // 🔥 IMPORTANT: publish time
+            post.setCreatedAt(scheduledDateTime);
+
+        } else {
+
+            post.setCreatedAt(LocalDateTime.now());
+        }
         Post savedPost = postRepository.save(post);
 
         // analytics row
@@ -254,7 +275,7 @@ public class PostServiceImpl implements PostService {
                 .orElseThrow();
 
         return postRepository
-                .findByUserAndCreatedAtLessThanEqualOrderByPinnedDescCreatedAtDesc(
+                .findProfilePosts(
                         profileUser,
                         LocalDateTime.now()
                 )
@@ -297,7 +318,7 @@ public class PostServiceImpl implements PostService {
     public List<PostDto> getAllPosts() {
 
         return postRepository
-                .findAllByCreatedAtLessThanEqualOrderByCreatedAtDesc(LocalDateTime.now())
+                .findAllPublishedPosts(LocalDateTime.now())
                 .stream()
                 .map(post -> map(post, post.getUser()))
                 .toList();
@@ -363,7 +384,7 @@ public class PostServiceImpl implements PostService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         return postRepository
-                .findByPostHashtags_Hashtag_NameAndCreatedAtLessThanEqualOrderByCreatedAtDesc(
+                .findPublishedByHashtag(
                         tag, LocalDateTime.now())
                 .stream()
                 .map(post -> map(post, user))
@@ -376,10 +397,8 @@ public class PostServiceImpl implements PostService {
         User user = userRepository.findByUsername(username).orElseThrow();
 
         return postRepository
-                .findAllByCreatedAtLessThanEqualOrderByCreatedAtDesc(LocalDateTime.now())
+                .findPublishedByContent(keyword, LocalDateTime.now())
                 .stream()
-                .filter(p -> p.getContent() != null &&
-                        p.getContent().toLowerCase().contains(keyword.toLowerCase()))
                 .map(p -> map(p, user))
                 .toList();
     }
