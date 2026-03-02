@@ -158,6 +158,58 @@
 			background: #e0e7ff;
 			font-weight: 600;
 		}
+		
+		/* ===== TRENDING BUTTON ===== */
+
+		.trending-badge {
+		    display: none;
+		    margin-left: 10px;
+		    padding: 8px 18px;
+		    border-radius: 25px;
+		    background: linear-gradient(45deg, #ff6a00, #ff3c00);
+		    color: white;
+		    font-size: 14px;
+		    font-weight: 600;
+		    text-decoration: none;
+		    border: none;
+		    box-shadow: 0 6px 15px rgba(255, 80, 0, 0.4);
+		    transition: 0.2s ease;
+		}
+
+		.trending-badge:hover {
+		    transform: scale(1.05);
+		}
+
+
+		/* ===== SIMPLE TRENDING DROPDOWN ===== */
+
+		#trendingBox {
+		    position: absolute;
+		    top: 45px;
+		    left: 0;
+		    width: 260px;
+		    background: white;
+		    border-radius: 12px;
+		    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+		    display: none;
+		    z-index: 3000;
+		    overflow: hidden;
+		    border: 1px solid #e5e7eb;
+		}
+
+
+		#trendingBox a {
+		    display: block;
+		    padding: 10px 14px;
+		    text-decoration: none;
+		    color: #111827;
+		    font-size: 14px;
+		    transition: background 0.2s ease;
+		}
+
+		#trendingBox a:hover {
+		    background: #f9fafb;
+		}
 	</style>
 
 	<meta charset="UTF-8">
@@ -189,21 +241,24 @@
 
 				<form th:action="@{/post/search}" method="get" class="search-form">
 
-					<input type="text" name="keyword" id="searchInput" placeholder="Search users or hashtags..."
-						oninput="handleSearchInput()" autocomplete="off" required>
-					<a id="dynamicTrendingBtn" href="/post/trending" style="
-						        display:none;
-						        margin-left:10px;
-						        padding:5px 12px;
-						        border-radius:15px;
-						        background:rgba(255,99,71,0.1);
-						        color:#ff5722;
-						        text-decoration:none;
-						        font-size:13px;">
-					</a>
-					<div id="trendingBox"></div>
+				    <input type="text"
+				           name="keyword"
+				           id="searchInput"
+				           placeholder="Search users or hashtags..."
+				           oninput="handleSearchInput()"
+				           autocomplete="off"
+				           required>
 
-					<button type="submit">Search</button>
+				    <button type="submit">Search</button>
+
+				    <a id="dynamicTrendingBtn"
+				       th:href="@{/post/trending}"
+				       class="trending-badge">
+				        🔥 Trending Hashtag
+				    </a>
+
+				    <div id="trendingBox"></div>
+
 				</form>
 
 
@@ -316,6 +371,11 @@
 						<a th:href="@{/profile/{username}(username=${post.username})}" th:text="${post.username}"></a>
 
 						<span th:text="${#temporals.format(post.createdAt,'dd MMM yyyy HH:mm')}"></span>
+						
+						<div th:if="${post.promotional}"
+						     style="color:#e11d48; font-size:13px; font-weight:600; margin-top:4px;">
+						    📢 Promotional
+						</div>
 					</div>
 
 				</div>
@@ -548,61 +608,42 @@
 			trendingTags = [];
 		}
 
-
 		function handleSearchInput() {
 
-			let input = document.getElementById("searchInput").value.trim();
-			let box = document.getElementById("trendingBox");
+		    let input = document.getElementById("searchInput").value.trim();
+		    let box = document.getElementById("trendingBox");
+		    let trendingBtn = document.getElementById("dynamicTrendingBtn");
 
-			let trendingBtn = document.getElementById("dynamicTrendingBtn");
+		    if (!input.startsWith("#")) {
+		        trendingBtn.style.display = "none";
+		        box.style.display = "none";
+		        return;
+		    }
 
-			if (input.startsWith("#")) {
+		    trendingBtn.style.display = "inline-block";
 
-				trendingBtn.style.display = "inline-block";
+		    let keyword = input.substring(1).toLowerCase();
 
-			} else {
+		    let filtered = trendingTags.filter(tag =>
+		        tag.toLowerCase().startsWith(keyword)
+		    );
 
-				trendingBtn.style.display = "none";
-			}
+		    if (filtered.length === 0) {
+		        box.style.display = "none";
+		        return;
+		    }
 
-			// If not starting with #
-			if (!input.startsWith("#")) {
-				box.style.display = "none";
-				return;
-			}
+		    box.innerHTML = "";  // ✅ No header
 
-			let keyword = input.substring(1).toLowerCase();
+		    filtered.forEach(tag => {
+		        let a = document.createElement("a");
+		        a.href = "/post/trending?tag=" + tag;
+		        a.innerText = "#" + tag;
+		        box.appendChild(a);
+		    });
 
-			let filtered = trendingTags.filter(tag =>
-				tag.toLowerCase().startsWith(keyword)
-			);
-
-			if (filtered.length === 0) {
-				box.style.display = "none";
-				return;
-			}
-
-			box.innerHTML = "";
-
-			filtered.forEach(tag => {
-
-				let a = document.createElement("a");
-				a.href = "/post/trending?tag=" + tag;
-				a.innerText = "#" + tag;
-				a.style.display = "block";
-				a.style.padding = "8px";
-				a.style.textDecoration = "none";
-				a.style.color = "#111827";
-
-				a.onmouseover = () => a.style.background = "#f3f4f6";
-				a.onmouseout = () => a.style.background = "transparent";
-
-				box.appendChild(a);
-			});
-
-			box.style.display = "block";
+		    box.style.display = "block";
 		}
-
 		document.addEventListener("click", function (event) {
 
 			let searchInput = document.getElementById("searchInput");

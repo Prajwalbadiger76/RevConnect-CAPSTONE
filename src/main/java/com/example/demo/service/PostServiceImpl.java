@@ -62,7 +62,8 @@ public class PostServiceImpl implements PostService {
     public void createPost(String username,
                            String content,
                            String hashtags,
-                           String scheduledAt) {
+                           String scheduledAt,
+                           boolean promotional) {
 
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -74,6 +75,27 @@ public class PostServiceImpl implements PostService {
         post.setPinned(false);
         post.setPinnedAt(null);
 
+        
+        // PROMOTIONAL LOGIC
+        // =========================
+        if (promotional) {
+
+            if (user.getRole() != Role.BUSINESS &&
+                user.getRole() != Role.CREATOR) {
+
+                throw new RuntimeException(
+                        "Only Business or Creator can create promotional posts"
+                );
+            }
+
+            post.setIsPromotional(true);
+        } else {
+            post.setIsPromotional(false);
+        }
+
+        
+        // SCHEDULE LOGIC (FIXED)
+        // =========================
         if (scheduledAt != null && !scheduledAt.isBlank()) {
 
             DateTimeFormatter formatter =
@@ -90,19 +112,20 @@ public class PostServiceImpl implements PostService {
 
             post.setScheduledAt(scheduledDateTime);
 
-            // 🔥 IMPORTANT: publish time
-            post.setCreatedAt(scheduledDateTime);
-
         } else {
-
-            post.setCreatedAt(LocalDateTime.now());
+            post.setScheduledAt(null);
         }
+
         Post savedPost = postRepository.save(post);
 
-        // analytics row
+       
+        // ANALYTICS
+        // =========================
         analyticsService.createPostAnalytics(savedPost);
 
-        // parse hashtags from FIELD (NOT content)
+        
+        // HASHTAGS
+        // =========================
         if (hashtags != null && !hashtags.isBlank()) {
             parseHashtags(savedPost, hashtags);
         }
@@ -315,8 +338,8 @@ public class PostServiceImpl implements PostService {
                 .orElseThrow();
 
         return postRepository
-                .findProfilePosts(
-                        profileUser,
+                .findPostsByUsername(
+                        profileUsername,   // ✅ FIXED HERE
                         LocalDateTime.now()
                 )
                 .stream()
@@ -358,7 +381,7 @@ public class PostServiceImpl implements PostService {
     public List<PostDto> getAllPosts() {
 
         return postRepository
-                .findAllPublishedPosts(LocalDateTime.now())
+                .findAllByCreatedAtLessThanEqualOrderByCreatedAtDesc(LocalDateTime.now())
                 .stream()
                 .map(post -> map(post, post.getUser()))
                 .toList();
@@ -424,7 +447,7 @@ public class PostServiceImpl implements PostService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         return postRepository
-                .findPublishedByHashtag(
+                .findByPostHashtags_Hashtag_NameAndCreatedAtLessThanEqualOrderByCreatedAtDesc(
                         tag, LocalDateTime.now())
                 .stream()
                 .map(post -> map(post, user))
@@ -437,8 +460,10 @@ public class PostServiceImpl implements PostService {
         User user = userRepository.findByUsername(username).orElseThrow();
 
         return postRepository
-                .findPublishedByContent(keyword, LocalDateTime.now())
+                .findByContentContainingIgnoreCase(keyword)  // ✅ FIXED
                 .stream()
+                .filter(p -> p.getScheduledAt() == null ||
+                             p.getScheduledAt().isBefore(LocalDateTime.now()))
                 .map(p -> map(p, user))
                 .toList();
     }
@@ -446,24 +471,13 @@ public class PostServiceImpl implements PostService {
     // =========================================================
     // TRENDING HASHTAGS
     // =========================================================
-
     @Override
     public List<String> getTrendingHashtags() {
 
-        Map<String, Integer> count = new HashMap<>();
-
-        for (Post post : postRepository.findAll()) {
-            for (PostHashtag ph : post.getPostHashtags()) {
-                String tag = ph.getHashtag().getName();
-                count.put(tag, count.getOrDefault(tag, 0) + 1);
-            }
-        }
-
-        return count.entrySet()
+        return postHashtagRepository.findTrendingHashtags()
                 .stream()
-                .sorted((a,b)->b.getValue()-a.getValue())
-                .limit(3)
-                .map(Map.Entry::getKey)
+                .limit(5)
+                .map(row -> (String) row[0])
                 .toList();
     }
 
@@ -480,6 +494,7 @@ public class PostServiceImpl implements PostService {
         dto.setCreatedAt(post.getCreatedAt());
         dto.setUsername(post.getUser().getUsername());
         dto.setPinned(post.getPinned());
+        dto.setPromotional(Boolean.TRUE.equals(post.getIsPromotional()));
         dto.setHashtags(
         	    post.getPostHashtags()
         	        .stream()

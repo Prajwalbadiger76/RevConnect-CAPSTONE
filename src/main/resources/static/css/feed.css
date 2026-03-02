@@ -530,3 +530,55 @@ body {
 .share-header a:hover {
     text-decoration: underline;
 }
+
+/* ===== SCHEDULE MODAL ===== */
+
+.schedule-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 5000;
+}
+
+.schedule-sheet {
+    background: white;
+    padding: 25px;
+    border-radius: 16px;
+    width: 350px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+}
+
+.schedule-input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+    margin-top: 15px;
+}
+
+.schedule-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.ok-btn {
+    background: #2563eb;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.cancel-btn {
+    background: #e5e7eb;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+}
