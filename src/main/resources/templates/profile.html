@@ -30,10 +30,9 @@
 					📷
 				</div>
 
-				<form id="bannerUploadForm" th:if="${isOwner}" th:action="@{/api/profile/edit}" method="post"
+				<form id="bannerUploadForm" th:if="${isOwner}" th:action="@{/profile/edit}" method="post"
 					enctype="multipart/form-data">
-					<form id="bannerUploadForm" th:if="${isOwner}" th:action="@{/profile/edit}" method="post"
-						enctype="multipart/form-data">
+			
 
 						<input type="file" id="bannerFileInput" name="bannerImageFile" accept="image/*"
 							style="display:none" onchange="document.getElementById('bannerUploadForm').submit();">
@@ -54,8 +53,6 @@
 						📷
 					</div>
 
-					<form id="profileUploadForm" th:if="${isOwner}" th:action="@{/api/profile/edit}" method="post"
-						enctype="multipart/form-data">
 						<form id="profileUploadForm" th:if="${isOwner}" th:action="@{/profile/edit}" method="post"
 							enctype="multipart/form-data">
 
@@ -255,7 +252,7 @@
 
 					<!-- EDIT BUTTON -->
 					<div class="edit-btn-wrapper" th:if="${isOwner}">
-						<a th:href="@{/api/profile/edit}" class="edit-btn">
+						<a th:href="@{/profile/edit}" class="edit-btn">
 							✏ Edit Profile
 						</a>
 					</div>
