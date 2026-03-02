@@ -102,7 +102,7 @@ public class PostServiceImpl implements PostService {
         // analytics row
         analyticsService.createPostAnalytics(savedPost);
 
-        // 🔥 parse hashtags from FIELD (NOT content)
+        // parse hashtags from FIELD (NOT content)
         if (hashtags != null && !hashtags.isBlank()) {
             parseHashtags(savedPost, hashtags);
         }
@@ -197,24 +197,39 @@ public class PostServiceImpl implements PostService {
     public void sharePost(Long postId, String username) {
 
         User currentUser = userRepository.findByUsername(username).orElseThrow();
-        Post originalPost = postRepository.findById(postId).orElseThrow();
+        Post post = postRepository.findById(postId).orElseThrow();
 
+        // 🔥 Resolve base/original post
+        Post basePost = post.getOriginalPost() != null
+                ? post.getOriginalPost()
+                : post;
+
+        // 🔥 Check if already shared
+        Optional<Post> existingShare =
+                postRepository.findByUserAndOriginalPost(currentUser, basePost);
+
+        if (existingShare.isPresent()) {
+            return; // silently ignore duplicate share
+        }
+
+        // 🔥 Create shared post
         Post shared = new Post();
-        shared.setContent("🔁 Shared from @" + originalPost.getUser().getUsername()
-                + "\n\n" + originalPost.getContent());
+        shared.setContent(basePost.getContent());
+        shared.setOriginalPost(basePost);
         shared.setUser(currentUser);
         shared.setCreatedAt(LocalDateTime.now());
+        shared.setOriginalPost(basePost);
 
         postRepository.save(shared);
 
-        analyticsService.incrementShares(postId);
+        analyticsService.incrementShares(basePost.getId());
 
-        if (!originalPost.getUser().getUsername().equals(username)) {
+        if (!basePost.getUser().getUsername().equals(username)) {
             notificationService.createNotification(
-                    originalPost.getUser().getUsername(),
+                    basePost.getUser().getUsername(),
                     username,
                     "SHARE",
-                    postId
+                    basePost.getId()
             );
         }
     }
@@ -224,29 +239,54 @@ public class PostServiceImpl implements PostService {
     // =========================================================
 
     @Override
-    public List<PostDto> getFeedPosts(String username) {
+    public List<PostDto> getFeedPosts(String username, String roleFilter) {
 
         User currentUser = userRepository.findByUsername(username).orElseThrow();
+        LocalDateTime now = LocalDateTime.now();
 
-        List<User> followedUsers = followRepository.findByFollower(currentUser)
-                .stream()
-                .map(Follow::getFollowing)
-                .toList();
+        List<Post> posts;
 
-        List<User> feedUsers = new ArrayList<>(followedUsers);
-        feedUsers.add(currentUser);
-        
-       
+        // ================= FILTER APPLIED =================
+        if (roleFilter != null && !roleFilter.equalsIgnoreCase("ALL")) {
 
-        return postRepository.findFeedPosts(feedUsers, LocalDateTime.now())
-                .stream()
+            Role selectedRole = Role.valueOf(roleFilter.toUpperCase());
+
+            posts = postRepository.findPostsByAuthorRole(selectedRole, now);
+
+        }
+        // ================= DEFAULT NORMAL FEED =================
+        else {
+
+            List<User> followedUsers = followRepository.findByFollower(currentUser)
+                    .stream()
+                    .map(Follow::getFollowing)
+                    .toList();
+
+            List<User> feedUsers = new ArrayList<>(followedUsers);
+            feedUsers.add(currentUser);
+
+            posts = postRepository.findFeedPosts(feedUsers, now);
+        }
+
+        return posts.stream()
+
+                // 🔥 Hide original post if current user already reshared it
+                .filter(post -> {
+                    if (post.getOriginalPost() == null) {
+                        return postRepository
+                                .findByUserAndOriginalPost(currentUser, post)
+                                .isEmpty();
+                    }
+                    return true;
+                })
+
                 .map(post -> {
                     analyticsService.recordView(post.getId(), currentUser.getId());
                     return map(post, currentUser);
                 })
                 .toList();
     }
-
+    
     // =========================================================
     // GET POST BY ID
     // =========================================================
@@ -469,6 +509,24 @@ public class PostServiceImpl implements PostService {
             dto.setTotalShares(analytics.getTotalShares());
             dto.setReachCount(analytics.getReachCount());
             dto.setEngagementRate(analytics.getEngagementRate());
+        }
+        
+     // 🔥 SHARE CHECK
+        Post basePost = post.getOriginalPost() != null
+                ? post.getOriginalPost()
+                : post;
+
+        boolean alreadyShared =
+                postRepository.findByUserAndOriginalPost(currentUser, basePost)
+                              .isPresent();
+
+        dto.setSharedByCurrentUser(alreadyShared);
+        
+     // SHARE HEADER SUPPORT
+        if (post.getOriginalPost() != null) {
+            dto.setSharedFromUsername(
+                post.getOriginalPost().getUser().getUsername()
+            );
         }
 
         return dto;

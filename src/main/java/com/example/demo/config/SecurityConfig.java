@@ -29,7 +29,7 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
 
             .sessionManagement(session ->
-                   session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                   session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
 
             //  URL Authorization Rules
@@ -42,6 +42,9 @@ public class SecurityConfig {
                             "/css/**",
                             "/js/**"
                     ).permitAll()
+                    .requestMatchers("/api/**").authenticated()
+                    .requestMatchers("/follow/**").authenticated()
+                    .requestMatchers("/profile/**").permitAll()
                     
                     .requestMatchers("/creator/**").hasRole("CREATOR")
                     .requestMatchers("/business/**").hasRole("BUSINESS")
