@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Search Results</title>
+
+    <link rel="stylesheet" th:href="@{/css/feed.css}">
+
+    <style>
+        body {
+            font-family: Arial;
+            max-width: 800px;
+            margin: auto;
+            padding: 30px;
+        }
+
+        .user-card {
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            background: #fff;
+        }
+
+        .username {
+            font-weight: bold;
+            text-decoration: none;
+            color: #007bff;
+        }
+
+        .username:hover {
+            text-decoration: underline;
+        }
+
+       
+
+        .feed-post-card {
+            background: #fff;
+            padding: 20px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+        }
+
+        .feed-post-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .feed-post-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .feed-post-content {
+            margin-bottom: 10px;
+            font-size: 15px;
+        }
+
+        .feed-post-actions {
+            display: flex;
+            gap: 20px;
+            margin-top: 10px;
+        }
+
+        .feed-post-actions button {
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+		.nav {
+		    margin-bottom: 25px;
+		}
+
+		.back-pill {
+		    display: inline-block;
+		    padding: 10px 20px;
+		    background-color: #f1f5f9;
+		    color: #111827;
+		    border-radius: 999px;
+		    text-decoration: none;
+		    font-weight: 500;
+		    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+		    transition: all 0.2s ease;
+		}
+
+		.back-pill:hover {
+		    background-color: #e2e8f0;
+		    transform: translateY(-2px);
+		}
+    </style>
+</head>
+<body>
+
+	<div class="nav">
+	    <a th:href="@{/feed}" class="back-pill">
+	        ← Back to Feed
+	    </a>
+	</div>
+
+<!-- ================= USER SEARCH ================= -->
+
+<div th:if="${searchType != 'hashtag' and #lists.isEmpty(results)}">
+    <p>No users found.</p>
+</div>
+
+<div th:if="${searchType != 'hashtag'}"
+     th:each="user : ${results}" class="user-card">
+
+    <a th:href="@{/profile/{username}(username=${user.username})}"
+       class="username"
+       th:text="${user.username}">
+    </a>
+
+    <div>
+        <span th:text="${user.fullName}"></span>
+    </div>
+
+    <div>
+        Followers:
+        <span th:text="${user.followerCount}"></span>
+    </div>
+
+</div>
+
+<!-- ================= HASHTAG SEARCH ================= -->
+
+<div th:if="${searchType == 'hashtag'}">
+
+    <div th:if="${#lists.isEmpty(posts)}">
+        No posts found for this hashtag.
+    </div>
+
+    <div th:each="post : ${posts}" class="feed-post-card">
+
+        <!-- HEADER -->
+        <div class="feed-post-header">
+
+            <img class="feed-post-avatar"
+                 th:src="@{'https://i.pravatar.cc/150?u=' + ${post.username}}">
+
+            <div>
+                <strong th:text="${post.username}"></strong>
+                <div th:text="${#temporals.format(post.createdAt,'dd MMM yyyy HH:mm')}"></div>
+            </div>
+
+        </div>
+
+        <!-- CONTENT -->
+        <div class="feed-post-content"
+             th:text="${post.content}">
+        </div>
+
+        <!-- HASHTAGS -->
+        <div th:if="${post.hashtags != null and !#lists.isEmpty(post.hashtags)}">
+            <span th:each="tag : ${post.hashtags}">
+                <a th:href="@{/post/search(keyword=${'#' + tag})}"
+                   style="color:#2563eb; text-decoration:none; font-weight:500;">
+                    <span th:text="${'#' + tag}"></span>
+                </a>
+            </span>
+        </div>
+
+		<!-- ACTIONS -->
+		<div class="feed-post-actions">
+
+		    <form th:action="@{/like/{postId}(postId=${post.id})}"
+		          method="post">
+		        <button type="submit">
+		            🤍 Like
+		        </button>
+		    </form>
+
+		    <span th:text="${post.likeCount} + ' likes'"></span>
+
+		    <form th:action="@{/post/share/{id}(id=${post.id})}"
+		          method="post">
+		        <button type="submit">🔁 Share</button>
+		    </form>
+
+		    <!-- ADD THIS BUTTON INSIDE ACTIONS -->
+			<button type="button"
+			        th:attr="onclick=|toggleComments(${post.id})|">
+		        💬 <span th:text="${#lists.size(post.comments)}"></span> Comments
+		    </button>
+
+		</div>
+
+		
+
+		<div th:id="'comments-' + ${post.id}"
+		     style="display:none; margin-top:10px;">
+
+		    <!-- Existing Comments -->
+		    <div th:each="comment : ${post.comments}"
+		         style="margin-bottom:6px;">
+		        <strong th:text="${comment.username}"></strong>
+		        <span th:text="${comment.content}"></span>
+		    </div>
+
+		    <!-- Add Comment Form -->
+		    <form th:action="@{/comment/{postId}(postId=${post.id})}"
+		          method="post"
+		          style="margin-top:8px;">
+
+		        <input type="text"
+		               name="content"
+		               placeholder="Write a comment..."
+		               required
+		               style="width:70%; padding:6px; border-radius:6px; border:1px solid #ddd;">
+
+		        <button type="submit"
+		                style="padding:6px 12px; border:none; background:#2563eb; color:white; border-radius:6px;">
+		            Post
+		        </button>
+
+		    </form>
+
+		</div>
+
+    </div>
+
+</div>
+
+<script>
+function toggleComments(postId) {
+    const box = document.getElementById("comments-" + postId);
+    if (!box) return;
+
+    box.style.display =
+        box.style.display === "block" ? "none" : "block";
+}
+</script>
+
+</body>
+</html>

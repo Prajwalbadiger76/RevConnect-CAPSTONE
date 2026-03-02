@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Search Results</title>
+    <link rel="stylesheet" th:href="@{/css/profile.css}">
+</head>
+<body>
+
+<div class="profile-container search-container">
+
+    <h2 class="search-title">Search Results</h2>
+
+    <!-- ================= ERROR MESSAGE FROM CONTROLLER ================= -->
+    <div th:if="${searchError}" class="search-error-card">
+        ❌ <span th:text="${searchError}"></span>
+    </div>
+
+    <!-- ================= NO USERS FOUND (AUTO CHECK) ================= -->
+    <div th:if="${results != null and #lists.isEmpty(results)}"
+         class="search-error-card">
+        ❌ No users found.
+    </div>
+
+    <!-- ================= SEARCH RESULTS ================= -->
+    <div th:if="${results != null and !#lists.isEmpty(results)}">
+
+        <div th:each="user : ${results}" class="search-card">
+
+            <a th:href="@{'/api/profile/' + ${user.username()}}"
+               class="search-user-link">
+
+                <div class="search-user">
+
+                    <img class="search-avatar"
+                         th:src="${user.profilePicture() != null 
+                                  ? user.profilePicture() 
+                                  : 'https://i.pravatar.cc/100'}">
+
+                    <div class="search-info">
+                        <h3 th:text="${user.fullName() != null ? user.fullName() : user.username()}"></h3>
+                        <p>@<span th:text="${user.username()}"></span></p>
+                    </div>
+
+                </div>
+
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

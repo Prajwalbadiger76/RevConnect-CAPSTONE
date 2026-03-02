@@ -17,8 +17,11 @@ public interface PostHashtagRepository extends JpaRepository<PostHashtag, Long> 
     @Query("""
     	    SELECT ph.hashtag.name, COUNT(ph)
     	    FROM PostHashtag ph
+    	    WHERE ph.post.scheduledAt IS NULL 
+    	       OR ph.post.scheduledAt <= CURRENT_TIMESTAMP
     	    GROUP BY ph.hashtag.name
     	    ORDER BY COUNT(ph) DESC
     	""")
     	List<Object[]> findTrendingHashtags();
+   
 }

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>Sent Requests</title>
+
+<style>
+body{
+    font-family:Segoe UI;
+    background:#f3f4f6;
+    margin:0;
+    padding:40px;
+}
+
+.container{
+    width:55%;
+    margin:auto;
+}
+
+.card{
+    background:white;
+    padding:18px;
+    margin-bottom:15px;
+    border-radius:12px;
+    box-shadow:0 4px 12px rgba(0,0,0,0.1);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    transition:0.2s;
+}
+
+.card:hover{
+    transform:translateY(-2px);
+}
+
+.left{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.avatar{
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    background:#6366f1;
+    color:white;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:bold;
+}
+
+.name{
+    text-decoration:none;
+    font-weight:600;
+    color:#2563eb;
+}
+
+.cancel{
+    border:none;
+    padding:8px 16px;
+    border-radius:7px;
+    cursor:pointer;
+    background:#ef4444;
+    color:white;
+    transition:0.25s;
+}
+
+/* hover animation */
+.cancel:hover{
+    background:#dc2626;
+    transform:scale(1.05);
+}
+
+/* click animation */
+.cancel:active{
+    transform:scale(0.95);
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h2 style="text-align:center;">Sent Requests</h2>
+
+<div th:if="${#lists.isEmpty(sent)}" style="text-align:center;">
+    No sent requests
+</div>
+
+<div th:each="req : ${sent}" class="card">
+
+    <div class="left">
+        <div class="avatar"
+             th:text="${#strings.substring(req.receiver.username,0,1)}"></div>
+
+        <a class="name"
+           th:href="@{/profile/{username}(username=${req.receiver.username})}"
+           th:text="${req.receiver.username}"></a>
+    </div>
+
+    <form th:action="@{/connections/cancel/{username}(username=${req.receiver.username})}"
+          method="post"
+          onsubmit="changeCancel(this,event)">
+        <button class="cancel">Cancel</button>
+    </form>
+
+</div>
+
+<div style="text-align:center;margin-top:20px;">
+    <a th:href="@{/feed}">← Back to Feed</a>
+</div>
+
+</div>
+
+<script>
+function changeCancel(form,event){
+
+    event.preventDefault();
+
+    let btn=form.querySelector("button");
+
+    btn.innerText="Cancelled";
+    btn.style.background="#9ca3af";
+    btn.disabled=true;
+
+    setTimeout(()=>{
+        form.submit();
+    },300);
+}
+</script>
+
+</body>
+</html>

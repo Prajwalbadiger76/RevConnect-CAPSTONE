@@ -4,7 +4,62 @@
     <meta charset="UTF-8">
     <title>Trending Hashtags</title>
     <link rel="stylesheet" th:href="@{/css/feed.css}">
+
+    <style>
+        .trending-page {
+            background: #f3f4f6;
+            min-height: 100vh;
+        }
+
+        .sub-header {
+            max-width: 900px;
+            margin: 20px auto 0 auto;
+            padding: 0 20px;
+        }
+
+        .back-btn {
+            text-decoration: none;
+            color: #2563eb;
+            font-weight: 500;
+        }
+
+        .feed-container {
+            max-width: 700px;
+            margin: 20px auto 40px auto;
+        }
+
+        /* ===== Trending Pills ===== */
+
+        .trending-tags-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .trend-pill {
+            padding: 6px 14px;
+            border-radius: 20px;
+            background: #f3f4f6;
+            text-decoration: none;
+            font-size: 14px;
+            color: #111827;
+            border: 1px solid #e5e7eb;
+            transition: 0.2s ease;
+        }
+
+        .trend-pill:hover {
+            background: #e5e7eb;
+        }
+
+        .active-tag {
+            background: #111827;
+            color: white;
+            border-color: #111827;
+        }
+    </style>
 </head>
+
 <body>
 
 <div class="trending-page">
@@ -24,16 +79,16 @@
     <div class="feed-container">
 
         <!-- Trending Pills -->
-        <div class="trending-tags-row">
+		<div class="trending-tags-row"
+		     th:if="${selectedTag == null}">
 
-            <a th:each="tagItem : ${trendingHashtags}"
-               th:href="@{/post/trending(tag=${tagItem})}"
-               class="trend-pill"
-               th:classappend="${tagItem == selectedTag} ? ' active-tag' : ''"
-               th:text="${'#' + tagItem}">
-            </a>
+		    <a th:each="tagItem : ${trendingHashtags}"
+		       th:href="@{/post/trending(tag=${tagItem})}"
+		       class="trend-pill"
+		       th:text="${'#' + tagItem}">
+		    </a>
 
-        </div>
+		</div>
 
         <!-- Posts -->
         <div th:each="post : ${posts}" class="post-card">
@@ -51,8 +106,10 @@
 
             </div>
 
-            <div class="post-content"
-                 th:text="${post.content}">
+            <div class="post-body">
+                <div class="post-content"
+                     th:text="${post.content}">
+                </div>
             </div>
 
         </div>
@@ -60,7 +117,6 @@
     </div>
 
 </div>
-
 
 </body>
 </html>
