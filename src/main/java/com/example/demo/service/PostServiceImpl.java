@@ -1,11 +1,15 @@
 package com.example.demo.service;
 
 import com.example.demo.dto.CommentDto;
+
 import com.example.demo.dto.PostDto;
 import com.example.demo.entity.*;
 import com.example.demo.exception.InvalidScheduleException;
 import com.example.demo.mapper.PostMapper;
 import com.example.demo.repo.*;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,12 +17,15 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+
 import java.util.regex.*;
 import java.util.stream.Collectors;
 
 @Service
 @Transactional
 public class PostServiceImpl implements PostService {
+
+    private static final Logger logger = LogManager.getLogger(PostServiceImpl.class);
 
     private final PostRepository postRepository;
     private final HashtagRepository hashtagRepository;
@@ -51,13 +58,12 @@ public class PostServiceImpl implements PostService {
         this.commentRepository = commentRepository;
         this.notificationService = notificationService;
         this.analyticsService = analyticsService;
-        this.postMapper=postMapper;
+        this.postMapper = postMapper;
     }
 
     // =========================================================
-    // CREATE POST (Controller Compatible)
+    // CREATE POST
     // =========================================================
-
     @Override
     public void createPost(String username,
                            String content,
@@ -67,10 +73,14 @@ public class PostServiceImpl implements PostService {
                            String ctaType,
                            String ctaUrl,
                            String productTag) {
-    	System.out.println("SERVICE promotional = " + promotional);
+
+        logger.info("Create post request received for user: {}", username);
 
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> {
+                    logger.error("User not found: {}", username);
+                    return new RuntimeException("User not found");
+                });
 
         Post post = new Post();
         post.setContent(content);
@@ -78,14 +88,15 @@ public class PostServiceImpl implements PostService {
         post.setCreatedAt(LocalDateTime.now());
         post.setPinned(false);
 
-        // ================= PROMOTIONAL LOGIC =================
         if (promotional) {
+            logger.info("Promotional post attempt by user: {}", username);
 
             if (user.getRole() != Role.BUSINESS &&
                 user.getRole() != Role.CREATOR) {
 
+                logger.warn("Unauthorized promotional post attempt by {}", username);
                 throw new RuntimeException(
-                    "Only Business or Creator can create promotional posts"
+                        "Only Business or Creator can create promotional posts"
                 );
             }
 
@@ -98,18 +109,6 @@ public class PostServiceImpl implements PostService {
             post.setIsPromotional(false);
         }
 
-        postRepository.save(post);
-
-        analyticsService.createPostAnalytics(post);
-
-        if (hashtags != null && !hashtags.isBlank()) {
-            parseHashtags(post, hashtags);
-        }
-    
-
-        
-        // SCHEDULE LOGIC (FIXED)
-        // =========================
         if (scheduledAt != null && !scheduledAt.isBlank()) {
 
             DateTimeFormatter formatter =
@@ -119,77 +118,80 @@ public class PostServiceImpl implements PostService {
                     LocalDateTime.parse(scheduledAt, formatter);
 
             if (!scheduledDateTime.isAfter(LocalDateTime.now())) {
+                logger.error("Invalid schedule time provided by user: {}", username);
                 throw new InvalidScheduleException(
                         "Scheduled time must be in the future"
                 );
             }
 
             post.setScheduledAt(scheduledDateTime);
-
-        } else {
-            post.setScheduledAt(null);
         }
 
         Post savedPost = postRepository.save(post);
-
-       
-        // ANALYTICS
-        // =========================
         analyticsService.createPostAnalytics(savedPost);
 
-        
-        // HASHTAGS
-        // =========================
         if (hashtags != null && !hashtags.isBlank()) {
             parseHashtags(savedPost, hashtags);
         }
+
+        logger.info("Post created successfully for user: {}", username);
     }
+
     // =========================================================
     // UPDATE POST
     // =========================================================
     @Override
-    @Transactional
     public void updatePost(Long postId,
                            String content,
                            String hashtags,
                            String username) {
 
+        logger.info("Update request for post {} by user {}", postId, username);
+
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new RuntimeException("Post not found"));
+                .orElseThrow(() -> {
+                    logger.error("Post not found for update: {}", postId);
+                    return new RuntimeException("Post not found");
+                });
 
         if (!post.getUser().getUsername().equals(username)) {
+            logger.warn("Unauthorized update attempt on post {} by {}", postId, username);
             throw new RuntimeException("You cannot edit this post");
         }
 
         post.setContent(content);
         postRepository.save(post);
 
-        // 🔥 DELETE OLD HASHTAGS
         postHashtagRepository.deleteByPost(post);
 
-        // 🔥 PARSE FROM HASHTAG FIELD
         if (hashtags != null && !hashtags.isBlank()) {
             parseHashtags(post, hashtags);
         }
+
+        logger.info("Post {} updated successfully", postId);
     }
 
     // =========================================================
     // DELETE POST
     // =========================================================
-
     @Override
-    @Transactional
     public void deletePost(Long postId, String username) {
 
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new RuntimeException("Post not found"));
+        logger.info("Delete request for post {} by user {}", postId, username);
 
-        // Security check: only owner can delete
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> {
+                    logger.error("Post not found for delete: {}", postId);
+                    return new RuntimeException("Post not found");
+                });
+
         if (!post.getUser().getUsername().equals(username)) {
+            logger.warn("Unauthorized delete attempt on post {} by {}", postId, username);
             throw new RuntimeException("You cannot delete this post");
         }
 
         postRepository.delete(post);
+        logger.info("Post {} deleted successfully", postId);
     }
     // =========================================================
     // LIKE / UNLIKE
@@ -404,28 +406,33 @@ public class PostServiceImpl implements PostService {
     // =========================================================
     // PIN / UNPIN
     // =========================================================
-
+   
     @Override
     public void pinPost(Long postId, String username) {
 
+        logger.info("Pin request for post {} by {}", postId, username);
+
         User user = userRepository.findByUsername(username).orElseThrow();
 
-        long pinnedCount = postRepository
-                .countByUserAndPinnedTrue(user);
+        long pinnedCount = postRepository.countByUserAndPinnedTrue(user);
 
         if (pinnedCount >= 3) {
+            logger.warn("User {} attempted to exceed pin limit", username);
             throw new RuntimeException("Maximum 3 pinned posts allowed");
         }
 
         Post post = postRepository.findById(postId).orElseThrow();
 
-        if (!post.getUser().getUsername().equals(username))
+        if (!post.getUser().getUsername().equals(username)) {
+            logger.warn("Unauthorized pin attempt by {}", username);
             throw new RuntimeException("You cannot pin this post");
+        }
 
         post.setPinned(true);
         post.setPinnedAt(LocalDateTime.now());
-
         postRepository.save(post);
+
+        logger.info("Post {} pinned successfully", postId);
     }
 
     @Override
