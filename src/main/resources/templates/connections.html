@@ -2,19 +2,31 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <title>Connection Requests</title>
+
 <link rel="stylesheet" th:href="@{/css/connection.css}">
+<link rel="stylesheet" th:href="@{/css/feed.css}">
+
 <style>
 body{
 font-family:Segoe UI;
-background:#f3f4f6;
+background:#DFE9EB;
 margin:0;
-padding:40px;
+padding:0;   /* removed 40px to prevent header overlap */
+}
+
+/* Push content below navbar */
+.page-wrapper{
+    margin-top:100px;   /* adjust if needed */
+    margin-bottom:80px;
 }
 
 .container{
     max-width: 650px;
-    margin: 30px auto;   /* reduced from 70px */
+    margin: 30px auto;
+    padding: 0 20px;   /* keep spacing */
 }
+
+/* ---- your original styles below unchanged ---- */
 
 .page-header{
     font-size: 24px;
@@ -34,17 +46,13 @@ padding:40px;
     margin-bottom: 30px;
     text-decoration: none;
     font-size: 14px;
-    color: #64748b ;   /* force grey */
+    color: #64748b;
     font-weight: 500;
     transition: 0.2s ease;
 }
 
-.back-link:visited{
-    color: #64748b ;   /* remove purple */
-}
-
 .back-link:hover{
-    color:#2563eb ;    /* blue on hover */
+    color:#2563eb;
 }
 
 .card{
@@ -59,12 +67,12 @@ padding:40px;
 }
 
 .left{
-	 display:flex; 
-	 align-items:center; 
-	 gap:12px;
-  }
+     display:flex; 
+     align-items:center; 
+     gap:12px;
+}
 
-  .avatar{
+.avatar{
       width:42px; 
       height:42px; 
       border-radius:50%;
@@ -75,19 +83,19 @@ padding:40px;
       justify-content:center;
       font-weight:bold; 
       font-size:18px;
-  }
+}
 
 .name{ 
-	text-decoration:none;
-	 font-weight:600; 
-	 color:#111827;
-	 transition: 0.2s ease;
-  }
+     text-decoration:none;
+     font-weight:600; 
+     color:#111827;
+     transition: 0.2s ease;
+}
 
-  .name:hover{
-      color:#2563eb;   /* blue on hover */
-  }
-  
+.name:hover{
+      color:#2563eb;
+}
+
 .btn{
 border:none;
 padding:8px 16px;
@@ -102,62 +110,12 @@ font-weight:600;
 .reject{ background:#ef4444; }
 .cancel{ background:#6b7280; }
 
-.back{
-text-align:center;
-margin-top:20px;
-}
-
-.back a{
-text-decoration:none !important;
-color:#2563eb;
-font-weight:600;
-}
-.modal{
-    display:none;
-    position:fixed;
-    top:0;
-    left:0;
-    width:100%;
-    height:100%;
-    background:rgba(0,0,0,0.4);
-    justify-content:center;
-    align-items:center;
-    z-index:1000;
-}
-
-.modal-box{
-    background:white;
-    padding:25px 30px;
-    border-radius:12px;
-    text-align:center;
-    width:320px;
-    box-shadow:0 10px 30px rgba(0,0,0,0.2);
-}
-
-.modal-buttons{
-    margin-top:15px;
-}
-
-.back-link{
-    display: inline-block;
-    margin-bottom: 30px;
-    text-decoration: none;
-    font-size: 14px;
-    color: #64748b;      /* grey */
-    font-weight: 500;
-    transition: 0.2s ease;
-}
-
-.back-link:hover{
-    color:#2563eb;       /* blue on hover */
-}
-
 .empty-state{
     display:flex;
     justify-content:center;
     align-items:center;
-  margin-top:40px; 
-  }
+    margin-top:40px; 
+}
 
 .empty-box{
     background:white;
@@ -172,85 +130,86 @@ font-weight:600;
     font-size:50px;
     margin-bottom:15px;
 }
-
 </style>
 </head>
 
 <body>
 
+<!-- ✅ HEADER -->
+<div th:replace="fragments/header :: header"></div>
+
+<div class="page-wrapper">
+
 <div class="container">
-	
-	<a th:href="@{/feed}" class="back-link">← Back to Feed</a>
-<div class="page-header">
-	Connection Requests
-</div>
+    
+    <a th:href="@{/feed}" class="back-link">← Back to Feed</a>
 
-<!-- ✅ Pending count added -->
-   
-<div class="page-count"
-     th:if="${!#lists.isEmpty(requests)}"
-     th:text="${#lists.size(requests)} + ' pending requests'">
-</div>
+    <div class="page-header">
+        Connection Requests
+    </div>
+
+    <div class="page-count"
+         th:if="${!#lists.isEmpty(requests)}"
+         th:text="${#lists.size(requests)} + ' pending requests'">
+    </div>
  
- <div th:if="${#lists.isEmpty(requests)}" class="empty-state">
-     <div class="empty-box">
-         <div class="empty-icon">📬</div>
-         <h3>No Pending Requests</h3>
-         <p>You're all caught up! New requests will appear here.</p>
-     </div>
- </div>
+    <div th:if="${#lists.isEmpty(requests)}" class="empty-state">
+        <div class="empty-box">
+            <div class="empty-icon">📬</div>
+            <h3>No Pending Requests</h3>
+            <p>You're all caught up! New requests will appear here.</p>
+        </div>
+    </div>
 
-<div th:each="req : ${requests}" class="card">
+    <div th:each="req : ${requests}" class="card">
 
-<div class="left">
+        <div class="left">
 
-<div class="avatar"
-th:text="${#strings.substring(req.requester.username,0,1).toUpperCase()}">
-</div>
+            <div class="avatar"
+            th:text="${#strings.substring(req.requester.username,0,1).toUpperCase()}">
+            </div>
 
-<a class="name"
-th:href="@{/profile/{username}(username=${req.requester.username})}"
-th:text="${req.requester.username}">
-</a>
+            <a class="name"
+            th:href="@{/profile/{username}(username=${req.requester.username})}"
+            th:text="${req.requester.username}">
+            </a>
 
-</div>
+        </div>
 
-<div>
+        <div>
 
-<!-- ACCEPT -->
-<form th:action="@{/connections/accept/{id}(id=${req.id})}"
-method="post"
-style="display:inline;">
-<button class="btn accept">Accept</button>
-</form>
+            <form th:action="@{/connections/accept/{id}(id=${req.id})}"
+            method="post"
+            style="display:inline;">
+                <button class="btn accept">Accept</button>
+            </form>
 
-<!-- ⭐ DIRECT REJECT (no popup) -->
-<form th:action="@{/connections/reject/{id}(id=${req.id})}"
-method="post"
-style="display:inline;">
-<button type="button"
-        class="btn reject"
-        onclick="openRejectModal(this.closest('form'))">
-    Reject
-</button>
-</form>
+            <form th:action="@{/connections/reject/{id}(id=${req.id})}"
+            method="post"
+            style="display:inline;">
+                <button type="button"
+                        class="btn reject"
+                        onclick="openRejectModal(this.closest('form'))">
+                    Reject
+                </button>
+            </form>
 
-</div>
+        </div>
 
-</div>
-
-<div class="back">
+    </div>
 
 </div>
 
 </div>
-</div>   <!-- end of container -->
 
-<!-- ⭐ ADD STEP 2 MODAL HERE -->
+<!-- ✅ FOOTER -->
+<div th:replace="fragments/footer :: footer"></div>
+
+<!-- Modal + Script unchanged -->
+
 <div id="rejectModal" class="modal">
     <div class="modal-box">
         <p>Are you sure you want to reject this request?</p>
-
         <div class="modal-buttons">
             <button class="btn accept" onclick="confirmReject()">Yes</button>
             <button class="btn cancel" onclick="closeRejectModal()">No</button>
@@ -258,7 +217,6 @@ style="display:inline;">
     </div>
 </div>
 
-<!-- ⭐ ADD SCRIPT ALSO HERE -->
 <script>
 let rejectForm = null;
 
@@ -278,7 +236,5 @@ function confirmReject(){
 }
 </script>
 
-</body>
-</html>
 </body>
 </html>
