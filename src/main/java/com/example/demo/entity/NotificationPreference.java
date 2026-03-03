@@ -63,7 +63,6 @@ public class NotificationPreference {
 		this.connectionEnabled = connectionEnabled;
 	}
 
-    // getters & setters
-    
+   
     
 }

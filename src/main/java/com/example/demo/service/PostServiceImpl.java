@@ -123,9 +123,13 @@ public class PostServiceImpl implements PostService {
         // =========================
         analyticsService.createPostAnalytics(savedPost);
 
-
+<<<<<<< HEAD
+        // parse hashtags from FIELD (NOT content)
+=======
+        
         // HASHTAGS
         // =========================
+>>>>>>> develop
         if (hashtags != null && !hashtags.isBlank()) {
             parseHashtags(savedPost, hashtags);
         }
@@ -271,6 +275,30 @@ public class PostServiceImpl implements PostService {
 
         // ================= FILTER APPLIED =================
         if (roleFilter != null && !roleFilter.equalsIgnoreCase("ALL")) {
+<<<<<<< HEAD
+
+            Role selectedRole = Role.valueOf(roleFilter.toUpperCase());
+
+            // show only selected role posts
+            posts = postRepository.findPostsByAuthorRole(selectedRole, now);
+
+        }
+        // ================= DEFAULT NORMAL FEED =================
+        else {
+
+            List<User> followedUsers = followRepository.findByFollower(currentUser)
+                    .stream()
+                    .map(Follow::getFollowing)
+                    .toList();
+
+            List<User> feedUsers = new ArrayList<>(followedUsers);
+            feedUsers.add(currentUser);
+
+            posts = postRepository.findFeedPosts(feedUsers, now);
+        }
+
+        return posts.stream()
+=======
 
             Role selectedRole = Role.valueOf(roleFilter.toUpperCase());
 
@@ -303,12 +331,17 @@ public class PostServiceImpl implements PostService {
                     return true;
                 })
 
+>>>>>>> develop
                 .map(post -> {
                     analyticsService.recordView(post.getId(), currentUser.getId());
                     return map(post, currentUser);
                 })
                 .toList();
     }
+<<<<<<< HEAD
+=======
+    
+>>>>>>> develop
     // =========================================================
     // GET POST BY ID
     // =========================================================

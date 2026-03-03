@@ -150,13 +150,11 @@
 		.filter-btn:hover {
 			background: rgb(185, 193, 208);
 		}
-<<<<<<< Updated upstream
-=======
 
 		/* SELECTED */
 		.filter-btn.active {
-			background: linear-gradient(to right, #e0f2fe, #bae6fd);
-			color: black;
+ background: linear-gradient(to right, #e0f2fe, #bae6fd);	
+ color: white;
 			font-weight: 600;
 			box-shadow: 0 6px 15px rgba(37, 99, 235, 0.4);
 		}
@@ -270,7 +268,6 @@
 			font-weight: 600;
 			color: black;
 		}
->>>>>>> Stashed changes
 	</style>
 
 	<meta charset="UTF-8">
@@ -304,18 +301,6 @@
 
 					<input type="text" name="keyword" id="searchInput" placeholder="Search users or hashtags..."
 						oninput="handleSearchInput()" autocomplete="off" required>
-<<<<<<< Updated upstream
-					<a id="dynamicTrendingBtn" href="/post/trending" style="
-						        display:none;
-						        margin-left:10px;
-						        padding:5px 12px;
-						        border-radius:15px;
-						        background:rgba(255,99,71,0.1);
-						        color:#ff5722;
-						        text-decoration:none;
-						        font-size:13px;">
-					</a>
-=======
 
 					<button type="submit">Search</button>
 
@@ -323,10 +308,8 @@
 						🔥 Trending Hashtag
 					</a>
 
->>>>>>> Stashed changes
 					<div id="trendingBox"></div>
 
-					<button type="submit">Search</button>
 				</form>
 
 
@@ -350,7 +333,7 @@
 
 				<div id="profileDropdown" class="dropdown">
 					<a th:href="@{/profile}">My Profile</a>
-					<a th:href="@{/logout}">Logout</a>
+					<a th:href="@{/api/auth/logout}">Logout</a>
 				</div>
 			</div>
 		</div>
@@ -389,12 +372,9 @@
 			<div class="create-post" th:if="${showCreateForm} ">
 				<form th:action="@{/post/create}" method="post">
 
-					<!-- Row 1: Avatar + Textarea -->
+					<!-- Row 1: Textarea -->
 					<div class="create-row">
 
-						<div class="avatar">
-							<span th:text="${#strings.substring(currentUsername,0,1).toUpperCase()}"></span>
-						</div>
 
 						<textarea name="content" id="postContent" placeholder="What's on your mind?"
 							required></textarea>
@@ -443,35 +423,15 @@
 						<a th:href="@{/profile/{username}(username=${post.username})}" th:text="${post.username}"></a>
 
 						<span th:text="${#temporals.format(post.createdAt,'dd MMM yyyy HH:mm')}"></span>
-<<<<<<< Updated upstream
-=======
 
 						<div th:if="${post.promotional}"
 							style="color:#e11d48; font-size:13px; font-weight:600; margin-top:4px;">
 							📢 Promotional
 						</div>
->>>>>>> Stashed changes
 					</div>
 
 				</div>
 
-<<<<<<< Updated upstream
-				<div th:if="${!#strings.startsWith(post.content,'🔁 Shared from')}" class="post-content"
-					th:text="${post.content}">
-				</div>
-				<div th:if="${post.hashtags != null}">
-					<span th:each="tag : ${post.hashtags}">
-						<a th:href="@{/post/search(keyword=${'#' + tag})}"
-							style="color:#2563eb; text-decoration:none; margin-right:8px;">
-							<span th:text="${'#' + tag}"></span>
-						</a>
-					</span>
-				</div>
-
-				<div th:if="${#strings.startsWith(post.content,'🔁 Shared from')}" class="shared-box"
-					th:text="${post.content}">
-				</div>
-=======
 				<!-- SHARE HEADER -->
 				<div th:if="${post.sharedFromUsername != null}" class="share-header">
 					🔁 Shared from
@@ -494,7 +454,6 @@
 						</a>
 					</span>
 				</div>
->>>>>>> Stashed changes
 
 				<div class="post-actions">
 
@@ -509,12 +468,6 @@
 						💬 <span th:text="${#lists.size(post.comments)}"></span> Comments
 					</span>
 
-<<<<<<< Updated upstream
-					<form th:action="@{/post/share/{id}(id=${post.id})}" method="post">
-						<button>🔁 Share</button>
-					</form>
-
-=======
 					<!-- If NOT shared -->
 					<form th:if="${!post.sharedByCurrentUser}" th:action="@{/post/share/{id}(id=${post.id})}"
 						method="post">
@@ -526,7 +479,6 @@
 						✔ Shared
 					</span>
 
->>>>>>> Stashed changes
 
 				</div>
 
@@ -589,9 +541,6 @@
 		<!-- ================= NOTIFICATION SIDEBAR ================= -->
 
 		<div class="notification-sidebar">
-<<<<<<< Updated upstream
-			<div class="sidebar-header">Notifications</div>
-=======
 			<div class="sidebar-header">
 
 				<span class="sidebar-title">Notifications</span>
@@ -604,10 +553,7 @@
 			</div>
 			<div class="notif-title">Unread</div>
 			<div id="notifUnread"></div>
->>>>>>> Stashed changes
 			<div class="notif-title">Read</div>
-			<div id="notifUnread"></div>
-			<div class="notif-title">Unread</div>
 			<div id="notifRead"></div>
 		</div>
 
@@ -736,60 +682,10 @@
 			trendingTags = [];
 		}
 
-
 		function handleSearchInput() {
 
 			let input = document.getElementById("searchInput").value.trim();
 			let box = document.getElementById("trendingBox");
-<<<<<<< Updated upstream
-
-			let trendingBtn = document.getElementById("dynamicTrendingBtn");
-
-			if (input.startsWith("#")) {
-
-				trendingBtn.style.display = "inline-block";
-
-			} else {
-
-				trendingBtn.style.display = "none";
-			}
-
-			// If not starting with #
-			if (!input.startsWith("#")) {
-				box.style.display = "none";
-				return;
-			}
-
-			let keyword = input.substring(1).toLowerCase();
-
-			let filtered = trendingTags.filter(tag =>
-				tag.toLowerCase().startsWith(keyword)
-			);
-
-			if (filtered.length === 0) {
-				box.style.display = "none";
-				return;
-			}
-
-			box.innerHTML = "";
-
-			filtered.forEach(tag => {
-
-				let a = document.createElement("a");
-				a.href = "/post/trending?tag=" + tag;
-				a.innerText = "#" + tag;
-				a.style.display = "block";
-				a.style.padding = "8px";
-				a.style.textDecoration = "none";
-				a.style.color = "#111827";
-
-				a.onmouseover = () => a.style.background = "#f3f4f6";
-				a.onmouseout = () => a.style.background = "transparent";
-
-				box.appendChild(a);
-			});
-
-=======
 			let trendingBtn = document.getElementById("dynamicTrendingBtn");
 
 			if (!input.startsWith("#")) {
@@ -820,10 +716,8 @@
 				box.appendChild(a);
 			});
 
->>>>>>> Stashed changes
 			box.style.display = "block";
 		}
-
 		document.addEventListener("click", function (event) {
 
 			let searchInput = document.getElementById("searchInput");
