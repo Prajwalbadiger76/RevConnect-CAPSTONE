@@ -13,8 +13,11 @@ public class PostDto {
 
     private long likeCount;
     private boolean likedByCurrentUser;
+    private boolean promotional;
 
-    // social media features
+ 
+
+	// social media features
     private boolean pinned;
     private List<String> hashtags = new ArrayList<>();
 
@@ -26,6 +29,7 @@ public class PostDto {
     private long totalShares;
     private long reachCount;
     private double engagementRate;
+    
 
     public PostDto() {}
 
@@ -69,6 +73,14 @@ public class PostDto {
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
+    
+    public boolean isPromotional() {
+ 		return promotional;
+ 	}
+
+ 	public void setPromotional(boolean promotional) {
+ 		this.promotional = promotional;
+ 	}
 
     // ================= LIKES =================
 
@@ -86,6 +98,28 @@ public class PostDto {
 
     public void setLikedByCurrentUser(boolean likedByCurrentUser) {
         this.likedByCurrentUser = likedByCurrentUser;
+    }
+    
+ // ================= RE-SHARE POST =================
+    
+    private boolean sharedByCurrentUser;
+
+    public boolean isSharedByCurrentUser() {
+        return sharedByCurrentUser;
+    }
+
+    public void setSharedByCurrentUser(boolean sharedByCurrentUser) {
+        this.sharedByCurrentUser = sharedByCurrentUser;
+    }
+    
+    private String sharedFromUsername;
+
+    public String getSharedFromUsername() {
+        return sharedFromUsername;
+    }
+
+    public void setSharedFromUsername(String sharedFromUsername) {
+        this.sharedFromUsername = sharedFromUsername;
     }
 
     // ================= PIN =================

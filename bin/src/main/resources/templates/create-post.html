@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Create Post</title>
+    <style>
+        body {
+            font-family: Arial;
+            max-width: 600px;
+            margin: auto;
+            padding: 40px;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 10px;
+            resize: none;
+        }
+
+        button {
+            padding: 8px 15px;
+            margin-top: 10px;
+        }
+
+        .btn-back {
+            text-decoration: none;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Create New Post</h2>
+
+<form th:action="@{/post/create}" method="post">
+
+    <!-- Content -->
+    <textarea name="content"
+              rows="5"
+              placeholder="What's on your mind?"
+              required></textarea>
+
+    <!-- Hashtags -->
+    <input type="text"
+           name="hashtags"
+           placeholder="Add hashtags (comma separated)">
+
+    <!-- Submit -->
+    <button type="submit">Create Post</button>
+
+    <a th:href="@{/feed}" class="btn-back">Cancel</a>
+
+</body>
+</html>

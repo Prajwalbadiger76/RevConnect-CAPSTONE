@@ -3,6 +3,7 @@ package com.example.demo.service;
 import com.example.demo.dto.CommentDto;
 import com.example.demo.dto.PostDto;
 import com.example.demo.entity.*;
+import com.example.demo.exception.InvalidScheduleException;
 import com.example.demo.mapper.PostMapper;
 import com.example.demo.repo.*;
 
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.regex.*;
 import java.util.stream.Collectors;
@@ -60,7 +62,8 @@ public class PostServiceImpl implements PostService {
     public void createPost(String username,
                            String content,
                            String hashtags,
-                           String scheduledAt) {
+                           String scheduledAt,
+                           boolean promotional) {
 
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -72,16 +75,57 @@ public class PostServiceImpl implements PostService {
         post.setPinned(false);
         post.setPinnedAt(null);
 
+        
+        // PROMOTIONAL LOGIC
+        // =========================
+        if (promotional) {
+
+            if (user.getRole() != Role.BUSINESS &&
+                user.getRole() != Role.CREATOR) {
+
+                throw new RuntimeException(
+                        "Only Business or Creator can create promotional posts"
+                );
+            }
+
+            post.setIsPromotional(true);
+        } else {
+            post.setIsPromotional(false);
+        }
+
+        
+        // SCHEDULE LOGIC (FIXED)
+        // =========================
         if (scheduledAt != null && !scheduledAt.isBlank()) {
-            post.setScheduledAt(LocalDateTime.parse(scheduledAt));
+
+            DateTimeFormatter formatter =
+                    DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
+
+            LocalDateTime scheduledDateTime =
+                    LocalDateTime.parse(scheduledAt, formatter);
+
+            if (!scheduledDateTime.isAfter(LocalDateTime.now())) {
+                throw new InvalidScheduleException(
+                        "Scheduled time must be in the future"
+                );
+            }
+
+            post.setScheduledAt(scheduledDateTime);
+
+        } else {
+            post.setScheduledAt(null);
         }
 
         Post savedPost = postRepository.save(post);
 
-        // analytics row
+       
+        // ANALYTICS
+        // =========================
         analyticsService.createPostAnalytics(savedPost);
 
-        // parse hashtags from FIELD (NOT content)
+
+        // HASHTAGS
+        // =========================
         if (hashtags != null && !hashtags.isBlank()) {
             parseHashtags(savedPost, hashtags);
         }
@@ -176,24 +220,39 @@ public class PostServiceImpl implements PostService {
     public void sharePost(Long postId, String username) {
 
         User currentUser = userRepository.findByUsername(username).orElseThrow();
-        Post originalPost = postRepository.findById(postId).orElseThrow();
+        Post post = postRepository.findById(postId).orElseThrow();
 
+        // 🔥 Resolve base/original post
+        Post basePost = post.getOriginalPost() != null
+                ? post.getOriginalPost()
+                : post;
+
+        // 🔥 Check if already shared
+        Optional<Post> existingShare =
+                postRepository.findByUserAndOriginalPost(currentUser, basePost);
+
+        if (existingShare.isPresent()) {
+            return; // silently ignore duplicate share
+        }
+
+        // 🔥 Create shared post
         Post shared = new Post();
-        shared.setContent("🔁 Shared from @" + originalPost.getUser().getUsername()
-                + "\n\n" + originalPost.getContent());
+        shared.setContent(basePost.getContent());
+        shared.setOriginalPost(basePost);
         shared.setUser(currentUser);
         shared.setCreatedAt(LocalDateTime.now());
+        shared.setOriginalPost(basePost);
 
         postRepository.save(shared);
 
-        analyticsService.incrementShares(postId);
+        analyticsService.incrementShares(basePost.getId());
 
-        if (!originalPost.getUser().getUsername().equals(username)) {
+        if (!basePost.getUser().getUsername().equals(username)) {
             notificationService.createNotification(
-                    originalPost.getUser().getUsername(),
+                    basePost.getUser().getUsername(),
                     username,
                     "SHARE",
-                    postId
+                    basePost.getId()
             );
         }
     }
@@ -215,7 +274,6 @@ public class PostServiceImpl implements PostService {
 
             Role selectedRole = Role.valueOf(roleFilter.toUpperCase());
 
-            // show only selected role posts
             posts = postRepository.findPostsByAuthorRole(selectedRole, now);
 
         }
@@ -234,6 +292,17 @@ public class PostServiceImpl implements PostService {
         }
 
         return posts.stream()
+
+                // 🔥 Hide original post if current user already reshared it
+                .filter(post -> {
+                    if (post.getOriginalPost() == null) {
+                        return postRepository
+                                .findByUserAndOriginalPost(currentUser, post)
+                                .isEmpty();
+                    }
+                    return true;
+                })
+
                 .map(post -> {
                     analyticsService.recordView(post.getId(), currentUser.getId());
                     return map(post, currentUser);
@@ -268,8 +337,8 @@ public class PostServiceImpl implements PostService {
                 .orElseThrow();
 
         return postRepository
-                .findByUserAndCreatedAtLessThanEqualOrderByPinnedDescCreatedAtDesc(
-                        profileUser,
+                .findPostsByUsername(
+                        profileUsername,   // ✅ FIXED HERE
                         LocalDateTime.now()
                 )
                 .stream()
@@ -390,10 +459,10 @@ public class PostServiceImpl implements PostService {
         User user = userRepository.findByUsername(username).orElseThrow();
 
         return postRepository
-                .findAllByCreatedAtLessThanEqualOrderByCreatedAtDesc(LocalDateTime.now())
+                .findByContentContainingIgnoreCase(keyword)  // ✅ FIXED
                 .stream()
-                .filter(p -> p.getContent() != null &&
-                        p.getContent().toLowerCase().contains(keyword.toLowerCase()))
+                .filter(p -> p.getScheduledAt() == null ||
+                             p.getScheduledAt().isBefore(LocalDateTime.now()))
                 .map(p -> map(p, user))
                 .toList();
     }
@@ -401,24 +470,13 @@ public class PostServiceImpl implements PostService {
     // =========================================================
     // TRENDING HASHTAGS
     // =========================================================
-
     @Override
     public List<String> getTrendingHashtags() {
 
-        Map<String, Integer> count = new HashMap<>();
-
-        for (Post post : postRepository.findAll()) {
-            for (PostHashtag ph : post.getPostHashtags()) {
-                String tag = ph.getHashtag().getName();
-                count.put(tag, count.getOrDefault(tag, 0) + 1);
-            }
-        }
-
-        return count.entrySet()
+        return postHashtagRepository.findTrendingHashtags()
                 .stream()
-                .sorted((a,b)->b.getValue()-a.getValue())
-                .limit(3)
-                .map(Map.Entry::getKey)
+                .limit(5)
+                .map(row -> (String) row[0])
                 .toList();
     }
 
@@ -435,6 +493,7 @@ public class PostServiceImpl implements PostService {
         dto.setCreatedAt(post.getCreatedAt());
         dto.setUsername(post.getUser().getUsername());
         dto.setPinned(post.getPinned());
+        dto.setPromotional(Boolean.TRUE.equals(post.getIsPromotional()));
         dto.setHashtags(
         	    post.getPostHashtags()
         	        .stream()
@@ -464,6 +523,24 @@ public class PostServiceImpl implements PostService {
             dto.setTotalShares(analytics.getTotalShares());
             dto.setReachCount(analytics.getReachCount());
             dto.setEngagementRate(analytics.getEngagementRate());
+        }
+        
+     // 🔥 SHARE CHECK
+        Post basePost = post.getOriginalPost() != null
+                ? post.getOriginalPost()
+                : post;
+
+        boolean alreadyShared =
+                postRepository.findByUserAndOriginalPost(currentUser, basePost)
+                              .isPresent();
+
+        dto.setSharedByCurrentUser(alreadyShared);
+        
+     // SHARE HEADER SUPPORT
+        if (post.getOriginalPost() != null) {
+            dto.setSharedFromUsername(
+                post.getOriginalPost().getUser().getUsername()
+            );
         }
 
         return dto;

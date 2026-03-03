@@ -27,6 +27,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         this.jwtUtil = jwtUtil;
     }
 
+    // Skip filter for public endpoints
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
 
@@ -36,7 +37,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 || path.equals("/login")
                 || path.equals("/register")
                 || path.startsWith("/css")
-                || path.startsWith("/js");
+                || path.startsWith("/js")
+                || path.startsWith("/images");
     }
 
     @Override
@@ -45,17 +47,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     FilterChain filterChain)
             throws ServletException, IOException {
 
-        String token = extractTokenFromCookies(request);
+        try {
 
-        if (token != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            // 🔥 VERY IMPORTANT: Always clear previous authentication
+            SecurityContextHolder.clearContext();
 
-            try {
+            String token = extractTokenFromCookies(request);
+
+            if (token != null) {
+
                 Claims claims = jwtUtil.extractClaims(token);
 
                 String username = claims.getSubject();
                 String role = claims.get("role", String.class);
 
-                // ✅ Extra safety check
                 if (username != null && role != null) {
 
                     UsernamePasswordAuthenticationToken authentication =
@@ -75,10 +80,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext()
                             .setAuthentication(authentication);
                 }
-
-            } catch (JwtException e) {
-                SecurityContextHolder.clearContext();
             }
+
+        } catch (JwtException e) {
+            // Invalid or expired token
+            SecurityContextHolder.clearContext();
         }
 
         filterChain.doFilter(request, response);

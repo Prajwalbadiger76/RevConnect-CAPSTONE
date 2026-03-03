@@ -1,25 +1,45 @@
 package com.example.demo.exception;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-@RestControllerAdvice
+@ControllerAdvice
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(InvalidScheduleException.class)
+    public String handleInvalidSchedule(
+            InvalidScheduleException ex,
+            RedirectAttributes redirectAttributes) {
+
+        redirectAttributes.addFlashAttribute("error", ex.getMessage());
+        return "redirect:/feed";
+    }
+
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<String> handleNotFound(ResourceNotFoundException ex) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+    public String handleNotFound(
+            ResourceNotFoundException ex,
+            RedirectAttributes redirectAttributes) {
+
+        redirectAttributes.addFlashAttribute("error", ex.getMessage());
+        return "redirect:/feed";
     }
 
     @ExceptionHandler(UnauthorizedActionException.class)
-    public ResponseEntity<String> handleUnauthorized(UnauthorizedActionException ex) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.FORBIDDEN);
+    public String handleUnauthorized(
+            UnauthorizedActionException ex,
+            RedirectAttributes redirectAttributes) {
+
+        redirectAttributes.addFlashAttribute("error", ex.getMessage());
+        return "redirect:/feed";
     }
 
     @ExceptionHandler(CustomException.class)
-    public ResponseEntity<String> handleCustom(CustomException ex) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    public String handleCustom(
+            CustomException ex,
+            RedirectAttributes redirectAttributes) {
+
+        redirectAttributes.addFlashAttribute("error", ex.getMessage());
+        return "redirect:/feed";
     }
 }

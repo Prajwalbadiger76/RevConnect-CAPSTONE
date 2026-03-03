@@ -47,18 +47,19 @@ public class PostController {
     public String createPost(@RequestParam String content,
                              @RequestParam(required = false) String hashtags,
                              @RequestParam(required = false) String scheduledAt,
+                             @RequestParam(required = false) Boolean promotional,
                              Authentication authentication) {
 
         postService.createPost(
                 authentication.getName(),
                 content,
                 hashtags,
-                scheduledAt
+                scheduledAt,
+                promotional != null && promotional
         );
 
         return "redirect:/feed";
     }
-
     // =========================
     // SHOW EDIT PAGE (GET)
  // =========================
@@ -147,7 +148,7 @@ public class PostController {
 
         postService.sharePost(id, authentication.getName());
 
-        return "redirect:/profile/" + authentication.getName() + "?tab=posts";
+        return "redirect:/feed";
     }
 
     // =========================

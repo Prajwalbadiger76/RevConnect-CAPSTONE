@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
 
@@ -22,19 +23,19 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     // FEED POSTS
     // ===============================
     @Query("""
-        SELECT DISTINCT p FROM Post p
-        LEFT JOIN FETCH p.postHashtags ph
-        LEFT JOIN FETCH ph.hashtag
-        WHERE p.user IN :users
-        AND (p.scheduledAt IS NULL OR p.scheduledAt <= :now)
-        ORDER BY p.createdAt DESC
-    """)
-    List<Post> findFeedPosts(
-            @Param("users") List<User> users,
-            @Param("now") LocalDateTime now
-    );
+    	    SELECT p FROM Post p
+    	    WHERE p.user IN :users
+    	    AND (p.scheduledAt IS NULL OR p.scheduledAt <= :now)
+    	    ORDER BY p.createdAt DESC
+    	""")
+    	List<Post> findFeedPosts(
+    	        @Param("users") List<User> users,
+    	        @Param("now") LocalDateTime now
+    	);
 
 
+
+    
     // ===============================
     // ALL POSTS
     // ===============================
@@ -101,4 +102,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     // PIN COUNT (MAX 3 PINNED POSTS)
     // ===============================
     long countByUserAndPinnedTrue(User user);
+    
+    Optional<Post> findByUserAndOriginalPost(User user, Post originalPost);
 }
