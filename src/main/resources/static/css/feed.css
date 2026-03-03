@@ -8,7 +8,7 @@
 body {
     margin: 0;
     font-family: "Segoe UI", sans-serif;
-    background: #DFE9EB;
+    background: #eef2f7;
     color: #1f2937;
 }
 
@@ -85,6 +85,15 @@ body {
     color: white;
     text-decoration: none;
     font-size: 14px;
+
+    display: flex;              /* Align text + icon */
+    align-items: center;        /* Perfect vertical alignment */
+    gap: 6px;                   /* Space between text & icon */
+}
+
+.navbar-right a svg {
+    width: 16px;
+    height: 16px;
 }
 
 /* Search */
@@ -110,6 +119,27 @@ body {
     cursor: pointer;
 }
 
+.search-form button {
+    display: flex;              /* Make text + icon align properly */
+    align-items: center;        /* Vertical center */
+    justify-content: center;    /* Center horizontally */
+    gap: 8px;                   /* Space between text and icon */
+
+    background: #2563eb;
+    color: white;
+    border: none;
+    padding: 10px 22px;
+    border-radius: 40px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.search-form button svg {
+    width: 18px;
+    height: 18px;
+}
+
 /* =====================================================
    FILTER SIDEBAR
 ===================================================== */
@@ -126,6 +156,15 @@ body {
     font-weight: 600;
     margin-bottom: 18px;
     font-size: 16px;
+
+    display: flex;          /* Align text + icon */
+    align-items: center;    /* Perfect vertical center */
+    gap: 8px;               /* Space between text & icon */
+}
+
+.filter-heading svg {
+    width: 18px;
+    height: 18px;
 }
 
 .filter-btn {
@@ -262,6 +301,7 @@ body {
     display: flex;
     gap: 16px;
     align-items: center;
+	margin-bottom: 1.8rem;
 }
 
 .post-top .avatar {
@@ -297,9 +337,9 @@ body {
 
 .post-actions {
     display: flex;
-    gap: 18px;
     align-items: center;
-    padding-top: 10px;
+    justify-content: space-between;
+    padding: 12px 0;
     border-top: 1px solid #f1f5f9;
 }
 
@@ -308,6 +348,20 @@ body {
     border: none;
     cursor: pointer;
     font-size: 14px;
+}
+
+.post-actions > * {
+    flex: unset;
+    text-align: left;
+}
+
+/* Add small spacing between items */
+.post-actions {
+    gap: 20px;
+}
+
+.post-actions form {
+    margin: 0;                   /* Remove default form margin */
 }
 
 /* =====================================================
@@ -383,13 +437,21 @@ body {
 
 .comment-form {
     display: flex;
+    width: 100%;          /* ADD THIS */
     gap: 10px;
     margin-top: 10px;
 }
 
+.comment-form form {
+    display: flex;        /* ADD THIS */
+    width: 100%;          /* ADD THIS */
+    gap: 10px;
+}
+
 .comment-form input {
     flex: 1;
-    padding: 8px;
+    width: 100%;          /* ADD THIS */
+    padding: 10px;        /* slightly bigger for better UI */
     border-radius: 8px;
     border: 1px solid #d1d5db;
 }
@@ -398,8 +460,9 @@ body {
     background: #10b981;
     color: white;
     border: none;
-    padding: 8px 14px;
+    padding: 8px 18px;    /* slightly balanced */
     border-radius: 8px;
+    white-space: nowrap;  /* prevents button shrinking */
 }
 
 .delete-btn {
@@ -1046,147 +1109,4 @@ body {
     display: flex;
     align-items: center;
     gap: 14px;
-}
-
-/* =====================================================
-   FINAL RESPONSIVE FIXES (SAFE FOR PRESENTATION)
-===================================================== */
-
-/* Prevent horizontal scroll */
-html, body {
-    overflow-x: hidden;
-}
-
-/* ================= TABLET ================= */
-@media (max-width: 1024px) {
-
-    .page-layout {
-        grid-template-columns: 200px 1fr;
-        gap: 20px;
-    }
-
-    .notification-sidebar {
-        display: none;
-    }
-
-    .search-form input {
-        width: 180px;
-    }
-}
-
-/* ================= MOBILE LARGE ================= */
-@media (max-width: 768px) {
-
-    .page-layout {
-        grid-template-columns: 1fr;
-        padding: 0 15px;
-    }
-
-    .filter-column {
-        display: none;
-    }
-
-    .notification-sidebar {
-        display: none;
-    }
-
-    /* Navbar stacking */
-    .navbar {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 12px;
-        padding: 12px 16px;
-    }
-
-    .navbar-right {
-        width: 100%;
-        justify-content: space-between;
-        flex-wrap: wrap;
-    }
-
-    .search-form {
-        width: 100%;
-    }
-
-    .search-form input {
-        width: 100%;
-    }
-
-    .search-form button {
-        white-space: nowrap;
-    }
-
-    /* Create Post */
-    .create-post {
-        padding: 18px;
-    }
-
-    .create-actions {
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .create-actions button {
-        width: 100%;
-    }
-
-    /* Post actions wrap */
-    .post-actions {
-        flex-wrap: wrap;
-        gap: 12px;
-    }
-
-    /* Promo section stack */
-    .promo-section {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 10px;
-    }
-
-    .promo-btn {
-        width: 100%;
-        justify-content: center;
-    }
-
-    /* Comment form stack */
-    .comment-form {
-        flex-direction: column;
-    }
-
-    .comment-form button {
-        width: 100%;
-    }
-
-    /* Schedule modal full width */
-    .schedule-sheet,
-    .app-popup {
-        width: 90%;
-        max-width: 400px;
-    }
-}
-
-/* ================= SMALL MOBILE ================= */
-@media (max-width: 480px) {
-
-    .navbar h2 {
-        font-size: 18px;
-    }
-
-    .post-card {
-        padding: 16px;
-    }
-
-    .post-content {
-        font-size: 14px;
-    }
-
-    .avatar {
-        width: 40px;
-        height: 40px;
-        font-size: 16px;
-    }
-
-    .create-post textarea {
-        font-size: 14px;
-    }
 }
