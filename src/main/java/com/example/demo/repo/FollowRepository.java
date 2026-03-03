@@ -25,16 +25,18 @@ public interface FollowRepository extends JpaRepository<Follow, Long> {
     
     @Query(value = """
     		SELECT 
-    		    follow_date,
-    		    SUM(new_followers) OVER (ORDER BY follow_date) total_followers
+    		    t.follow_date,
+    		    SUM(t.new_followers) OVER (ORDER BY t.follow_date) AS total_followers
     		FROM (
-    		    SELECT TRUNC(created_at) follow_date,
-    		           COUNT(*) new_followers
-    		    FROM follows
-    		    WHERE following_id = :userId
-    		    GROUP BY TRUNC(created_at)
-    		)
+    		    SELECT TRUNC(f.CREATED_AT) AS follow_date,
+    		           COUNT(*) AS new_followers
+    		    FROM FOLLOWS f
+    		    WHERE f.FOLLOWING_ID = :userId
+    		    GROUP BY TRUNC(f.CREATED_AT)
+    		) t
+    		ORDER BY t.follow_date
     		""", nativeQuery = true)
-    		List<Object[]> getFollowerGrowth(Long userId);
-
+    		List<Object[]> getFollowerGrowth(@Param("userId") Long userId);
+    		
+    		long countByFollowing_Id(Long followingId);
 }

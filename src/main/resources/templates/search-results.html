@@ -96,15 +96,15 @@
 <body>
 
 	<div class="nav">
-	    <a th:href="@{/feed}" class="back-pill">
-	        ← Back to Feed
+	    <a th:href="@{/profile}" class="back-pill">
+	        ← Back to Profile
 	    </a>
 	</div>
 
 <!-- ================= USER SEARCH ================= -->
 
-<div th:if="${searchType != 'hashtag' and #lists.isEmpty(results)}">
-    <p>No users found.</p>
+<div th:if="${results != null and #lists.isEmpty(results)}">
+    <p>No users found for "<span th:text="${keyword}"></span>"</p>
 </div>
 
 <div th:if="${searchType != 'hashtag'}"

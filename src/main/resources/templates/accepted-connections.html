@@ -3,155 +3,89 @@
 <head>
 <title>My Connections</title>
 
-<style>
-body{
-font-family:Segoe UI;
-background:#f3f4f6;
-margin:0;
-padding:40px;
-}
+<link rel="stylesheet" th:href="@{/css/connection.css}">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600&display=swap" rel="stylesheet">
 
-.container{
-width:55%;
-margin:auto;
-}
 
-h2{
-text-align:center;
-margin-bottom:25px;
-}
-
-.card{
-background:white;
-padding:18px;
-margin-bottom:15px;
-border-radius:12px;
-box-shadow:0 4px 12px rgba(0,0,0,0.1);
-display:flex;
-justify-content:space-between;
-align-items:center;
-transition:0.2s;
-}
-
-.card:hover{
-transform:translateY(-2px);
-}
-
-.left{
-display:flex;
-align-items:center;
-gap:12px;
-}
-
-.avatar{
-width:42px;
-height:42px;
-border-radius:50%;
-background:#6366f1;
-color:white;
-display:flex;
-align-items:center;
-justify-content:center;
-font-weight:bold;
-font-size:18px;
-}
-
-.name{
-text-decoration:none;
-font-weight:600;
-color:#2563eb;
-}
-
-.name:hover{
-text-decoration:underline;
-}
-
-.remove{
-border:none;
-padding:8px 16px;
-border-radius:7px;
-cursor:pointer;
-background:#ef4444;
-color:white;
-transition:0.25s;
-}
-
-/* hover */
-.remove:hover{
-background:#dc2626;
-transform:scale(1.05);
-}
-
-/* click animation */
-.remove:active{
-transform:scale(0.95);
-}
-
-.back{
-text-align:center;
-margin-top:25px;
-}
-
-.back a{
-text-decoration:none;
-color:#2563eb;
-font-weight:600;
-}
-</style>
 </head>
 
 <body>
 
 <div class="container">
 
-<h2>My Connections</h2>
+    <!-- Back link like Pending page -->
+    <a th:href="@{/feed}" class="back-link">← Back to Feed</a>
 
-<div th:if="${#lists.isEmpty(connections)}">
-<p style="text-align:center;">No connections yet.</p>
+    <!-- Page header like Pending -->
+    <div class="page-header">
+        My Connections
+    </div>
+
+    <!-- Empty state -->
+    <div th:if="${#lists.isEmpty(connections)}" class="empty-state">
+        <div class="empty-box">
+            <div class="empty-icon">🌐</div>
+            <h3>No Connections Yet</h3>
+            <p>Start connecting with people to grow your network.</p>
+        </div>
+    </div>
+
+    <!-- Connection cards -->
+    <div th:each="user : ${connections}" class="card">
+
+        <div class="left">
+            <div class="avatar"
+                 th:text="${#strings.substring(user.username,0,1).toUpperCase()}">
+            </div>
+
+            <a class="name"
+               th:href="@{/profile/{username}(username=${user.username})}"
+               th:text="${user.username}">
+            </a>
+        </div>
+
+        <form th:action="@{/connections/remove/{username}(username=${user.username})}"
+              method="post"
+              style="display:inline;">
+            <button type="button"
+                    class="btn reject"
+                    onclick="openRemoveModal(this.closest('form'))">
+                Remove
+            </button>
+        </form>
+
+    </div>
+
 </div>
 
-<div th:each="user : ${connections}" class="card">
+<!-- REMOVE CONFIRMATION MODAL -->
+<div id="removeModal" class="modal">
+    <div class="modal-box">
+        <p>Are you sure you want to remove this connection?</p>
 
-<div class="left">
-<div class="avatar"
-th:text="${#strings.substring(user.username,0,1).toUpperCase()}"></div>
-
-<a class="name"
-th:href="@{/profile/{username}(username=${user.username})}"
-th:text="${user.username}"></a>
-</div>
-
-<form th:action="@{/connections/remove/{username}(username=${user.username})}"
-method="post"
-onsubmit="changeRemove(this,event)">
-<button class="remove">Remove</button>
-</form>
-
-</div>
-
-<div class="back">
-<a th:href="@{/feed}">← Back to Feed</a>
-</div>
-
+        <div class="modal-buttons">
+            <button class="btn reject" onclick="confirmRemove()">Yes</button>
+            <button class="btn cancel" onclick="closeRemoveModal()">No</button>
+        </div>
+    </div>
 </div>
 
 <script>
-function changeRemove(form,event){
+let removeForm = null;
 
-event.preventDefault();
+function openRemoveModal(form){
+    removeForm = form;
+    document.getElementById("removeModal").style.display = "flex";
+}
 
-if(!confirm("Remove connection?")) return;
+function closeRemoveModal(){
+    document.getElementById("removeModal").style.display = "none";
+}
 
-let btn=form.querySelector("button");
-
-btn.innerText="Removed";
-btn.style.background="#9ca3af";
-btn.style.transform="scale(0.95)";
-btn.disabled=true;
-
-setTimeout(()=>{
-form.submit();
-},300);
+function confirmRemove(){
+    if(removeForm){
+        removeForm.submit();
+    }
 }
 </script>
 
