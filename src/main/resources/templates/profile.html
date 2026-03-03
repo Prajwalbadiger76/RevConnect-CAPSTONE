@@ -30,16 +30,9 @@
 					📷
 				</div>
 
-<<<<<<< HEAD
-				<form id="bannerUploadForm" th:if="${isOwner}" th:action="@{/api/profile/edit}" method="post"
-					enctype="multipart/form-data">
-					<form id="bannerUploadForm" th:if="${isOwner}" th:action="@{/profile/edit}" method="post"
-						enctype="multipart/form-data">
-=======
 				<form id="bannerUploadForm" th:if="${isOwner}" th:action="@{/profile/edit}" method="post"
 					enctype="multipart/form-data">
 			
->>>>>>> develop
 
 						<input type="file" id="bannerFileInput" name="bannerImageFile" accept="image/*"
 							style="display:none" onchange="document.getElementById('bannerUploadForm').submit();">
@@ -60,11 +53,6 @@
 						📷
 					</div>
 
-<<<<<<< HEAD
-					<form id="profileUploadForm" th:if="${isOwner}" th:action="@{/api/profile/edit}" method="post"
-						enctype="multipart/form-data">
-=======
->>>>>>> develop
 						<form id="profileUploadForm" th:if="${isOwner}" th:action="@{/profile/edit}" method="post"
 							enctype="multipart/form-data">
 
@@ -239,21 +227,13 @@
 						<!-- ================= STATS ================= -->
 						<div class="profile-stats">
 
-<<<<<<< HEAD
-							<a th:href="@{/api/profile/{username}/followers(username=${profile.username})}"
-=======
 							<a th:href="@{/follow/followers/{username}(username=${profile.username})}"
->>>>>>> develop
 								class="stat-item">
 								<span class="stat-number" th:text="${profile.followerCount}">0</span>
 								<span class="stat-label">Followers</span>
 							</a>
 
-<<<<<<< HEAD
-							<a th:href="@{/api/profile/{username}/following(username=${profile.username})}"
-=======
 							<a th:href="@{/follow/following/{username}(username=${profile.username})}"
->>>>>>> develop
 								class="stat-item">
 								<span class="stat-number" th:text="${profile.followingCount}">0</span>
 								<span class="stat-label">Following</span>
@@ -270,11 +250,7 @@
 
 					<!-- EDIT BUTTON -->
 					<div class="edit-btn-wrapper" th:if="${isOwner}">
-<<<<<<< HEAD
-						<a th:href="@{/api/profile/edit}" class="edit-btn">
-=======
 						<a th:href="@{/profile/edit}" class="edit-btn">
->>>>>>> develop
 							✏ Edit Profile
 						</a>
 					</div>
