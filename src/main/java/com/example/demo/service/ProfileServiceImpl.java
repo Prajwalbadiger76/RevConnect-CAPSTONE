@@ -87,8 +87,10 @@ public class ProfileServiceImpl implements ProfileService {
         long followerCount = followRepository.countByFollowing(targetUser);
         long followingCount = followRepository.countByFollower(targetUser);
 
-//        long postCount = postRepository.countByUser(targetUser);
-        long postCount = 0;
+        long postCount = postRepository.countPostsByUsername(
+                targetUser.getUsername(),
+                java.time.LocalDateTime.now()
+        );
 
         //  Privacy Logic
         boolean limitedView = false;
@@ -332,9 +334,13 @@ public class ProfileServiceImpl implements ProfileService {
         String businessAddress = (!limitedView && isBusiness) ? user.getBusinessAddress() : null;
         String businessHours = (!limitedView && isBusiness) ? user.getBusinessHours() : null;
 
-        long postCount = 0;
-        long followerCount = 0;
-        long followingCount = 0;
+        long postCount = postRepository.countPostsByUsername(
+                user.getUsername(),
+                java.time.LocalDateTime.now()
+        );
+
+        long followerCount = followRepository.countByFollowing(user);
+        long followingCount = followRepository.countByFollower(user);
 
         return new ProfileResponse(
 
