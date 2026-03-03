@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head></head>
+<body>
+
+<!-- ================= FOOTER FRAGMENT ================= -->
+<div th:fragment="footer">
+
+    <footer class="main-footer">
+        <div class="footer-content">
+
+            <div class="footer-left">
+                <h3>RevConnect</h3>
+                <p>Connect. Share. Grow.</p>
+            </div>
+
+            <div class="footer-links">
+                <a th:href="@{/feed}">Home</a>
+                <a th:href="@{/connections}">Connections</a>
+                <a th:href="@{/profile}">Profile</a>
+            </div>
+
+        </div>
+
+        <div class="footer-bottom">
+            © <span th:text="${#dates.year(#dates.createNow())}"></span>
+            RevConnect. All rights reserved.
+        </div>
+    </footer>
+
+</div>
+
+</body>
+</html>

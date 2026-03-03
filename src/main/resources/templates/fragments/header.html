@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head></head>
+<body>
+
+<div th:fragment="header">
+
+    <!-- ================= NAVBAR ================= -->
+
+    <div id="overlay" class="overlay" onclick="toggleNotifications()"></div>
+
+    <div class="navbar">
+
+        <!-- LEFT -->
+        <div class="navbar-right">
+
+            <h2>
+                <a th:href="@{/feed}" style="color:white; text-decoration:none;">
+                    RevConnect
+                </a>
+            </h2>
+
+            <div style="position:relative;">
+
+                <form th:action="@{/post/search}" method="get" class="search-form">
+
+                    <input type="text"
+                           name="keyword"
+                           id="searchInput"
+                           placeholder="Search users or hashtags..."
+                           oninput="handleSearchInput()"
+                           autocomplete="off"
+                           required>
+
+                    <button type="submit">Search</button>
+
+
+                </form>
+
+            </div>
+        </div>
+
+        <!-- RIGHT -->
+        <div class="navbar-right">
+
+            <a th:href="@{/connections}">Pending Requests</a>
+            <a th:href="@{/connections/sent}">Sent Requests</a>
+            <a th:href="@{/connections/accepted}">Connections</a>
+
+            <div class="profile-menu">
+                <div class="profile-circle"
+                     onclick="toggleProfileMenu()"
+                     th:text="${currentUsername != null ? #strings.substring(currentUsername,0,1).toUpperCase() : ''}">
+                </div>
+
+                <div id="profileDropdown" class="dropdown">
+                    <a th:href="@{/profile}">My Profile</a>
+                    <a th:href="@{/api/auth/logout}">Logout</a>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>
