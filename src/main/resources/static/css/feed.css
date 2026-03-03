@@ -90,23 +90,33 @@ body {
 /* =====================================================
    FILTER SIDEBAR
 ===================================================== */
+/*
+=======
+>>>>>>> develop
 .filter-column {
     position: sticky;
     top: 100px;
 }
 
 .filter-card {
+<<<<<<< HEAD
+    background: #fafafa;
+=======
     background: #ffffff;
+>>>>>>> develop
     border-radius: 18px;
     padding: 20px;
     box-shadow: 0 8px 24px rgba(0,0,0,0.06);
 }
 
+<<<<<<< HEAD
+=======
 .filter-heading {
     font-weight: 600;
     margin-bottom: 18px;
     font-size: 16px;
 }
+>>>>>>> develop
 
 .filter-btn {
     width: 100%;
@@ -129,7 +139,9 @@ body {
     background: #2563eb;
     color: white;
     font-weight: 600;
-}
+<<<<<<< HEAD
+}*/
+
 
 /* =====================================================
    PROFILE DROPDOWN
