@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<<<<<<< HEAD
 
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
@@ -168,40 +167,11 @@
 
 
 </div>
-=======
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <title>Notification Settings</title>
-</head>
-<body>
-
-<a th:href="@{/feed}">Back</a>
-
-<h2>Notification Preferences</h2>
-
-<label>
-    <input type="checkbox" id="likeToggle">
-    Enable Like Notifications
-</label>
-<br><br>
-
-<label>
-    <input type="checkbox" id="commentToggle">
-    Enable Comment Notifications
-</label>
-<br><br>
-
-<label>
-    <input type="checkbox" id="followToggle">
-    Enable Follow Notifications
-</label>
->>>>>>> develop
 
 <script>
 
 async function loadPreferences() {
 
-<<<<<<< HEAD
     try{
         const response = await fetch("/notification-preferences");
         const pref = await response.json();
@@ -255,7 +225,6 @@ async function updatePreferences(){
 }
 
 // Auto-save when toggled (same as your current behavior)
-=======
     const response = await fetch("/notification-preferences");
     const pref = await response.json();
 
@@ -281,7 +250,6 @@ async function updatePreferences() {
     alert("Preferences Updated!");
 }
 
->>>>>>> develop
 document.getElementById("likeToggle").addEventListener("change", updatePreferences);
 document.getElementById("commentToggle").addEventListener("change", updatePreferences);
 document.getElementById("followToggle").addEventListener("change", updatePreferences);
@@ -291,8 +259,5 @@ loadPreferences();
 </script>
 
 </body>
-<<<<<<< HEAD
 </html>
-=======
-</html>
->>>>>>> develop
+
