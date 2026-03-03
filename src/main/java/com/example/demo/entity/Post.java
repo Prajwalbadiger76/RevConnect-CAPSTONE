@@ -25,6 +25,11 @@ public class Post {
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
+    
+    private String ctaType;     
+    private String ctaUrl;
+
+    private String productTag;
 
     // ================= USER =================
 
@@ -194,4 +199,29 @@ public class Post {
     public void setViews(List<PostView> views) {
         this.views = views;
     }
+
+	public String getCtaType() {
+		return ctaType;
+	}
+
+	public void setCtaType(String ctaType) {
+		this.ctaType = ctaType;
+	}
+
+	public String getCtaUrl() {
+		return ctaUrl;
+	}
+
+	public void setCtaUrl(String ctaUrl) {
+		this.ctaUrl = ctaUrl;
+	}
+
+	public String getProductTag() {
+		return productTag;
+	}
+
+	public void setProductTag(String productTag) {
+		this.productTag = productTag;
+	}
+    
 }

@@ -20,5 +20,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
             String username,
             String fullName
     );
+    
 
 }

@@ -13,38 +13,61 @@ body {
 }
 
 /* =====================================================
+   GLOBAL VARIABLES
+===================================================== */
+:root {
+    --navbar-height: 80px;   /* adjust if navbar height changes */
+}
+
+/* =====================================================
+   STICKY SIDE BARS
+===================================================== */
+.filter-column,
+.notification-sidebar {
+    position: sticky;
+    top: var(--navbar-height);
+}
+/* =====================================================
    MAIN 3 COLUMN LAYOUT
 ===================================================== */
 .page-layout {
     max-width: 1200px;
-    margin: 30px auto;
+	margin: calc(var(--navbar-height) + 10px) auto 30px auto;
     padding: 0 20px;
     display: grid;
-    grid-template-columns: 240px 1fr 320px;
+
+    grid-template-columns: 240px minmax(0, 1fr) 320px; /* important */
     gap: 30px;
+
     align-items: start;
 }
 
 .feed-container {
     width: 100%;
-    margin: 0;
+    min-width: 0;  /* VERY IMPORTANT */
 }
+
+
 
 /* =====================================================
    NAVBAR
 ===================================================== */
 .navbar {
-    position: sticky;
+    position: fixed;
     top: 0;
+    left: 0;
+    width: 100%;
+
     background: #0f172a;
     color: white;
     padding: 14px 30px;
+
     display: flex;
     justify-content: space-between;
     align-items: center;
-    z-index: 1000;
-}
 
+    z-index: 9999;
+}
 .navbar-left,
 .navbar-right {
     display: flex;
@@ -90,10 +113,7 @@ body {
 /* =====================================================
    FILTER SIDEBAR
 ===================================================== */
-.filter-column {
-    position: sticky;
-    top: 100px;
-}
+
 
 .filter-card {
     background: #ffffff;
@@ -260,17 +280,19 @@ body {
     color: #6b7280;
 }
 
-.post-body {
-    background: #f8fafc;
-    padding: 16px;
-    border-radius: 12px;
-    margin: 18px 0;
-    border: 1px solid #e2e8f0;
-}
 
 .post-content {
     line-height: 1.6;
     font-size: 15px;
+}
+
+.post-body {
+    background: #f8fafc;        /* very light blue-gray */
+    padding: 16px;
+    border-radius: 12px;
+    margin: 15px 0;
+    border: 1px solid #e2e8f0;
+    transition: background 0.2s ease;
 }
 
 .post-actions {
@@ -392,13 +414,22 @@ body {
 /* =====================================================
    NOTIFICATION SIDEBAR
 ===================================================== */
+/* =====================================================
+   NOTIFICATION SIDEBAR (LinkedIn Style)
+===================================================== */
+
 .notification-sidebar {
-    position: sticky;
-    top: 100px;
-    background: white;
-    border-radius: 18px;
+   
+
+    height: calc(100vh - 100px);
+    overflow-y: auto;
+
+    background: #ffffff;
+    border-radius: 12px;
     padding: 20px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+
+    border: 1px solid #e5e7eb;
+    box-shadow: none;
 }
 
 .sidebar-header {
@@ -408,22 +439,36 @@ body {
 }
 
 .notif-item {
-    padding: 10px 12px;
-    border-radius: 12px;
+    padding: 12px;
+    border-radius: 10px;
     margin-bottom: 8px;
+    cursor: pointer;
     font-size: 14px;
     transition: 0.2s ease;
 }
 
 .notif-item.unread {
-    background: #eef2ff;
+    background: #eef3ff;
     font-weight: 600;
+}
+
+.notif-item.read {
+    background: #fafafa;
 }
 
 .notif-item:hover {
     background: #f1f5f9;
 }
 
+.notif-text {
+    font-size: 14px;
+}
+
+.empty-text {
+    font-size: 13px;
+    color: #888;
+    text-align: center;
+}
 /* =====================================================
    POST HASHTAGS (NEW STYLING)
 ===================================================== */
@@ -483,6 +528,7 @@ body {
     .search-form input {
         width: 100%;
     }
+}
 
 /* =====================================================
    POOST BODY BLOCK
@@ -581,4 +627,207 @@ body {
     padding: 8px 15px;
     border-radius: 8px;
     cursor: pointer;
+}
+
+/* ===== APP POPUP MODAL ===== */
+
+.app-popup-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 6000;
+}
+
+.app-popup {
+    background: white;
+    padding: 25px 30px;
+    border-radius: 16px;
+    width: 350px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    animation: popupFade 0.2s ease;
+}
+
+.app-popup button {
+    margin-top: 18px;
+    background: #2563eb;
+    color: white;
+    border: none;
+    padding: 8px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+@keyframes popupFade {
+    from {
+        transform: scale(0.95);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* =====================================================
+   PROMOTIONAL TOGGLE (MODERN APP STYLE)
+===================================================== */
+
+.promo-toggle-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-top: 18px;
+}
+
+/* Toggle container */
+.toggle-switch {
+    position: relative;
+    width: 50px;
+    height: 26px;
+}
+
+/* Hide checkbox */
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+/* Slider background */
+.slider {
+    position: absolute;
+    inset: 0;
+    background: #d1d5db;
+    border-radius: 30px;
+    transition: all 0.3s ease;
+}
+
+/* Toggle circle */
+.slider:before {
+    content: "";
+    position: absolute;
+    height: 20px;
+    width: 20px;
+    left: 3px;
+    top: 3px;
+    background: white;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+/* Active state */
+.toggle-switch input:checked + .slider {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    box-shadow: 0 0 8px rgba(37,99,235,0.5);
+}
+
+.toggle-switch input:checked + .slider:before {
+    transform: translateX(24px);
+}
+
+/* Label text */
+.toggle-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+}
+
+/* =====================================================
+   PROMOTIONAL FIELDS
+===================================================== */
+
+.promo-fields {
+    display: none;
+    margin-top: 18px;
+    padding: 16px;
+    background: #f8fafc;
+    border-radius: 14px;
+    border: 1px solid #e5e7eb;
+    animation: fadeSlide 0.25s ease;
+
+    width: 100%;
+    box-sizing: border-box;   /* add this */
+}
+
+.promo-input {
+    width: 100%;
+    max-width: 100%;          /* add this */
+    padding: 11px 12px;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    margin-bottom: 12px;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    box-sizing: border-box;   /* add this */
+}
+
+.promo-input:focus {
+    outline: none;
+    border: 1px solid #2563eb;
+    box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
+}
+
+/* Smooth animation */
+@keyframes fadeSlide {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* =====================================================
+   LINKEDIN STYLE CTA BUTTON
+===================================================== */
+.promo-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    background: #0a66c2;
+    color: white;
+    border-radius: 6px;
+    text-decoration: none;
+    border: 1px solid #0a66c2;
+    transition: all 0.15s ease;
+    white-space: nowrap;   /* add this line */
+}
+
+/* Hover */
+.promo-btn:hover {
+    background: #004182;        /* darker blue */
+    border-color: #004182;
+}
+
+.promo-section {
+    margin-top: 14px;
+    padding: 14px 16px;
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    width: 100%;
+    box-sizing: border-box;
+}
+
+
+
+.product-tag {
+    font-size: 14px;
+    font-weight: 600;
+    color: #111827;
 }

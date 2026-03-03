@@ -7,11 +7,14 @@ import java.util.List;
 
 public interface PostService {
 
-	 void createPost(String username,
-             String content,
-             String hashtags,
-             String scheduledAt,
-             boolean promotional);
+	void createPost(String username,
+            String content,
+            String hashtags,
+            String scheduledAt,
+            boolean promotional,
+            String ctaType,
+            String ctaUrl,
+            String productTag);
 
     void updatePost(Long postId, String content, String hashtags, String username);
 

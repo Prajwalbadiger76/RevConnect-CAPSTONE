@@ -4,7 +4,8 @@ import java.util.List;
 
 import com.example.demo.dto.LoginRequest;
 import com.example.demo.dto.ProfileResponse;
-import com.example.demo.dto.RegisterRequest; 
+import com.example.demo.dto.RegisterRequest;
+import com.example.demo.entity.User; 
 
 public interface UserService {
 
@@ -13,4 +14,6 @@ public interface UserService {
     String login(LoginRequest request);
     
     List<ProfileResponse> searchUsers(String keyword);
+    
+    User findByUsername(String username);
 }

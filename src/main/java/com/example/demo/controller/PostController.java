@@ -2,10 +2,13 @@ package com.example.demo.controller;
 
 import com.example.demo.dto.PostDto;
 import com.example.demo.entity.*;
-
+import com.example.demo.repo.HashtagRepository;
+import com.example.demo.repo.PostHashtagRepository;
+import com.example.demo.repo.PostRepository;
 import com.example.demo.service.*;
 
 import java.security.Principal;
+import java.time.LocalDateTime;
 import java.util.*;
 
 
@@ -23,13 +26,22 @@ public class PostController {
 
     private final PostService postService;
     private final ProfileService profileService;
+    private final PostRepository postRepository;
+    private final UserService userService;
+    private final HashtagRepository hashtagRepository;
+    private final PostHashtagRepository postHashtagRepository;
    
    
 
     public PostController(PostService postService,
-            ProfileService profileService) {
+            ProfileService profileService,PostRepository postRepository,UserService userService,HashtagRepository hashtagRepository,
+            PostHashtagRepository postHashtagRepository) {
 					this.postService = postService;
 					this.profileService = profileService;
+					this.postRepository=postRepository;
+					this.userService=userService;
+					this.hashtagRepository=hashtagRepository;
+					this.postHashtagRepository=postHashtagRepository;
 					}
 
     // =========================
@@ -48,14 +60,22 @@ public class PostController {
                              @RequestParam(required = false) String hashtags,
                              @RequestParam(required = false) String scheduledAt,
                              @RequestParam(required = false) Boolean promotional,
+                             @RequestParam(required = false) String ctaType,
+                             @RequestParam(required = false) String ctaUrl,
+                             @RequestParam(required = false) String productTag,
                              Authentication authentication) {
+
+        System.out.println("isPromotional = " + promotional); // 🔥 DEBUG
 
         postService.createPost(
                 authentication.getName(),
                 content,
                 hashtags,
                 scheduledAt,
-                promotional != null && promotional
+                Boolean.TRUE.equals(promotional),
+                ctaType,
+                ctaUrl,
+                productTag
         );
 
         return "redirect:/feed";
@@ -183,8 +203,6 @@ public class PostController {
         model.addAttribute("posts", posts);
         model.addAttribute("results", users);
         model.addAttribute("currentUsername", currentUsername);
-        model.addAttribute("trendingHashtags",
-                postService.getTrendingHashtags());
         model.addAttribute("showCreateForm", false);
 
         return "search-results";
