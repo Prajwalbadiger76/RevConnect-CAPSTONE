@@ -65,4 +65,10 @@ public class UserServiceImpl implements UserService {
         return Collections.emptyList();   
     }
 
+    @Override
+    public User findByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new CustomException("User not found"));
+    }
+
 }
