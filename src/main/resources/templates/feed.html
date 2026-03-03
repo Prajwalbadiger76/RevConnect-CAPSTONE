@@ -436,26 +436,27 @@
 
 				<!-- SHARE HEADER -->
 				<div th:if="${post.sharedFromUsername != null}" class="share-header">
-					🔁 Shared from
-					<a th:href="@{/profile/{username}(username=${post.sharedFromUsername})}"
-						th:text="'@' + ${post.sharedFromUsername}">
-					</a>
+				    🔁 Re-Shared from 
+				    <a th:href="@{/profile/{username}(username=${post.sharedFromUsername})}"
+				       th:text="'@' + ${post.sharedFromUsername}">
+				    </a>
 				</div>
 
 				<!-- POST CONTENT BLOCK -->
 				<div class="post-body">
-					<div class="post-content" th:text="${post.content}">
-					</div>
+				    <div class="post-content"
+				         th:text="${post.content}">
+				    </div>
 				</div>
-
+				
 				<div th:if="${post.hashtags != null}">
-					<span th:each="tag : ${post.hashtags}">
-						<a th:href="@{/post/search(keyword=${'#' + tag})}"
-							style="color:#2563eb; text-decoration:none; margin-right:8px;">
-							<span th:text="${'#' + tag}"></span>
-						</a>
-					</span>
-				</div>
+									<span th:each="tag : ${post.hashtags}">
+										<a th:href="@{/post/search(keyword=${'#' + tag})}"
+											style="color:#2563eb; text-decoration:none; margin-right:8px;">
+											<span th:text="${'#' + tag}"></span>
+										</a>
+									</span>
+				</div>				
 
 				<div class="post-actions">
 
@@ -473,12 +474,12 @@
 					<!-- If NOT shared -->
 					<form th:if="${!post.sharedByCurrentUser}" th:action="@{/post/share/{id}(id=${post.id})}"
 						method="post">
-						<button>🔁 Share</button>
+						<button>🔁 Re-Share</button>
 					</form>
 
 					<!-- If already shared -->
 					<span th:if="${post.sharedByCurrentUser}" style="color:gray; font-weight:500;">
-						✔ Shared
+						✔ Re-Shared
 					</span>
 
 
