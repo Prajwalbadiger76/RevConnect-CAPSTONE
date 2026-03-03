@@ -2,17 +2,169 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Followers</title>
+    <link rel="stylesheet" th:href="@{/css/feed.css}">
+
+    <style>
+        body {
+            background: #f4f6f9;
+            margin: 0;
+            font-family: "Segoe UI", sans-serif;
+        }
+
+        .followers-container {
+            max-width: 650px;
+            margin: 70px auto;
+			padding:0 10px;
+        }
+
+        .followers-header {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #1f2937;
+        }
+
+        .followers-count {
+            font-size: 14px;
+            color: #6b7280;
+            margin-bottom: 25px;
+        }
+
+		.follower-card {
+		    background: white;
+		    padding: 16px 20px;
+		    border-radius: 14px;
+		    margin-bottom: 12px;
+		    box-shadow: 0 4px 14px rgba(0,0,0,0.05);
+		    display: flex;
+		    align-items: center;
+		    justify-content: space-between;
+		    border: 1px solid transparent;
+		    transition: all 0.25s ease;
+		}
+		.follower-card:hover {
+		    transform: translateY(-3px);
+		    box-shadow: 0 10px 28px rgba(0,0,0,0.10);
+		    border: 1px solid #e0e7ff;
+		    background: #fafbff;
+		}
+
+        .follower-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 16px;
+            text-transform: uppercase;
+        }
+
+        .follower-name {
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 500;
+            color: #111827;
+        }
+
+        .follower-name:hover {
+            color:#2563eb;
+        }
+
+		.back-link {
+		    display: inline-block;
+		    margin-bottom: 30px;   /* 👈 This creates proper space */
+		    text-decoration: none;
+		    font-size: 14px;
+		    color: #64748b;
+		    font-weight: 500;
+		    transition: 0.2s ease;
+		}
+
+		.back-link:hover {
+		    color: #2563eb;
+		}
+
+        .empty-text {
+            color: #6b7280;
+            font-size: 14px;
+        }
+		
+		.empty-state{
+		    display:flex;
+		    justify-content:center;
+		    align-items:center;
+		    margin-top:40px;
+		}
+
+		.empty-box{
+		    background:white;
+		    padding:40px;
+		    border-radius:16px;
+		    box-shadow:0 8px 25px rgba(0,0,0,0.08);
+		    text-align:center;
+		    max-width:400px;
+		}
+
+		.empty-icon{
+		    font-size:50px;
+		    margin-bottom:15px;
+		}
+		
+    </style>
 </head>
 <body>
 
-<h2>Followers</h2>
+<div class="followers-container">
+	
+	<!-- MOVE BACK LINK HERE -->
+	    <a th:href="@{/feed}" class="back-link">← Back to Feed</a>
 
-<div th:each="user : ${followers}">
-    <a th:href="@{/profile/{username}(username=${user.username})}"
-       th:text="${user.username}"></a>
+    <div class="followers-header">
+        Followers
+    </div>
+
+	<div class="followers-count"
+	     th:if="${!#lists.isEmpty(followers)}"
+	     th:text="${#lists.size(followers)} + ' followers'">
+	</div>
+
+    <!-- If empty -->
+	<div th:if="${#lists.isEmpty(followers)}" class="empty-state">
+	    <div class="empty-box">
+	        <div class="empty-icon">📢</div>
+	        <h3>No Followers Yet</h3>
+	        <p>When someone follows you, they’ll appear here.</p>
+	    </div>
+	</div>
+
+    <!-- SAME LOGIC -->
+    <div th:each="user : ${followers}" class="follower-card">
+
+        <div class="follower-left">
+            <div class="avatar"
+                 th:text="${#strings.substring(user.username,0,1)}">
+            </div>
+
+            <a th:href="@{/profile/{username}(username=${user.username})}"
+               th:text="${user.username}"
+               class="follower-name">
+            </a>
+        </div>
+
+    </div>
+
+
 </div>
-
-<a th:href="@{/feed}">Back</a>
 
 </body>
 </html>

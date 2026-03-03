@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-<title>Pending Connection Requests</title>
-
+<title>Connection Requests</title>
+<link rel="stylesheet" th:href="@{/css/connection.css}">
 <style>
 body{
 font-family:Segoe UI;
@@ -12,60 +12,82 @@ padding:40px;
 }
 
 .container{
-width:55%;
-margin:auto;
+    max-width: 650px;
+    margin: 30px auto;   /* reduced from 70px */
 }
 
-h2{
-text-align:center;
-margin-bottom:25px;
+.page-header{
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #1f2937;
+}
+
+.page-count{
+    font-size: 14px;
+    color: #6b7280;
+    margin-bottom: 25px;
+}
+
+.back-link{
+    display: inline-block;
+    margin-bottom: 30px;
+    text-decoration: none;
+    font-size: 14px;
+    color: #64748b ;   /* force grey */
+    font-weight: 500;
+    transition: 0.2s ease;
+}
+
+.back-link:visited{
+    color: #64748b ;   /* remove purple */
+}
+
+.back-link:hover{
+    color:#2563eb ;    /* blue on hover */
 }
 
 .card{
-background:white;
-padding:18px;
-margin-bottom:15px;
-border-radius:12px;
-box-shadow:0 4px 12px rgba(0,0,0,0.1);
-display:flex;
-justify-content:space-between;
-align-items:center;
-transition:0.2s;
-}
-
-.card:hover{
-transform:translateY(-2px);
+    background:white;
+    padding:18px;
+    margin-bottom:15px;
+    border-radius:12px;
+    box-shadow:0 4px 12px rgba(0,0,0,0.1);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
 }
 
 .left{
-display:flex;
-align-items:center;
-gap:12px;
-}
+	 display:flex; 
+	 align-items:center; 
+	 gap:12px;
+  }
 
-.avatar{
-width:42px;
-height:42px;
-border-radius:50%;
-background:#6366f1;
-color:white;
-display:flex;
-align-items:center;
-justify-content:center;
-font-weight:bold;
-font-size:18px;
-}
+  .avatar{
+      width:42px; 
+      height:42px; 
+      border-radius:50%;
+      background:#6366f1; 
+      color:white;
+      display:flex; 
+      align-items:center; 
+      justify-content:center;
+      font-weight:bold; 
+      font-size:18px;
+  }
 
-.name{
-text-decoration:none;
-font-weight:600;
-color:#2563eb;
-}
+.name{ 
+	text-decoration:none;
+	 font-weight:600; 
+	 color:#111827;
+	 transition: 0.2s ease;
+  }
 
-.name:hover{
-text-decoration:underline;
-}
-
+  .name:hover{
+      color:#2563eb;   /* blue on hover */
+  }
+  
 .btn{
 border:none;
 padding:8px 16px;
@@ -73,122 +95,190 @@ border-radius:7px;
 cursor:pointer;
 margin-left:6px;
 color:white;
-transition:0.25s;
+font-weight:600;
 }
 
-/* colors */
 .accept{ background:#10b981; }
 .reject{ background:#ef4444; }
-
-/* hover */
-.accept:hover{
-background:#059669;
-transform:scale(1.05);
-}
-
-.reject:hover{
-background:#dc2626;
-transform:scale(1.05);
-}
-
-/* click animation */
-.btn:active{
-transform:scale(0.95);
-}
+.cancel{ background:#6b7280; }
 
 .back{
 text-align:center;
-margin-top:25px;
+margin-top:20px;
 }
 
 .back a{
-text-decoration:none;
+text-decoration:none !important;
 color:#2563eb;
 font-weight:600;
 }
+.modal{
+    display:none;
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.4);
+    justify-content:center;
+    align-items:center;
+    z-index:1000;
+}
+
+.modal-box{
+    background:white;
+    padding:25px 30px;
+    border-radius:12px;
+    text-align:center;
+    width:320px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.2);
+}
+
+.modal-buttons{
+    margin-top:15px;
+}
+
+.back-link{
+    display: inline-block;
+    margin-bottom: 30px;
+    text-decoration: none;
+    font-size: 14px;
+    color: #64748b;      /* grey */
+    font-weight: 500;
+    transition: 0.2s ease;
+}
+
+.back-link:hover{
+    color:#2563eb;       /* blue on hover */
+}
+
+.empty-state{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+  margin-top:40px; 
+  }
+
+.empty-box{
+    background:white;
+    padding:40px;
+    border-radius:16px;
+    box-shadow:0 8px 25px rgba(0,0,0,0.08);
+    text-align:center;
+    max-width:400px;
+}
+
+.empty-icon{
+    font-size:50px;
+    margin-bottom:15px;
+}
+
 </style>
 </head>
 
 <body>
 
 <div class="container">
-
-<h2>Pending Connection Requests</h2>
-
-<div th:if="${#lists.isEmpty(requests)}" style="text-align:center;">
-No pending requests
+	
+	<a th:href="@{/feed}" class="back-link">← Back to Feed</a>
+<div class="page-header">
+	Connection Requests
 </div>
+
+<!-- ✅ Pending count added -->
+   
+<div class="page-count"
+     th:if="${!#lists.isEmpty(requests)}"
+     th:text="${#lists.size(requests)} + ' pending requests'">
+</div>
+ 
+ <div th:if="${#lists.isEmpty(requests)}" class="empty-state">
+     <div class="empty-box">
+         <div class="empty-icon">📬</div>
+         <h3>No Pending Requests</h3>
+         <p>You're all caught up! New requests will appear here.</p>
+     </div>
+ </div>
 
 <div th:each="req : ${requests}" class="card">
 
 <div class="left">
+
 <div class="avatar"
-th:text="${#strings.substring(req.requester.username,0,1).toUpperCase()}"></div>
+th:text="${#strings.substring(req.requester.username,0,1).toUpperCase()}">
+</div>
 
 <a class="name"
 th:href="@{/profile/{username}(username=${req.requester.username})}"
-th:text="${req.requester.username}"></a>
+th:text="${req.requester.username}">
+</a>
+
 </div>
 
 <div>
+
+<!-- ACCEPT -->
 <form th:action="@{/connections/accept/{id}(id=${req.id})}"
 method="post"
-style="display:inline;"
-onsubmit="changeAccept(this,event)">
+style="display:inline;">
 <button class="btn accept">Accept</button>
 </form>
 
+<!-- ⭐ DIRECT REJECT (no popup) -->
 <form th:action="@{/connections/reject/{id}(id=${req.id})}"
 method="post"
-style="display:inline;"
-onsubmit="changeReject(this,event)">
-<button class="btn reject">Reject</button>
+style="display:inline;">
+<button type="button"
+        class="btn reject"
+        onclick="openRejectModal(this.closest('form'))">
+    Reject
+</button>
 </form>
+
 </div>
 
 </div>
 
 <div class="back">
-<a th:href="@{/feed}">← Back to Feed</a>
-</div>
 
 </div>
 
+</div>
+</div>   <!-- end of container -->
+
+<!-- ⭐ ADD STEP 2 MODAL HERE -->
+<div id="rejectModal" class="modal">
+    <div class="modal-box">
+        <p>Are you sure you want to reject this request?</p>
+
+        <div class="modal-buttons">
+            <button class="btn accept" onclick="confirmReject()">Yes</button>
+            <button class="btn cancel" onclick="closeRejectModal()">No</button>
+        </div>
+    </div>
+</div>
+
+<!-- ⭐ ADD SCRIPT ALSO HERE -->
 <script>
-function changeAccept(form,event){
+let rejectForm = null;
 
-event.preventDefault();
-
-if(!confirm("Accept connection?")) return;
-
-let btn=form.querySelector("button");
-
-btn.innerText="Accepted ✓";
-btn.style.background="#9ca3af";
-btn.disabled=true;
-
-setTimeout(()=>{
-form.submit();
-},300);
+function openRejectModal(form){
+    rejectForm = form;
+    document.getElementById("rejectModal").style.display = "flex";
 }
 
-function changeReject(form,event){
+function closeRejectModal(){
+    document.getElementById("rejectModal").style.display = "none";
+}
 
-event.preventDefault();
-
-if(!confirm("Reject request?")) return;
-
-let btn=form.querySelector("button");
-
-btn.innerText="Rejected";
-btn.style.background="#9ca3af";
-btn.disabled=true;
-
-setTimeout(()=>{
-form.submit();
-},300);
+function confirmReject(){
+    if(rejectForm){
+        rejectForm.submit();
+    }
 }
 </script>
 
+</body>
+</html>
 </body>
 </html>
