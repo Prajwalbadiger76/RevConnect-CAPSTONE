@@ -14,6 +14,9 @@ public class PostDto {
     private long likeCount;
     private boolean likedByCurrentUser;
     private boolean promotional;
+    private String ctaType;
+    private String ctaUrl;
+    private String productTag;
 
  
 
@@ -81,10 +84,37 @@ public class PostDto {
  	public void setPromotional(boolean promotional) {
  		this.promotional = promotional;
  	}
+ 	
+ 	  public String getCtaType() {
+ 			return ctaType;
+ 		}
+
+ 		public void setCtaType(String ctaType) {
+ 			this.ctaType = ctaType;
+ 		}
+
+ 		public String getCtaUrl() {
+ 			return ctaUrl;
+ 		}
+
+ 		public void setCtaUrl(String ctaUrl) {
+ 			this.ctaUrl = ctaUrl;
+ 		}
+
+ 		public String getProductTag() {
+ 			return productTag;
+ 		}
+
+ 		public void setProductTag(String productTag) {
+ 			this.productTag = productTag;
+ 		}
+ 	
 
     // ================= LIKES =================
 
-    public long getLikeCount() {
+  
+
+	public long getLikeCount() {
         return likeCount;
     }
 

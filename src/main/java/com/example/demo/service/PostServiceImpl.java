@@ -63,7 +63,11 @@ public class PostServiceImpl implements PostService {
                            String content,
                            String hashtags,
                            String scheduledAt,
-                           boolean promotional) {
+                           boolean promotional,
+                           String ctaType,
+                           String ctaUrl,
+                           String productTag) {
+    	System.out.println("SERVICE promotional = " + promotional);
 
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -73,25 +77,35 @@ public class PostServiceImpl implements PostService {
         post.setUser(user);
         post.setCreatedAt(LocalDateTime.now());
         post.setPinned(false);
-        post.setPinnedAt(null);
 
-        
-        // PROMOTIONAL LOGIC
-        // =========================
+        // ================= PROMOTIONAL LOGIC =================
         if (promotional) {
 
             if (user.getRole() != Role.BUSINESS &&
                 user.getRole() != Role.CREATOR) {
 
                 throw new RuntimeException(
-                        "Only Business or Creator can create promotional posts"
+                    "Only Business or Creator can create promotional posts"
                 );
             }
 
             post.setIsPromotional(true);
+            post.setCtaType(ctaType);
+            post.setCtaUrl(ctaUrl);
+            post.setProductTag(productTag);
+
         } else {
             post.setIsPromotional(false);
         }
+
+        postRepository.save(post);
+
+        analyticsService.createPostAnalytics(post);
+
+        if (hashtags != null && !hashtags.isBlank()) {
+            parseHashtags(post, hashtags);
+        }
+    
 
         
         // SCHEDULE LOGIC (FIXED)
@@ -123,7 +137,7 @@ public class PostServiceImpl implements PostService {
         // =========================
         analyticsService.createPostAnalytics(savedPost);
 
-
+        
         // HASHTAGS
         // =========================
         if (hashtags != null && !hashtags.isBlank()) {
@@ -309,6 +323,7 @@ public class PostServiceImpl implements PostService {
                 })
                 .toList();
     }
+    
     // =========================================================
     // GET POST BY ID
     // =========================================================
@@ -494,6 +509,9 @@ public class PostServiceImpl implements PostService {
         dto.setUsername(post.getUser().getUsername());
         dto.setPinned(post.getPinned());
         dto.setPromotional(Boolean.TRUE.equals(post.getIsPromotional()));
+        dto.setCtaType(post.getCtaType());
+        dto.setCtaUrl(post.getCtaUrl());
+        dto.setProductTag(post.getProductTag());
         dto.setHashtags(
         	    post.getPostHashtags()
         	        .stream()
@@ -552,15 +570,18 @@ public class PostServiceImpl implements PostService {
 
     private void parseHashtags(Post post, String hashtags) {
 
-        String[] tags = hashtags.split("\\s+");
+        if (hashtags == null || hashtags.isBlank()) return;
 
-        for (String rawTag : tags) {
+        // Split by comma OR space
+        String[] rawTags = hashtags.split("[,\\s]+");
 
-            String tag = rawTag.replace("#", "")
-                               .trim()
-                               .toLowerCase();
+        // Use Set to remove duplicates
+        Set<String> uniqueTags = Arrays.stream(rawTags)
+                .map(tag -> tag.replace("#", "").trim().toLowerCase())
+                .filter(tag -> !tag.isEmpty())
+                .collect(Collectors.toSet());
 
-            if (tag.isEmpty()) continue;
+        for (String tag : uniqueTags) {
 
             Hashtag hashtag = hashtagRepository
                     .findByName(tag)
