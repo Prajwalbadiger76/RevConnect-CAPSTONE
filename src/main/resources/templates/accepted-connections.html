@@ -1,93 +1,171 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-<title>My Connections</title>
+<title>Followers</title>
 
-<link rel="stylesheet" th:href="@{/css/connection.css}">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" th:href="@{/css/feed.css}">
 
+<style>
+
+/* ===== PAGE WRAPPER ===== */
+.followers-wrapper{
+    margin-top:0px;     /* space below navbar */
+    margin-bottom:80px;
+	padding-bottom:80px;
+}
+
+/* ===== CONTAINER ===== */
+.followers-container{
+    max-width:650px;
+    margin:0 auto;
+    padding:0 20px;
+}
+
+/* ===== BACK LINK ===== */
+.back-link{
+    display:inline-block;
+    margin-bottom:25px;
+    font-size:14px;
+    color:#64748b;
+    text-decoration:none;
+    font-weight:500;
+}
+
+.back-link:hover{
+    color:#2563eb;
+}
+
+/* ===== HEADER ===== */
+.followers-header{
+    font-size:24px;
+    font-weight:600;
+    color:#1f2937;
+    margin-bottom:6px;
+}
+
+.followers-count{
+    font-size:14px;
+    color:#6b7280;
+    margin-bottom:25px;
+}
+
+/* ===== CARD ===== */
+.follower-card{
+    background:white;
+    padding:18px 20px;
+    border-radius:16px;
+    margin-bottom:15px;
+    box-shadow:0 4px 14px rgba(0,0,0,0.08);
+    display:flex;
+    align-items:center;
+    gap:15px;
+    transition:all 0.25s ease;
+}
+
+.follower-card:hover{
+    transform:translateY(-3px);
+    box-shadow:0 10px 25px rgba(0,0,0,0.12);
+}
+
+/* ===== AVATAR ===== */
+.avatar{
+    width:45px;
+    height:45px;
+    border-radius:50%;
+    background:linear-gradient(135deg,#6366f1,#4f46e5);
+    color:white;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:600;
+    font-size:18px;
+}
+
+/* ===== NAME ===== */
+.follower-name{
+    text-decoration:none;
+    font-weight:600;
+    color:#111827;
+    font-size:16px;
+}
+
+.follower-name:hover{
+    color:#2563eb;
+}
+
+/* ===== EMPTY STATE ===== */
+.empty-state{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    margin-top:40px;
+}
+
+.empty-box{
+    background:white;
+    padding:40px;
+    border-radius:18px;
+    box-shadow:0 8px 25px rgba(0,0,0,0.08);
+    text-align:center;
+    max-width:400px;
+}
+
+.empty-icon{
+    font-size:50px;
+    margin-bottom:15px;
+}
+
+</style>
 
 </head>
 
 <body>
 
-<div class="container">
+<!-- HEADER -->
+<div th:replace="fragments/header :: header"></div>
 
-    <!-- Back link like Pending page -->
+<div class="followers-wrapper">
+<div class="followers-container">
+
     <a th:href="@{/feed}" class="back-link">← Back to Feed</a>
 
-    <!-- Page header like Pending -->
-    <div class="page-header">
-        My Connections
+    <div class="followers-header">
+        Followers
     </div>
 
-    <!-- Empty state -->
-    <div th:if="${#lists.isEmpty(connections)}" class="empty-state">
+    <div class="followers-count"
+         th:if="${!#lists.isEmpty(followers)}"
+         th:text="${#lists.size(followers)} + ' followers'">
+    </div>
+
+    <!-- Empty State -->
+    <div th:if="${#lists.isEmpty(followers)}" class="empty-state">
         <div class="empty-box">
-            <div class="empty-icon">🌐</div>
-            <h3>No Connections Yet</h3>
-            <p>Start connecting with people to grow your network.</p>
+            <div class="empty-icon">📢</div>
+            <h3>No Followers Yet</h3>
+            <p>When someone follows you, they’ll appear here.</p>
         </div>
     </div>
 
-    <!-- Connection cards -->
-    <div th:each="user : ${connections}" class="card">
+    <!-- Cards -->
+    <div th:each="user : ${followers}" class="follower-card">
 
-        <div class="left">
-            <div class="avatar"
-                 th:text="${#strings.substring(user.username,0,1).toUpperCase()}">
-            </div>
-
-            <a class="name"
-               th:href="@{/profile/{username}(username=${user.username})}"
-               th:text="${user.username}">
-            </a>
+        <div class="avatar"
+             th:text="${#strings.substring(user.username,0,1).toUpperCase()}">
         </div>
 
-        <form th:action="@{/connections/remove/{username}(username=${user.username})}"
-              method="post"
-              style="display:inline;">
-            <button type="button"
-                    class="btn reject"
-                    onclick="openRemoveModal(this.closest('form'))">
-                Remove
-            </button>
-        </form>
+        <a th:href="@{/profile/{username}(username=${user.username})}"
+           th:text="${user.username}"
+           class="follower-name">
+        </a>
 
     </div>
 
 </div>
-
-<!-- REMOVE CONFIRMATION MODAL -->
-<div id="removeModal" class="modal">
-    <div class="modal-box">
-        <p>Are you sure you want to remove this connection?</p>
-
-        <div class="modal-buttons">
-            <button class="btn reject" onclick="confirmRemove()">Yes</button>
-            <button class="btn cancel" onclick="closeRemoveModal()">No</button>
-        </div>
-    </div>
 </div>
 
-<script>
-let removeForm = null;
-
-function openRemoveModal(form){
-    removeForm = form;
-    document.getElementById("removeModal").style.display = "flex";
-}
-
-function closeRemoveModal(){
-    document.getElementById("removeModal").style.display = "none";
-}
-
-function confirmRemove(){
-    if(removeForm){
-        removeForm.submit();
-    }
-}
-</script>
+<!-- FOOTER -->
+<div th:replace="fragments/footer :: footer"></div>
 
 </body>
 </html>

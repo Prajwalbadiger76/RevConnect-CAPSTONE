@@ -3,17 +3,19 @@
 <head>
 <title>Sent Requests</title>
 
-<style>
-body{
-font-family:Segoe UI;
-background:#f3f4f6;
-margin:0;
-padding:40px;
-}
+<link rel="stylesheet" th:href="@{/css/feed.css}">
 
+<style>
+
+/* ===== SAFE PAGE SPACING (like pending) ===== */
 .container{
-width:55%;
-margin:auto;
+    max-width:650px;
+    margin:10px auto 150px auto;   /* pushes below navbar */
+    padding:0 20px;
+}
+.page-wrapper{
+    min-height: calc(100vh - 160px); /* pushes footer down */
+    padding-top: 100px; /* space below navbar */
 }
 
 /* CARD */
@@ -61,12 +63,12 @@ transform:scale(1.08);
 .name{
 text-decoration:none;
 font-weight:600;
-color:#111827;   /* black */
+color:#111827;
 transition:0.2s ease;
 }
 
 .name:hover{
-color:#2563eb;   /* blue on hover */
+color:#2563eb;
 }
 
 /* CANCEL BUTTON */
@@ -87,14 +89,7 @@ transform:translateY(-2px);
 box-shadow:0 6px 14px rgba(0,0,0,0.2);
 }
 
-.cancel-btn{
-transition: all 0.25s ease;
-}
-
-.cancel-btn:hover{
-transform: translateY(-2px);
-box-shadow: 0 6px 14px rgba(0,0,0,0.2);
-}
+/* BACK LINK */
 .back-link{
 display:inline-block;
 margin-bottom:30px;
@@ -110,11 +105,32 @@ color:#2563eb;
 }
 
 .page-header{
-text-align:left;
 font-size:24px;
 font-weight:600;
 margin-bottom:20px;
 color:#1f2937;
+}
+
+/* EMPTY STATE */
+.empty-state{
+display:flex;
+justify-content:center;
+align-items:center;
+margin-top:40px;
+}
+
+.empty-box{
+background:white;
+padding:40px;
+border-radius:16px;
+box-shadow:0 8px 25px rgba(0,0,0,0.08);
+text-align:center;
+max-width:400px;
+}
+
+.empty-icon{
+font-size:50px;
+margin-bottom:15px;
 }
 
 /* MODAL */
@@ -156,81 +172,65 @@ border-radius:7px;
 cursor:pointer;
 }
 
-.empty-state{
-display:flex;
-justify-content:center;
-align-items:center;
-margin-top:40px;
-}
-
-.empty-box{
-background:white;
-padding:40px;
-border-radius:16px;
-box-shadow:0 8px 25px rgba(0,0,0,0.08);
-text-align:center;
-max-width:400px;
-}
-
-.empty-icon{
-font-size:50px;
-margin-bottom:15px;
-}
 </style>
 </head>
 
 <body>
 
-<div class="container">
+<div th:replace="fragments/header :: header"></div>
 
-	<a th:href="@{/feed}" class="back-link">← Back to Feed</a>
-	<h2 class="page-header">Sent Requests</h2>
-	
-	<div th:if="${#lists.isEmpty(sent)}" class="empty-state">
-	    <div class="empty-box">
-	        <div class="empty-icon">📤</div>
-	        <h3>No Sent Requests</h3>
-	        <p>You haven’t sent any connection requests yet.</p>
-	    </div>
-	</div>
+<div class="page-wrapper">
+    <div class="container">
 
-<div th:each="req : ${sent}" class="card">
+    <a th:href="@{/feed}" class="back-link">← Back to Feed</a>
+    <div class="page-header">Sent Requests</div>
+    
+    <div th:if="${#lists.isEmpty(sent)}" class="empty-state">
+        <div class="empty-box">
+            <div class="empty-icon">📤</div>
+            <h3>No Sent Requests</h3>
+            <p>You haven’t sent any connection requests yet.</p>
+        </div>
+    </div>
 
-<div class="left">
-<div class="avatar"
-th:text="${#strings.substring(req.receiver.username,0,1)}"></div>
+    <div th:each="req : ${sent}" class="card">
 
-<a class="name"
-th:href="@{/profile/{username}(username=${req.receiver.username})}"
-th:text="${req.receiver.username}"></a>
+        <div class="left">
+            <div class="avatar"
+                 th:text="${#strings.substring(req.receiver.username,0,1).toUpperCase()}">
+            </div>
+
+            <a class="name"
+               th:href="@{/profile/{username}(username=${req.receiver.username})}"
+               th:text="${req.receiver.username}">
+            </a>
+        </div>
+
+        <form th:action="@{/connections/cancel/{username}(username=${req.receiver.username})}"
+              method="post"
+              style="display:inline;">
+            <button type="button"
+                    class="cancel"
+                    onclick="openCancelModal(this.closest('form'))">
+                Cancel
+            </button>
+        </form>
+
+    </div>
+
 </div>
 
-<!-- ⭐  CANCEL -->
-<form th:action="@{/connections/cancel/{username}(username=${req.receiver.username})}"
-      method="post"
-      style="display:inline;">
-    <button type="button"
-            class="cancel"
-            onclick="openCancelModal(this.closest('form'))">
-        Cancel
-    </button>
-</form>
+<!-- FOOTER -->
+<div th:replace="fragments/footer :: footer"></div>
 
-</div>
-
-
-</div>
-
-</div>   <!-- container -->
-
-<!-- ⭐ CANCEL CONFIRMATION MODAL -->
+<!-- CANCEL CONFIRMATION MODAL -->
 <div id="cancelModal" class="modal">
     <div class="modal-box">
         <p>Are you sure you want to cancel this request?</p>
 
         <div class="modal-buttons">
             <button class="cancel" onclick="confirmCancel()">Yes</button>
-            <button class="btn cancel-btn" onclick="closeCancelModal()">No</button>
+            <button class="cancel-btn" onclick="closeCancelModal()">No</button>
         </div>
     </div>
 </div>
