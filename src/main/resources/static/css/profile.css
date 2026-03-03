@@ -9,7 +9,7 @@ body {
     margin: 30px auto;
 }
 
-.back-link {
+.back-link { 
     text-decoration: none;
     color: #555;
     font-size: 14px;
@@ -728,4 +728,140 @@ body {
 
 .delete-btn:hover {
     background: #dc2626;
+}
+
+/* =====================================================
+   FINAL RESPONSIVE FIXES – PROFILE PAGE (SAFE)
+===================================================== */
+
+html, body {
+    overflow-x: hidden;
+}
+
+/* ================= TABLET ================= */
+@media (max-width: 1024px) {
+
+    .profile-container {
+        width: 92%;
+    }
+
+    .profile-info-section {
+        padding: 25px;
+    }
+
+    .profile-stats {
+        gap: 25px;
+    }
+}
+
+/* ================= MOBILE LARGE ================= */
+@media (max-width: 768px) {
+
+    .profile-container {
+        width: 95%;
+        margin: 20px auto;
+    }
+
+    /* Banner height reduce */
+    .banner-section {
+        height: 220px;
+    }
+
+    /* Profile info stack */
+    .profile-info-section {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 25px 20px;
+    }
+
+    .profile-image-wrapper {
+        margin-top: -60px;
+    }
+
+    .profile-main-info {
+        margin-left: 0;
+        margin-top: 15px;
+    }
+
+    .edit-btn-wrapper {
+        position: static;
+        margin-top: 15px;
+    }
+
+    /* Action buttons stack */
+    .action-buttons {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .action-buttons button {
+        width: 100%;
+    }
+
+    /* Stats stack */
+    .profile-stats {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    /* Tabs wrap */
+    .profile-tabs {
+        flex-wrap: wrap;
+        gap: 20px;
+        padding: 0 15px;
+    }
+
+    .tab-content {
+        padding: 20px;
+    }
+
+    /* Profile posts */
+    .profile-post-header {
+        flex-wrap: wrap;
+    }
+
+    .profile-post-actions {
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .profile-comment-form {
+        flex-direction: column;
+    }
+
+    .profile-comment-form button {
+        width: 100%;
+    }
+
+    /* Modal responsive */
+    .modal-content {
+        width: 90%;
+        max-width: 350px;
+    }
+}
+
+/* ================= SMALL MOBILE ================= */
+@media (max-width: 480px) {
+
+    .banner-section {
+        height: 180px;
+    }
+
+    .profile-img {
+        width: 120px;
+        height: 120px;
+    }
+
+    .profile-post-card {
+        padding: 15px;
+    }
+
+    .profile-post-content {
+        font-size: 14px;
+    }
+
+    .profile-tabs a {
+        font-size: 14px;
+    }
 }
