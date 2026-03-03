@@ -5,6 +5,8 @@ import com.example.demo.entity.Notification;
 import com.example.demo.entity.User;
 import com.example.demo.repo.NotificationRepository;
 import com.example.demo.repo.UserRepository;
+import com.example.demo.repo.NotificationPreferenceRepository;
+import com.example.demo.entity.NotificationPreference;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,14 +25,17 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class NotificationServiceTest {
 
-    @Mock
-    private NotificationRepository notificationRepository;
+	@Mock
+	private NotificationRepository notificationRepository;
 
-    @Mock
-    private UserRepository userRepository;
+	@Mock
+	private UserRepository userRepository;
 
-    @InjectMocks
-    private NotificationServiceImpl notificationService;
+	@Mock
+	private NotificationPreferenceRepository preferenceRepository;
+
+	@InjectMocks
+	private NotificationServiceImpl notificationService;
 
     private User recipient;
     private User sender;

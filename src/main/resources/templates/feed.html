@@ -127,37 +127,150 @@
 			box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
 		}
 
-		/* TITLE */
-		.filter-heading {
-			font-weight: 600;
-			margin-bottom: 12px;
-			font-size: 16px;
-		}
 
-		/* BUTTON STYLE */
+		/* FILTER BUTTON DEFAULT (VISIBLE DARK BOX) */
 		.filter-btn {
 			width: 100%;
 			text-align: left;
-			padding: 10px 12px;
+			padding: 12px;
 			border-radius: 10px;
 			border: none;
-			background: transparent;
-			cursor: pointer;
-			font-size: 14px;
-			margin-bottom: 6px;
-			transition: 0.2s;
-		}
+			margin-bottom: 10px;
 
-		/* HOVER EFFECT */
-		.filter-btn:hover {
 			background: #eef3ff;
+			/* Dark solid */
+			color: black;
+			font-size: 14px;
+			cursor: pointer;
+
+			transition: all 0.2s ease;
 		}
 
-		/* ACTIVE BUTTON */
+		/* HOVER */
+		.filter-btn:hover {
+			background: rgb(185, 193, 208);
+		}
+<<<<<<< Updated upstream
+=======
+
+		/* SELECTED */
 		.filter-btn.active {
-			background: #e0e7ff;
+			background: linear-gradient(to right, #e0f2fe, #bae6fd);
+			color: black;
+			font-weight: 600;
+			box-shadow: 0 6px 15px rgba(37, 99, 235, 0.4);
+		}
+
+		/* ===== TRENDING BUTTON ===== */
+
+		.trending-badge {
+			display: none;
+			margin-left: 10px;
+			padding: 8px 18px;
+			border-radius: 25px;
+			background: linear-gradient(45deg, #ff6a00, #ff3c00);
+			color: white;
+			font-size: 14px;
+			font-weight: 600;
+			text-decoration: none;
+			border: none;
+			box-shadow: 0 6px 15px rgba(255, 80, 0, 0.4);
+			transition: 0.2s ease;
+		}
+
+		.trending-badge:hover {
+			transform: scale(1.05);
+		}
+
+
+		/* ===== SIMPLE TRENDING DROPDOWN ===== */
+
+		#trendingBox {
+			position: absolute;
+			top: 45px;
+			left: 0;
+			width: 260px;
+			background: white;
+			border-radius: 12px;
+			box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+			display: none;
+			z-index: 3000;
+			overflow: hidden;
+			border: 1px solid #e5e7eb;
+		}
+
+
+		#trendingBox a {
+			display: block;
+			padding: 10px 14px;
+			text-decoration: none;
+			color: #111827;
+			font-size: 14px;
+			transition: background 0.2s ease;
+		}
+
+		#trendingBox a:hover {
+			background: #f9fafb;
+		}
+
+		/* notification */
+
+		.sidebar-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 12px 16px;
+			border-radius: 12px;
+			margin-bottom: 15px;
+
+			/* Attractive soft gradient */
+			background: linear-gradient(90deg, #00c6ff, #0072ff);
+			font-size: 18px;
 			font-weight: 600;
 		}
+
+		.sidebar-title {
+			color: #111827;
+		}
+
+		.sidebar-bell {
+			position: relative;
+			font-size: 22px;
+		}
+
+		.sidebar-badge {
+			position: absolute;
+			top: -6px;
+			right: -10px;
+			background: #ef4444;
+			color: white;
+			font-size: 11px;
+			font-weight: 600;
+			padding: 2px 6px;
+			border-radius: 50px;
+			display: none;
+			min-width: 18px;
+			text-align: center;
+		}
+
+		/* FILTER HEADER STYLE */
+
+		.filter-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+
+			padding: 12px 16px;
+			border-radius: 12px;
+			margin-bottom: 15px;
+
+			background: linear-gradient(90deg, #00c6ff, #0072ff);
+
+			font-size: 18px;
+			font-weight: 600;
+			color: black;
+		}
+>>>>>>> Stashed changes
 	</style>
 
 	<meta charset="UTF-8">
@@ -191,6 +304,7 @@
 
 					<input type="text" name="keyword" id="searchInput" placeholder="Search users or hashtags..."
 						oninput="handleSearchInput()" autocomplete="off" required>
+<<<<<<< Updated upstream
 					<a id="dynamicTrendingBtn" href="/post/trending" style="
 						        display:none;
 						        margin-left:10px;
@@ -201,6 +315,15 @@
 						        text-decoration:none;
 						        font-size:13px;">
 					</a>
+=======
+
+					<button type="submit">Search</button>
+
+					<a id="dynamicTrendingBtn" th:href="@{/post/trending}" class="trending-badge">
+						🔥 Trending Hashtag
+					</a>
+
+>>>>>>> Stashed changes
 					<div id="trendingBox"></div>
 
 					<button type="submit">Search</button>
@@ -242,8 +365,9 @@
 		<div class="filter-column">
 
 			<div class="filter-card">
-				<div class="filter-heading">Filter Post</div>
-
+				<div class="filter-header">
+					<span>Filter Post</span>
+				</div>
 				<button class="filter-btn" onclick="changeRoleFilter('ALL')">All Posts</button>
 				<button class="filter-btn" onclick="changeRoleFilter('PERSONAL')">Personal</button>
 				<button class="filter-btn" onclick="changeRoleFilter('CREATOR')">Creators</button>
@@ -319,10 +443,19 @@
 						<a th:href="@{/profile/{username}(username=${post.username})}" th:text="${post.username}"></a>
 
 						<span th:text="${#temporals.format(post.createdAt,'dd MMM yyyy HH:mm')}"></span>
+<<<<<<< Updated upstream
+=======
+
+						<div th:if="${post.promotional}"
+							style="color:#e11d48; font-size:13px; font-weight:600; margin-top:4px;">
+							📢 Promotional
+						</div>
+>>>>>>> Stashed changes
 					</div>
 
 				</div>
 
+<<<<<<< Updated upstream
 				<div th:if="${!#strings.startsWith(post.content,'🔁 Shared from')}" class="post-content"
 					th:text="${post.content}">
 				</div>
@@ -338,6 +471,30 @@
 				<div th:if="${#strings.startsWith(post.content,'🔁 Shared from')}" class="shared-box"
 					th:text="${post.content}">
 				</div>
+=======
+				<!-- SHARE HEADER -->
+				<div th:if="${post.sharedFromUsername != null}" class="share-header">
+					🔁 Shared from
+					<a th:href="@{/profile/{username}(username=${post.sharedFromUsername})}"
+						th:text="'@' + ${post.sharedFromUsername}">
+					</a>
+				</div>
+
+				<!-- POST CONTENT BLOCK -->
+				<div class="post-body">
+					<div class="post-content" th:text="${post.content}">
+					</div>
+				</div>
+
+				<div th:if="${post.hashtags != null}">
+					<span th:each="tag : ${post.hashtags}">
+						<a th:href="@{/post/search(keyword=${'#' + tag})}"
+							style="color:#2563eb; text-decoration:none; margin-right:8px;">
+							<span th:text="${'#' + tag}"></span>
+						</a>
+					</span>
+				</div>
+>>>>>>> Stashed changes
 
 				<div class="post-actions">
 
@@ -352,10 +509,24 @@
 						💬 <span th:text="${#lists.size(post.comments)}"></span> Comments
 					</span>
 
+<<<<<<< Updated upstream
 					<form th:action="@{/post/share/{id}(id=${post.id})}" method="post">
 						<button>🔁 Share</button>
 					</form>
 
+=======
+					<!-- If NOT shared -->
+					<form th:if="${!post.sharedByCurrentUser}" th:action="@{/post/share/{id}(id=${post.id})}"
+						method="post">
+						<button>🔁 Share</button>
+					</form>
+
+					<!-- If already shared -->
+					<span th:if="${post.sharedByCurrentUser}" style="color:gray; font-weight:500;">
+						✔ Shared
+					</span>
+
+>>>>>>> Stashed changes
 
 				</div>
 
@@ -418,7 +589,22 @@
 		<!-- ================= NOTIFICATION SIDEBAR ================= -->
 
 		<div class="notification-sidebar">
+<<<<<<< Updated upstream
 			<div class="sidebar-header">Notifications</div>
+=======
+			<div class="sidebar-header">
+
+				<span class="sidebar-title">Notifications</span>
+
+				<div class="sidebar-bell">
+					🔔
+					<sup id="sidebarNotifCount" class="sidebar-badge"></sup>
+				</div>
+
+			</div>
+			<div class="notif-title">Unread</div>
+			<div id="notifUnread"></div>
+>>>>>>> Stashed changes
 			<div class="notif-title">Read</div>
 			<div id="notifUnread"></div>
 			<div class="notif-title">Unread</div>
@@ -437,10 +623,26 @@
 			fetch('/notifications')
 				.then(res => res.json())
 				.then(data => {
+
 					let unread = data.filter(n => !n.read);
 					let read = data.filter(n => n.read);
+
 					renderNotifications(unread, read);
+
+					updateSidebarNotificationCount(unread.length);
 				});
+		}
+
+		function updateSidebarNotificationCount(count) {
+
+			const badge = document.getElementById("sidebarNotifCount");
+
+			if (count > 0) {
+				badge.innerText = count;
+				badge.style.display = "inline-block";
+			} else {
+				badge.style.display = "none";
+			}
 		}
 
 		function renderNotifications(unread, read) {
@@ -539,6 +741,7 @@
 
 			let input = document.getElementById("searchInput").value.trim();
 			let box = document.getElementById("trendingBox");
+<<<<<<< Updated upstream
 
 			let trendingBtn = document.getElementById("dynamicTrendingBtn");
 
@@ -586,6 +789,38 @@
 				box.appendChild(a);
 			});
 
+=======
+			let trendingBtn = document.getElementById("dynamicTrendingBtn");
+
+			if (!input.startsWith("#")) {
+				trendingBtn.style.display = "none";
+				box.style.display = "none";
+				return;
+			}
+
+			trendingBtn.style.display = "inline-block";
+
+			let keyword = input.substring(1).toLowerCase();
+
+			let filtered = trendingTags.filter(tag =>
+				tag.toLowerCase().startsWith(keyword)
+			);
+
+			if (filtered.length === 0) {
+				box.style.display = "none";
+				return;
+			}
+
+			box.innerHTML = "";  // ✅ No header
+
+			filtered.forEach(tag => {
+				let a = document.createElement("a");
+				a.href = "/post/trending?tag=" + tag;
+				a.innerText = "#" + tag;
+				box.appendChild(a);
+			});
+
+>>>>>>> Stashed changes
 			box.style.display = "block";
 		}
 
@@ -753,15 +988,20 @@
 			else
 				window.location.href = "/feed?role=" + role;
 		}
-	</script>
 
-	<script th:inline="javascript">
-		let selected = "[[${selectedRole}]]";
-		if (!selected) selected = "ALL";
+		document.addEventListener("DOMContentLoaded", function () {
 
-		document.querySelectorAll(".filter-btn").forEach(btn => {
-			if (btn.innerText.toUpperCase().includes(selected))
-				btn.classList.add("active");
+			const params = new URLSearchParams(window.location.search);
+			let role = params.get("role");
+
+			if (!role) role = "ALL";
+
+			document.querySelectorAll(".filter-btn").forEach(btn => {
+				if (btn.innerText.toUpperCase().includes(role)) {
+					btn.classList.add("active");
+				}
+			});
+
 		});
 	</script>
 
