@@ -123,7 +123,7 @@ public class PostServiceImpl implements PostService {
         // =========================
         analyticsService.createPostAnalytics(savedPost);
 
-        
+
         // HASHTAGS
         // =========================
         if (hashtags != null && !hashtags.isBlank()) {
@@ -309,7 +309,6 @@ public class PostServiceImpl implements PostService {
                 })
                 .toList();
     }
-    
     // =========================================================
     // GET POST BY ID
     // =========================================================
