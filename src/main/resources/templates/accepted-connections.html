@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-<title>Followers</title>
+<title>My Connections</title>
 
 <link rel="stylesheet" th:href="@{/css/feed.css}">
 
@@ -9,8 +9,8 @@
 
 /* ===== PAGE WRAPPER ===== */
 .followers-wrapper{
-    margin-top:0px;     /* space below navbar */
-    margin-bottom:80px;
+    margin-top:0px;
+    margin-bottom:280px;
 	padding-bottom:80px;
 }
 
@@ -130,25 +130,25 @@
     <a th:href="@{/feed}" class="back-link">← Back to Feed</a>
 
     <div class="followers-header">
-        Followers
+        My Connections
     </div>
 
     <div class="followers-count"
-         th:if="${!#lists.isEmpty(followers)}"
-         th:text="${#lists.size(followers)} + ' followers'">
+         th:if="${!#lists.isEmpty(connections)}"
+         th:text="${#lists.size(connections)} + ' connections'">
     </div>
 
     <!-- Empty State -->
-    <div th:if="${#lists.isEmpty(followers)}" class="empty-state">
+    <div th:if="${#lists.isEmpty(connections)}" class="empty-state">
         <div class="empty-box">
-            <div class="empty-icon">📢</div>
-            <h3>No Followers Yet</h3>
-            <p>When someone follows you, they’ll appear here.</p>
+            <div class="empty-icon">🌐</div>
+            <h3>No Connections Yet</h3>
+            <p>Start connecting with people to grow your network.</p>
         </div>
     </div>
 
     <!-- Cards -->
-    <div th:each="user : ${followers}" class="follower-card">
+    <div th:each="user : ${connections}" class="follower-card">
 
         <div class="avatar"
              th:text="${#strings.substring(user.username,0,1).toUpperCase()}">
