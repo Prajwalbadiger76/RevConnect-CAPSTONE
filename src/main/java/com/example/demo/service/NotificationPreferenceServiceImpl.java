@@ -43,7 +43,9 @@ public class NotificationPreferenceServiceImpl
         pref.setLikeEnabled(updated.isLikeEnabled());
         pref.setCommentEnabled(updated.isCommentEnabled());
         pref.setFollowEnabled(updated.isFollowEnabled());
+        pref.setConnectionEnabled(updated.isConnectionEnabled());
 
         repository.save(pref);
     }
+    
 }

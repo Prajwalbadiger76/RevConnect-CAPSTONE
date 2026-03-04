@@ -95,6 +95,42 @@
 		#trendingBox a:hover {
 		    background: #f9fafb;
 		}
+		.filter-card {
+				    background: #ffffff;
+				    border-radius: 18px;
+				    padding: 20px;
+				    box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+				}
+
+
+				.filter-heading svg {
+				    width: 18px;
+				    height: 18px;
+				}
+
+				.filter-btn {
+				    width: 100%;
+				    text-align: left;
+				    padding: 10px 14px;
+				    border-radius: 10px;
+				    border: none;
+				    background: transparent;
+				    cursor: pointer;
+				    font-size: 14px;
+				    margin-bottom: 8px;
+				    transition: 0.2s ease;
+				}
+
+				.filter-btn:hover {
+				    background: #f1f5f9;
+				}
+
+				.filter-btn.active {
+				    background: #2563eb;
+				    color: white;
+				    font-weight: 600;
+				}
+				
 	</style>
 </head>
 <body>
@@ -199,10 +235,21 @@
 					</svg>
 				</div>
 
-				<button class="filter-btn" onclick="changeRoleFilter('ALL')">All Posts</button>
-				<button class="filter-btn" onclick="changeRoleFilter('PERSONAL')">Personal</button>
-				<button class="filter-btn" onclick="changeRoleFilter('CREATOR')">Creators</button>
-				<button class="filter-btn" onclick="changeRoleFilter('BUSINESS')">Businesses</button>
+				<button class="filter-btn" data-role="ALL" onclick="changeRoleFilter('ALL')">
+								    All Posts
+								</button>
+
+								<button class="filter-btn" data-role="PERSONAL" onclick="changeRoleFilter('PERSONAL')">
+								    Personal
+								</button>
+
+								<button class="filter-btn" data-role="CREATOR" onclick="changeRoleFilter('CREATOR')">
+								    Creators
+								</button>
+
+								<button class="filter-btn" data-role="BUSINESS" onclick="changeRoleFilter('BUSINESS')">
+								    Businesses
+								</button>
 
 			</div>
 
@@ -459,12 +506,23 @@
 		<!-- ================= NOTIFICATION SIDEBAR ================= -->
 
 		<div class="notification-sidebar">
-			<div class="sidebar-header">Notifications</div>
-			<div class="notif-title">Unread</div>
-			<div id="notifUnread"></div>
-			<div class="notif-title">Read</div>
-			<div id="notifRead"></div>
-		</div>
+					<div class="sidebar-header">
+
+						<span class="sidebar-title">Notifications</span>
+
+						<div class="sidebar-bell">
+							🔔
+							<sup id="sidebarNotifCount" class="sidebar-badge"></sup>
+						</div>
+
+					</div>
+					<div class="notif-title">Unread</div>
+					<div id="notifUnread"></div>
+					<div class="notif-title">History</div>
+					<div id="notifRead"></div>
+				</div>
+
+			</div>
 
 	</div>
 
@@ -764,23 +822,30 @@
 	<!--this is the filter type post-->
 
 	<script>
-		function changeRoleFilter(role) {
-			if (role === "ALL")
-				window.location.href = "/feed";
-			else
-				window.location.href = "/feed?role=" + role;
-		}
-	</script>
+		    function changeRoleFilter(role) {
+		        if (role === "ALL")
+		            window.location.href = "/feed";
+		        else
+		            window.location.href = "/feed?role=" + role;
+		    }
 
-	<script th:inline="javascript">
-		let selected = "[[${selectedRole}]]";
-		if (!selected) selected = "ALL";
+		    document.addEventListener("DOMContentLoaded", function () {
 
-		document.querySelectorAll(".filter-btn").forEach(btn => {
-			if (btn.innerText.toUpperCase().includes(selected))
-				btn.classList.add("active");
-		});
-	</script>
+		        const params = new URLSearchParams(window.location.search);
+		        let role = params.get("role");
+
+		        if (!role) role = "ALL";
+
+		        document.querySelectorAll(".filter-btn").forEach(btn => {
+		            if (btn.dataset.role === role) {
+		                btn.classList.add("active");
+		            } else {
+		                btn.classList.remove("active");
+		            }
+		        });
+
+		    });
+		</script>
 	
 	<script>
 	function togglePromotional(el) {
