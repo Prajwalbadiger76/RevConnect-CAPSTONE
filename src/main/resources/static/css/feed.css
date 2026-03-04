@@ -145,6 +145,11 @@ body {
 ===================================================== */
 
 
+/* =====================================================
+   FILTER SIDEBAR
+===================================================== */
+/*
+
 .filter-card {
     background: #ffffff;
     border-radius: 18px;
@@ -152,15 +157,6 @@ body {
     box-shadow: 0 8px 24px rgba(0,0,0,0.06);
 }
 
-.filter-heading {
-    font-weight: 600;
-    margin-bottom: 18px;
-    font-size: 16px;
-
-    display: flex;          /* Align text + icon */
-    align-items: center;    /* Perfect vertical center */
-    gap: 8px;               /* Space between text & icon */
-}
 
 .filter-heading svg {
     width: 18px;
@@ -190,6 +186,23 @@ body {
     font-weight: 600;
 }
 
+/* FILTER HEADER STYLE */
+
+		.filter-heading {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+
+			padding: 12px 16px;
+			border-radius: 12px;
+			margin-bottom: 15px;
+
+			background: linear-gradient(90deg, #00c6ff, #0072ff);
+
+			font-size: 18px;
+			font-weight: 600;
+			color: black;
+		}
 /* =====================================================
    PROFILE DROPDOWN
 ===================================================== */
@@ -532,6 +545,44 @@ body {
     color: #888;
     text-align: center;
 }
+
+.sidebar-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 12px 16px;
+			border-radius: 12px;
+			margin-bottom: 15px;
+
+			/* Attractive soft gradient */
+			background: linear-gradient(90deg, #00c6ff, #0072ff);
+			font-size: 18px;
+			font-weight: 600;
+		}
+
+		.sidebar-title {
+			color: #111827;
+		}
+
+		.sidebar-bell {
+			position: relative;
+			font-size: 22px;
+		}
+
+		.sidebar-badge {
+			position: absolute;
+			top: -6px;
+			right: -10px;
+			background: #ef4444;
+			color: white;
+			font-size: 11px;
+			font-weight: 600;
+			padding: 2px 6px;
+			border-radius: 50px;
+			display: none;
+			min-width: 18px;
+			text-align: center;
+		}
 /* =====================================================
    POST HASHTAGS (NEW STYLING)
 ===================================================== */

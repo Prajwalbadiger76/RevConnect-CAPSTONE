@@ -297,4 +297,25 @@ this.postService = postService;
 
         return "search-results";
     }
+    
+//analytics
+    
+    @PreAuthorize("hasAnyRole('CREATOR','BUSINESS')")
+    @GetMapping("/{username}/analytics")
+    public String followerAnalytics(@PathVariable String username,
+                                    Authentication authentication,
+                                    Model model) {
+
+        if (authentication == null) {
+            return "redirect:/login";
+        }
+
+        List<FollowerGrowthDTO> growthData =
+                analyticsService.getFollowerGrowth(username);
+
+        model.addAttribute("growthData", growthData);
+        model.addAttribute("username", username);
+
+        return "analytics";
+    }
 }

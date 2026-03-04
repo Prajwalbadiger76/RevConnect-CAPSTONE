@@ -285,40 +285,21 @@ public class PostServiceImpl implements PostService {
 
         List<Post> posts;
 
-        // ================= FILTER APPLIED =================
+        // ================= PERSONAL / CREATOR / BUSINESS =================
         if (roleFilter != null && !roleFilter.equalsIgnoreCase("ALL")) {
 
             Role selectedRole = Role.valueOf(roleFilter.toUpperCase());
-
             posts = postRepository.findPostsByAuthorRole(selectedRole, now);
-
         }
-        // ================= DEFAULT NORMAL FEED =================
+
+        // ================= ALL POSTS (GLOBAL) =================
         else {
 
-            List<User> followedUsers = followRepository.findByFollower(currentUser)
-                    .stream()
-                    .map(Follow::getFollowing)
-                    .toList();
-
-            List<User> feedUsers = new ArrayList<>(followedUsers);
-            feedUsers.add(currentUser);
-
-            posts = postRepository.findFeedPosts(feedUsers, now);
+            posts = postRepository
+                    .findAllByCreatedAtLessThanEqualOrderByCreatedAtDesc(now);
         }
 
         return posts.stream()
-
-                // 🔥 Hide original post if current user already reshared it
-                .filter(post -> {
-                    if (post.getOriginalPost() == null) {
-                        return postRepository
-                                .findByUserAndOriginalPost(currentUser, post)
-                                .isEmpty();
-                    }
-                    return true;
-                })
-
                 .map(post -> {
                     analyticsService.recordView(post.getId(), currentUser.getId());
                     return map(post, currentUser);
