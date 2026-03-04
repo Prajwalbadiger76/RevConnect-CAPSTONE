@@ -16,6 +16,9 @@
         <div class="auth-card">
 
             <h2>Create Account</h2>
+			<div th:if="${error}" class="register-error">
+			    <p th:text="${error}"></p>
+			</div>
 
             <!-- IMPORTANT: th:object added -->
             <form th:action="@{/api/auth/register}"

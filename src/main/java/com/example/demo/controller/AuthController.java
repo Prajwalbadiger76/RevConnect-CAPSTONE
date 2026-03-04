@@ -49,11 +49,22 @@ public class AuthController {
             return "register";
         }
 
-        userService.register(request);
+        try {
 
-        logger.info("User successfully registered: {}", request.username());
+            userService.register(request);
 
-        return "redirect:/login";
+            logger.info("User successfully registered: {}", request.username());
+
+            return "redirect:/login";
+
+        } catch (com.example.demo.exception.CustomException ex) {
+
+            logger.warn("Registration failed: {}", ex.getMessage());
+
+            model.addAttribute("error", ex.getMessage());
+
+            return "register";   // stay on same page
+        }
     }
 
 
