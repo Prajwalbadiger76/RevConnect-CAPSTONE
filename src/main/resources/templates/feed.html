@@ -533,44 +533,60 @@
 		}
 
 		function fetchNotifications() {
-			fetch('/notifications')
-				.then(res => res.json())
-				.then(data => {
-					let unread = data.filter(n => !n.read);
-					let read = data.filter(n => n.read);
-					renderNotifications(unread, read);
-				});
-		}
+							fetch('/notifications')
+								.then(res => res.json())
+								.then(data => {
 
-		function renderNotifications(unread, read) {
+									let unread = data.filter(n => !n.read);
+									let read = data.filter(n => n.read);
 
-			const unreadBox = document.getElementById("notifUnread");
-			const readBox = document.getElementById("notifRead");
+									renderNotifications(unread, read);
 
-			unreadBox.innerHTML = "";
-			readBox.innerHTML = "";
+									updateSidebarNotificationCount(unread.length);
+								});
+						}
+						
+						function updateSidebarNotificationCount(count) {
 
-			unread.forEach(n => unreadBox.appendChild(createItem(n, true)));
-			read.forEach(n => readBox.appendChild(createItem(n, false)));
-		}
+									const badge = document.getElementById("sidebarNotifCount");
 
-		function createItem(n, unread) {
+									if (count > 0) {
+										badge.innerText = count;
+										badge.style.display = "inline-block";
+									} else {
+										badge.style.display = "none";
+									}
+								}
 
-			let div = document.createElement("div");
-			div.className = "notif-item " + (unread ? "unread" : "read");
+				function renderNotifications(unread, read) {
 
-			div.innerHTML = `<div class="notif-text">${n.message}</div>`;
+					const unreadBox = document.getElementById("notifUnread");
+					const readBox = document.getElementById("notifRead");
 
-			div.onclick = function () {
-				fetch('/notifications/read/' + n.id, {method: 'POST'})
-					.then(() => fetchNotifications());
-			};
+					unreadBox.innerHTML = "";
+					readBox.innerHTML = "";
 
-			return div;
-		}
+					unread.forEach(n => unreadBox.appendChild(createItem(n, true)));
+					read.forEach(n => readBox.appendChild(createItem(n, false)));
+				}
 
-		setInterval(fetchNotifications, 5000);
-		fetchNotifications();
+				function createItem(n, unread) {
+
+					let div = document.createElement("div");
+					div.className = "notif-item " + (unread ? "unread" : "read");
+
+					div.innerHTML = `<div class="notif-text">${n.message}</div>`;
+
+					div.onclick = function () {
+						fetch('/notifications/read/' + n.id, {method: 'POST'})
+							.then(() => fetchNotifications());
+					};
+
+					return div;
+				}
+
+				setInterval(fetchNotifications, 5000);
+				fetchNotifications();
 
 		function toggleComments(postId) {
 			let section = document.getElementById("comments-" + postId);
