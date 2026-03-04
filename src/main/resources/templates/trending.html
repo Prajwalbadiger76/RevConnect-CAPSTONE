@@ -13,8 +13,8 @@
 
         .sub-header {
             max-width: 900px;
-            margin: 20px auto 0 auto;
-            padding: 0 20px;
+            margin: 100px auto 0 auto;
+            padding: 0 100px 0 p;
         }
 
         .back-btn {
@@ -26,6 +26,7 @@
         .feed-container {
             max-width: 700px;
             margin: 20px auto 40px auto;
+			padding-top: 50px;
         }
 
         /* ===== Trending Pills ===== */
@@ -69,14 +70,17 @@
         <h2>RevConnect</h2>
     </div>
 
-    <!-- BACK BUTTON -->
-    <div class="sub-header">
-        <a th:href="@{/feed}" class="back-btn">
-            ← Back to Feed
-        </a>
-    </div>
 
     <div class="feed-container">
+		
+		<!-- BACK BUTTON -->
+		<div class="sub-header">
+		    <a th:href="@{/feed}" class="back-btn">
+		        ← Back to Feed
+		    </a>
+		</div>
+		
+		<h2 class="followers-header">Trending Hashtags</h2>
 
         <!-- Trending Pills -->
 		<div class="trending-tags-row">
@@ -146,12 +150,12 @@
 		        <form th:if="${!post.sharedByCurrentUser}"
 		              th:action="@{/post/share/{id}(id=${post.id})}"
 		              method="post">
-		            <button>🔁 Share</button>
+		            <button>🔁 Re-Share</button>
 		        </form>
 
 		        <span th:if="${post.sharedByCurrentUser}"
 		              style="color:gray; font-weight:500;">
-		            ✔ Shared
+		            🔁 Re-Shared
 		        </span>
 
 		    </div>
