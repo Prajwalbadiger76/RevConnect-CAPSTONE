@@ -3,131 +3,254 @@
 <head>
 <title>Sent Requests</title>
 
+<link rel="stylesheet" th:href="@{/css/feed.css}">
+
 <style>
-body{
-    font-family:Segoe UI;
-    background:#f3f4f6;
-    margin:0;
-    padding:40px;
-}
 
+/* ===== SAFE PAGE SPACING (like pending) ===== */
 .container{
-    width:55%;
-    margin:auto;
+    max-width:650px;
+    margin:10px auto 150px auto;   /* pushes below navbar */
+    padding:0 20px;
+}
+.page-wrapper{
+    min-height: calc(100vh - 160px); /* pushes footer down */
+    padding-top: 100px; /* space below navbar */
 }
 
+/* CARD */
 .card{
-    background:white;
-    padding:18px;
-    margin-bottom:15px;
-    border-radius:12px;
-    box-shadow:0 4px 12px rgba(0,0,0,0.1);
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    transition:0.2s;
+background:white;
+padding:18px;
+margin-bottom:15px;
+border-radius:12px;
+box-shadow:0 4px 12px rgba(0,0,0,0.1);
+display:flex;
+justify-content:space-between;
+align-items:center;
+transition:all 0.25s ease;
 }
 
 .card:hover{
-    transform:translateY(-2px);
+transform:translateY(-4px);
+box-shadow:0 12px 28px rgba(0,0,0,0.18);
 }
 
+/* LEFT */
 .left{
-    display:flex;
-    align-items:center;
-    gap:12px;
+display:flex;
+align-items:center;
+gap:12px;
 }
 
 .avatar{
-    width:42px;
-    height:42px;
-    border-radius:50%;
-    background:#6366f1;
-    color:white;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-weight:bold;
+width:42px;
+height:42px;
+border-radius:50%;
+background:#6366f1;
+color:white;
+display:flex;
+align-items:center;
+justify-content:center;
+font-weight:bold;
+transition:0.25s;
+}
+
+.card:hover .avatar{
+transform:scale(1.08);
 }
 
 .name{
-    text-decoration:none;
-    font-weight:600;
-    color:#2563eb;
+text-decoration:none;
+font-weight:600;
+color:#111827;
+transition:0.2s ease;
 }
 
+.name:hover{
+color:#2563eb;
+}
+
+/* CANCEL BUTTON */
 .cancel{
-    border:none;
-    padding:8px 16px;
-    border-radius:7px;
-    cursor:pointer;
-    background:#ef4444;
-    color:white;
-    transition:0.25s;
+border:none;
+padding:8px 16px;
+border-radius:7px;
+cursor:pointer;
+background:#ef4444;
+color:white;
+font-weight:600;
+transition:all 0.25s ease;
 }
 
-/* hover animation */
 .cancel:hover{
-    background:#dc2626;
-    transform:scale(1.05);
+background:#dc2626;
+transform:translateY(-2px);
+box-shadow:0 6px 14px rgba(0,0,0,0.2);
 }
 
-/* click animation */
-.cancel:active{
-    transform:scale(0.95);
+/* BACK LINK */
+.back-link{
+display:inline-block;
+margin-bottom:30px;
+text-decoration:none;
+font-size:14px;
+color:#64748b;
+font-weight:500;
+transition:0.2s ease;
 }
+
+.back-link:hover{
+color:#2563eb;
+}
+
+.page-header{
+font-size:24px;
+font-weight:600;
+margin-bottom:20px;
+color:#1f2937;
+}
+
+/* EMPTY STATE */
+.empty-state{
+display:flex;
+justify-content:center;
+align-items:center;
+margin-top:40px;
+}
+
+.empty-box{
+background:white;
+padding:40px;
+border-radius:16px;
+box-shadow:0 8px 25px rgba(0,0,0,0.08);
+text-align:center;
+max-width:400px;
+}
+
+.empty-icon{
+font-size:50px;
+margin-bottom:15px;
+}
+
+/* MODAL */
+.modal{
+display:none;
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.4);
+justify-content:center;
+align-items:center;
+z-index:1000;
+}
+
+.modal-box{
+background:white;
+padding:25px 30px;
+border-radius:12px;
+text-align:center;
+width:320px;
+box-shadow:0 10px 30px rgba(0,0,0,0.2);
+}
+
+.modal-buttons{
+margin-top:15px;
+display:flex;
+justify-content:center;
+gap:10px;
+}
+
+.cancel-btn{
+background:#6b7280;
+color:white;
+border:none;
+padding:8px 16px;
+border-radius:7px;
+cursor:pointer;
+}
+
 </style>
 </head>
 
 <body>
 
-<div class="container">
+<div th:replace="fragments/header :: header"></div>
 
-<h2 style="text-align:center;">Sent Requests</h2>
+<div class="page-wrapper">
+    <div class="container">
 
-<div th:if="${#lists.isEmpty(sent)}" style="text-align:center;">
-    No sent requests
-</div>
-
-<div th:each="req : ${sent}" class="card">
-
-    <div class="left">
-        <div class="avatar"
-             th:text="${#strings.substring(req.receiver.username,0,1)}"></div>
-
-        <a class="name"
-           th:href="@{/profile/{username}(username=${req.receiver.username})}"
-           th:text="${req.receiver.username}"></a>
+    <a th:href="@{/feed}" class="back-link">← Back to Feed</a>
+    <div class="page-header">Sent Requests</div>
+    
+    <div th:if="${#lists.isEmpty(sent)}" class="empty-state">
+        <div class="empty-box">
+            <div class="empty-icon">📤</div>
+            <h3>No Sent Requests</h3>
+            <p>You haven’t sent any connection requests yet.</p>
+        </div>
     </div>
 
-    <form th:action="@{/connections/cancel/{username}(username=${req.receiver.username})}"
-          method="post"
-          onsubmit="changeCancel(this,event)">
-        <button class="cancel">Cancel</button>
-    </form>
+    <div th:each="req : ${sent}" class="card">
+
+        <div class="left">
+            <div class="avatar"
+                 th:text="${#strings.substring(req.receiver.username,0,1).toUpperCase()}">
+            </div>
+
+            <a class="name"
+               th:href="@{/profile/{username}(username=${req.receiver.username})}"
+               th:text="${req.receiver.username}">
+            </a>
+        </div>
+
+        <form th:action="@{/connections/cancel/{username}(username=${req.receiver.username})}"
+              method="post"
+              style="display:inline;">
+            <button type="button"
+                    class="cancel"
+                    onclick="openCancelModal(this.closest('form'))">
+                Cancel
+            </button>
+        </form>
+
+    </div>
 
 </div>
 
-<div style="text-align:center;margin-top:20px;">
-    <a th:href="@{/feed}">← Back to Feed</a>
-</div>
+<!-- FOOTER -->
+<div th:replace="fragments/footer :: footer"></div>
 
+<!-- CANCEL CONFIRMATION MODAL -->
+<div id="cancelModal" class="modal">
+    <div class="modal-box">
+        <p>Are you sure you want to cancel this request?</p>
+
+        <div class="modal-buttons">
+            <button class="cancel" onclick="confirmCancel()">Yes</button>
+            <button class="cancel-btn" onclick="closeCancelModal()">No</button>
+        </div>
+    </div>
 </div>
 
 <script>
-function changeCancel(form,event){
+let cancelForm = null;
 
-    event.preventDefault();
+function openCancelModal(form){
+    cancelForm = form;
+    document.getElementById("cancelModal").style.display = "flex";
+}
 
-    let btn=form.querySelector("button");
+function closeCancelModal(){
+    document.getElementById("cancelModal").style.display = "none";
+}
 
-    btn.innerText="Cancelled";
-    btn.style.background="#9ca3af";
-    btn.disabled=true;
-
-    setTimeout(()=>{
-        form.submit();
-    },300);
+function confirmCancel(){
+    if(cancelForm){
+        cancelForm.submit();
+    }
 }
 </script>
 

@@ -298,6 +298,8 @@ this.postService = postService;
         return "search-results";
     }
     
+//analytics
+    
     @PreAuthorize("hasAnyRole('CREATOR','BUSINESS')")
     @GetMapping("/{username}/analytics")
     public String followerAnalytics(@PathVariable String username,

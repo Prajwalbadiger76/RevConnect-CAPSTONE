@@ -7,81 +7,8 @@
 	<link rel="stylesheet" th:href="@{/css/feed.css}">
 
 	<style>
-		/* ====== PAGE LAYOUT ====== */
-		.page-layout {
-			display: grid;
-			grid-template-columns: 180px 650px 320px;
-			gap: 125px;
-			justify-content: center;
-			padding-top: 20px;
-			margin-top: 25px;
-		}
-
-		.feed-container {
-			width: 650px;
-		}
-
-
-
-
-		/* ===== RIGHT SIDEBAR ===== */
-		.notification-sidebar {
-			width: 320px;
-			height: calc(100vh - 80px);
-			position: sticky;
-			top: 70px;
-			background: #ffffff;
-			border-radius: 12px;
-			box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-			padding: 15px;
-			overflow-y: auto;
-		}
-
-		.sidebar-header {
-			font-size: 20px;
-			font-weight: 600;
-			margin-bottom: 10px;
-		}
-
-		.notif-title {
-			font-size: 14px;
-			color: #666;
-			margin: 15px 0 8px 0;
-			font-weight: 600;
-		}
-
-		.notif-item {
-			padding: 12px;
-			border-radius: 10px;
-			margin-bottom: 8px;
-			cursor: pointer;
-			transition: 0.2s;
-		}
-
-		.notif-item:hover {
-			background: #f5f7fb;
-		}
-
-		.notif-item.unread {
-			background: #eef3ff;
-		}
-
-		.notif-item.read {
-			background: #fafafa;
-		}
-
-		.notif-text {
-			font-size: 14px;
-		}
-
-		.empty-text {
-			font-size: 13px;
-			color: #888;
-			text-align: center;
-		}
 
 		/* ===== ANALYTICS BAR ===== */
-
 		.analytics-bar {
 			display: flex;
 			justify-content: space-around;
@@ -109,16 +36,10 @@
 			font-size: 11px;
 			color: #777;
 		}
-	</style>
 
-	<style>
-		/* FILTER COLUMN POSITION */
-		.filter-column {
-			position: sticky;
-			top: 90px;
-			height: fit-content;
-		}
+		
 
+<<<<<<< HEAD
 		/* FILTER CARD */
 		.filter-card {
 			background: white;
@@ -137,6 +58,9 @@
 			border: none;
 			margin-bottom: 10px;
 
+=======
+		.filter-btn:hover {
+>>>>>>> 07f8d80a29b6540271bbca3e411d6735d811f510
 			background: #eef3ff;
 			/* Dark solid */
 			color: black;
@@ -146,6 +70,7 @@
 			transition: all 0.2s ease;
 		}
 
+<<<<<<< HEAD
 		/* HOVER */
 		.filter-btn:hover {
 			background: rgb(185, 193, 208);
@@ -160,7 +85,14 @@
 		}
 
 		/* ===== TRENDING BUTTON ===== */
+=======
+		.filter-btn.active {
+			background: #e0e7ff;
+			font-weight: 600;
+		}
+>>>>>>> 07f8d80a29b6540271bbca3e411d6735d811f510
 
+		/* ===== TRENDING BUTTON ===== */
 		.trending-badge {
 			display: none;
 			margin-left: 10px;
@@ -180,9 +112,7 @@
 			transform: scale(1.05);
 		}
 
-
 		/* ===== SIMPLE TRENDING DROPDOWN ===== */
-
 		#trendingBox {
 			position: absolute;
 			top: 45px;
@@ -196,7 +126,6 @@
 			overflow: hidden;
 			border: 1px solid #e5e7eb;
 		}
-
 
 		#trendingBox a {
 			display: block;
@@ -268,13 +197,44 @@
 			font-weight: 600;
 			color: black;
 		}
+		.filter-card {
+				    background: #ffffff;
+				    border-radius: 18px;
+				    padding: 20px;
+				    box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+				}
+
+
+				.filter-heading svg {
+				    width: 18px;
+				    height: 18px;
+				}
+
+				.filter-btn {
+				    width: 100%;
+				    text-align: left;
+				    padding: 10px 14px;
+				    border-radius: 10px;
+				    border: none;
+				    background: transparent;
+				    cursor: pointer;
+				    font-size: 14px;
+				    margin-bottom: 8px;
+				    transition: 0.2s ease;
+				}
+
+				.filter-btn:hover {
+				    background: #f1f5f9;
+				}
+
+				.filter-btn.active {
+				    background: #2563eb;
+				    color: white;
+				    font-weight: 600;
+				}
+				
 	</style>
-
-	<meta charset="UTF-8">
-	<title>RevConnect - Feed</title>
-	<link rel="stylesheet" th:href="@{/css/feed.css}">
 </head>
-
 <body>
 
 	<!-- ================= NAVBAR ================= -->
@@ -289,8 +249,6 @@
 
 
 		<div class="navbar-right">
-			<!--<a th:href="@{/connections}">Pending</a>
-			<a th:href="@{/connections/accepted}">Connections</a>-->
 
 
 			<h2>RevConnect</h2>
@@ -302,7 +260,15 @@
 					<input type="text" name="keyword" id="searchInput" placeholder="Search users or hashtags..."
 						oninput="handleSearchInput()" autocomplete="off" required>
 
+<<<<<<< HEAD
 					<button type="submit">Search</button>
+=======
+				    <button type="submit">Search
+						<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+						  <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
+						</svg>
+					</button>
+>>>>>>> 07f8d80a29b6540271bbca3e411d6735d811f510
 
 					<a id="dynamicTrendingBtn" th:href="@{/post/trending}" class="trending-badge">
 						🔥 Trending Hashtag
@@ -321,10 +287,23 @@
 		<div class="navbar-right">
 
 
-			<a th:href="@{/connections}">Pending</a>
-			<a th:href="@{/connections}">Pending Requests</a>
-			<a th:href="@{/connections/sent}">Sent Requests</a>
-			<a th:href="@{/connections/accepted}">Connections</a>
+			<a th:href="@{/connections}">Pending Requests
+				<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-fill-exclamation" viewBox="0 0 16 16">
+				  <path d="M11 5a3 3 0 1 1-6 0 3 3 0 0 1 6 0m-9 8c0 1 1 1 1 1h5.256A4.5 4.5 0 0 1 8 12.5a4.5 4.5 0 0 1 1.544-3.393Q8.844 9.002 8 9c-5 0-6 3-6 4"/>
+				  <path d="M16 12.5a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0m-3.5-2a.5.5 0 0 0-.5.5v1.5a.5.5 0 0 0 1 0V11a.5.5 0 0 0-.5-.5m0 4a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1"/>
+				</svg>
+			</a>
+			<a th:href="@{/connections/sent}">Sent Requests
+				<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-fill-check" viewBox="0 0 16 16">
+				  <path d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7m1.679-4.493-1.335 2.226a.75.75 0 0 1-1.174.144l-.774-.773a.5.5 0 0 1 .708-.708l.547.548 1.17-1.951a.5.5 0 1 1 .858.514M11 5a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
+				  <path d="M2 13c0 1 1 1 1 1h5.256A4.5 4.5 0 0 1 8 12.5a4.5 4.5 0 0 1 1.544-3.393Q8.844 9.002 8 9c-5 0-6 3-6 4"/>
+				</svg>
+			</a>
+			<a th:href="@{/connections/accepted}">Connections
+				<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-people-fill" viewBox="0 0 16 16">
+				  <path d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6m-5.784 6A2.24 2.24 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.3 6.3 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1zM4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5"/>
+				</svg>
+			</a>
 
 			<div class="profile-menu">
 				<div class="profile-circle" onclick="toggleProfileMenu()"
@@ -348,6 +327,7 @@
 		<div class="filter-column">
 
 			<div class="filter-card">
+<<<<<<< HEAD
 				<div class="filter-header">
 					<span>Filter Post</span>
 				</div>
@@ -355,6 +335,30 @@
 				<button class="filter-btn" onclick="changeRoleFilter('PERSONAL')">Personal</button>
 				<button class="filter-btn" onclick="changeRoleFilter('CREATOR')">Creators</button>
 				<button class="filter-btn" onclick="changeRoleFilter('BUSINESS')">Businesses</button>
+=======
+				<div class="filter-heading">
+					Filter Post
+					<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-filter" viewBox="0 0 16 16">
+						<path d="M6 10.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5m-2-3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5m-2-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5"/>
+					</svg>
+				</div>
+
+				<button class="filter-btn" data-role="ALL" onclick="changeRoleFilter('ALL')">
+								    All Posts
+								</button>
+
+								<button class="filter-btn" data-role="PERSONAL" onclick="changeRoleFilter('PERSONAL')">
+								    Personal
+								</button>
+
+								<button class="filter-btn" data-role="CREATOR" onclick="changeRoleFilter('CREATOR')">
+								    Creators
+								</button>
+
+								<button class="filter-btn" data-role="BUSINESS" onclick="changeRoleFilter('BUSINESS')">
+								    Businesses
+								</button>
+>>>>>>> 07f8d80a29b6540271bbca3e411d6735d811f510
 
 			</div>
 
@@ -378,7 +382,51 @@
 
 						<textarea name="content" id="postContent" placeholder="What's on your mind?"
 							required></textarea>
+							
+							
+							
+							<div th:if="${currentUserRole == 'CREATOR' or currentUserRole == 'BUSINESS'}">
 
+							    <!-- 🔥 Promotional Toggle -->
+							    <div class="promo-toggle-wrapper">
+
+							        <!-- Hidden field for backend -->
+							        <input type="hidden" name="promotional" id="promoInput" value="false">
+
+							        <label class="toggle-switch">
+							            <input type="checkbox"
+							                   id="promoToggle"
+							                   onchange="togglePromotional(this)">
+							            <span class="slider"></span>
+							        </label>
+
+							        <span class="toggle-label">Promotional Post</span>
+
+							    </div>
+
+							    <!-- 🔥 Promotional Fields -->
+							    <div id="promoFields" class="promo-fields">
+
+							        <select name="ctaType" class="promo-input">
+							            <option value="">Select CTA</option>
+							            <option value="Learn More">Learn More</option>
+							            <option value="Shop Now">Shop Now</option>
+							            <option value="Sign Up">Sign Up</option>
+							        </select>
+
+							        <input type="text"
+							               name="ctaUrl"
+							               placeholder="CTA URL"
+							               class="promo-input">
+
+							        <input type="text"
+							               name="productTag"
+							               placeholder="Tag product/service"
+							               class="promo-input">
+
+							    </div>
+
+							</div>
 					</div>
 
 					<!-- Hashtag Suggestions (outside flex row) -->
@@ -392,6 +440,8 @@
 
 					<!-- Hidden field -->
 					<input type="hidden" name="scheduledAt" id="scheduledAtInput">
+					
+					<div class="create-divider"></div>
 
 					<!-- Row 3: Buttons -->
 					<div class="create-actions">
@@ -411,7 +461,8 @@
 
 
 			<!-- POSTS -->
-			<div th:each="post : ${posts}" class="post-card">
+			<div th:each="post : ${posts}"
+			     th:class="'post-card ' + (${post.promotional} ? 'promo-highlight' : '')">
 
 				<div class="post-top">
 
@@ -423,26 +474,66 @@
 						<a th:href="@{/profile/{username}(username=${post.username})}" th:text="${post.username}"></a>
 
 						<span th:text="${#temporals.format(post.createdAt,'dd MMM yyyy HH:mm')}"></span>
+<<<<<<< HEAD
 
 						<div th:if="${post.promotional}"
 							style="color:#e11d48; font-size:13px; font-weight:600; margin-top:4px;">
 							📢 Promotional
 						</div>
+=======
+						
+						<span th:if="${post.promotional}" class="sponsored-inline">
+						    • Sponsored
+						</span>
+>>>>>>> 07f8d80a29b6540271bbca3e411d6735d811f510
 					</div>
 
 				</div>
 
 				<!-- SHARE HEADER -->
 				<div th:if="${post.sharedFromUsername != null}" class="share-header">
+<<<<<<< HEAD
 					🔁 Shared from
 					<a th:href="@{/profile/{username}(username=${post.sharedFromUsername})}"
 						th:text="'@' + ${post.sharedFromUsername}">
 					</a>
+=======
+				    🔁 Reposted from 
+				    <a th:href="@{/profile/{username}(username=${post.sharedFromUsername})}"
+				       th:text="'@' + ${post.sharedFromUsername}">
+				    </a>
+>>>>>>> 07f8d80a29b6540271bbca3e411d6735d811f510
 				</div>
 
 				<!-- POST CONTENT BLOCK -->
 				<div class="post-body">
+<<<<<<< HEAD
 					<div class="post-content" th:text="${post.content}">
+=======
+				    <div class="post-content"
+				         th:text="${post.content}">
+				    </div>
+					<div th:if="${post.promotional}" class="promo-section">
+
+					    <div class="product-tag"
+					         th:text="${post.productTag}">
+					    </div>
+
+						<a th:if="${post.ctaUrl}" 
+						   th:href="${post.ctaUrl}" 
+						   target="_blank" 
+						   class="promo-btn">
+
+						    <!-- Icon based on CTA -->
+						    <span th:if="${post.ctaType == 'Learn More'}">🔗</span>
+						    <span th:if="${post.ctaType == 'Shop Now'}">🛒</span>
+						    <span th:if="${post.ctaType == 'Sign Up'}">✍️</span>
+
+						    <span th:text="${post.ctaType}"></span>
+
+						</a>
+
+>>>>>>> 07f8d80a29b6540271bbca3e411d6735d811f510
 					</div>
 				</div>
 
@@ -469,6 +560,7 @@
 					</span>
 
 					<!-- If NOT shared -->
+<<<<<<< HEAD
 					<form th:if="${!post.sharedByCurrentUser}" th:action="@{/post/share/{id}(id=${post.id})}"
 						method="post">
 						<button>🔁 Share</button>
@@ -477,6 +569,18 @@
 					<!-- If already shared -->
 					<span th:if="${post.sharedByCurrentUser}" style="color:gray; font-weight:500;">
 						✔ Shared
+=======
+					<form th:if="${!post.sharedByCurrentUser}"
+					      th:action="@{/post/share/{id}(id=${post.id})}"
+					      method="post">
+					    <button>🔁 Re-Share</button>
+					</form>
+
+					<!-- If already shared -->
+					<span th:if="${post.sharedByCurrentUser}"
+					      style="color:gray; font-weight:500;">
+					    🔁 Reposted
+>>>>>>> 07f8d80a29b6540271bbca3e411d6735d811f510
 					</span>
 
 
@@ -541,6 +645,7 @@
 		<!-- ================= NOTIFICATION SIDEBAR ================= -->
 
 		<div class="notification-sidebar">
+<<<<<<< HEAD
 			<div class="sidebar-header">
 
 				<span class="sidebar-title">Notifications</span>
@@ -556,6 +661,25 @@
 			<div class="notif-title">Read</div>
 			<div id="notifRead"></div>
 		</div>
+=======
+					<div class="sidebar-header">
+
+						<span class="sidebar-title">Notifications</span>
+
+						<div class="sidebar-bell">
+							🔔
+							<sup id="sidebarNotifCount" class="sidebar-badge"></sup>
+						</div>
+
+					</div>
+					<div class="notif-title">Unread</div>
+					<div id="notifUnread"></div>
+					<div class="notif-title">History</div>
+					<div id="notifRead"></div>
+				</div>
+
+			</div>
+>>>>>>> 07f8d80a29b6540271bbca3e411d6735d811f510
 
 	</div>
 
@@ -566,6 +690,7 @@
 		}
 
 		function fetchNotifications() {
+<<<<<<< HEAD
 			fetch('/notifications')
 				.then(res => res.json())
 				.then(data => {
@@ -592,34 +717,62 @@
 		}
 
 		function renderNotifications(unread, read) {
+=======
+							fetch('/notifications')
+								.then(res => res.json())
+								.then(data => {
 
-			const unreadBox = document.getElementById("notifUnread");
-			const readBox = document.getElementById("notifRead");
+									let unread = data.filter(n => !n.read);
+									let read = data.filter(n => n.read);
+>>>>>>> 07f8d80a29b6540271bbca3e411d6735d811f510
 
-			unreadBox.innerHTML = "";
-			readBox.innerHTML = "";
+									renderNotifications(unread, read);
 
-			unread.forEach(n => unreadBox.appendChild(createItem(n, true)));
-			read.forEach(n => readBox.appendChild(createItem(n, false)));
-		}
+									updateSidebarNotificationCount(unread.length);
+								});
+						}
+						
+						function updateSidebarNotificationCount(count) {
 
-		function createItem(n, unread) {
+									const badge = document.getElementById("sidebarNotifCount");
 
-			let div = document.createElement("div");
-			div.className = "notif-item " + (unread ? "unread" : "read");
+									if (count > 0) {
+										badge.innerText = count;
+										badge.style.display = "inline-block";
+									} else {
+										badge.style.display = "none";
+									}
+								}
 
-			div.innerHTML = `<div class="notif-text">${n.message}</div>`;
+				function renderNotifications(unread, read) {
 
-			div.onclick = function () {
-				fetch('/notifications/read/' + n.id, {method: 'POST'})
-					.then(() => fetchNotifications());
-			};
+					const unreadBox = document.getElementById("notifUnread");
+					const readBox = document.getElementById("notifRead");
 
-			return div;
-		}
+					unreadBox.innerHTML = "";
+					readBox.innerHTML = "";
 
-		setInterval(fetchNotifications, 5000);
-		fetchNotifications();
+					unread.forEach(n => unreadBox.appendChild(createItem(n, true)));
+					read.forEach(n => readBox.appendChild(createItem(n, false)));
+				}
+
+				function createItem(n, unread) {
+
+					let div = document.createElement("div");
+					div.className = "notif-item " + (unread ? "unread" : "read");
+
+					div.innerHTML = `<div class="notif-text">${n.message}</div>`;
+
+					div.onclick = function () {
+						fetch('/notifications/read/' + n.id, {method: 'POST'})
+							.then(() => fetchNotifications());
+					};
+
+					return div;
+				}
+
+				setInterval(fetchNotifications, 5000);
+				fetchNotifications();
 
 		function toggleComments(postId) {
 			let section = document.getElementById("comments-" + postId);
@@ -661,19 +814,6 @@
 	</div>
 
 
-	<!-- SCRIPT (UNCHANGED) -->
-	<script>
-
-
-		function toggleComments(postId) {
-			let section = document.getElementById("comments-" + postId);
-			if (section.style.display === "none") {
-				section.style.display = "block";
-			} else {
-				section.style.display = "none";
-			}
-		}
-	</script>
 
 	<script th:inline="javascript">
 
@@ -707,6 +847,7 @@
 				return;
 			}
 
+<<<<<<< HEAD
 			box.innerHTML = "";  // ✅ No header
 
 			filtered.forEach(tag => {
@@ -715,6 +856,24 @@
 				a.innerText = "#" + tag;
 				box.appendChild(a);
 			});
+=======
+		    box.innerHTML = "";
+
+		    filtered.forEach(tag => {
+		        let a = document.createElement("a");
+
+		        // ✅ FIXED HERE
+		        a.href = "/post/search?keyword=%23" + tag;
+
+		        a.innerText = "#" + tag;
+		        a.style.display = "block";
+		        a.style.padding = "8px";
+		        a.style.textDecoration = "none";
+		        a.style.color = "#111827";
+
+		        box.appendChild(a);
+		    });
+>>>>>>> 07f8d80a29b6540271bbca3e411d6735d811f510
 
 			box.style.display = "block";
 		}
@@ -876,6 +1035,7 @@
 	<!--this is the filter type post-->
 
 	<script>
+<<<<<<< HEAD
 		function changeRoleFilter(role) {
 			if (role === "ALL")
 				window.location.href = "/feed";
@@ -897,8 +1057,65 @@
 			});
 
 		});
+=======
+		    function changeRoleFilter(role) {
+		        if (role === "ALL")
+		            window.location.href = "/feed";
+		        else
+		            window.location.href = "/feed?role=" + role;
+		    }
+
+		    document.addEventListener("DOMContentLoaded", function () {
+
+		        const params = new URLSearchParams(window.location.search);
+		        let role = params.get("role");
+
+		        if (!role) role = "ALL";
+
+		        document.querySelectorAll(".filter-btn").forEach(btn => {
+		            if (btn.dataset.role === role) {
+		                btn.classList.add("active");
+		            } else {
+		                btn.classList.remove("active");
+		            }
+		        });
+
+		    });
+		</script>
+	
+	<script>
+	function togglePromotional(el) {
+
+	    const hiddenInput = document.getElementById("promoInput");
+	    const promoFields = document.getElementById("promoFields");
+
+	    const ctaType = document.querySelector("select[name='ctaType']");
+	    const ctaUrl = document.querySelector("input[name='ctaUrl']");
+	    const productTag = document.querySelector("input[name='productTag']");
+
+	    if (el.checked) {
+	        hiddenInput.value = "true";
+	        promoFields.style.display = "block";
+
+	        // Make fields required
+	        ctaType.required = true;
+	        ctaUrl.required = true;
+	        productTag.required = true;
+
+	    } else {
+	        hiddenInput.value = "false";
+	        promoFields.style.display = "none";
+
+	        // Remove required validation
+	        ctaType.required = false;
+	        ctaUrl.required = false;
+	        productTag.required = false;
+	    }
+	}
+>>>>>>> 07f8d80a29b6540271bbca3e411d6735d811f510
 	</script>
 
+	<div th:replace="fragments/footer :: footer"></div>
 </body>
 
 </html>

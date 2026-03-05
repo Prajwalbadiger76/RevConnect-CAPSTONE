@@ -1,3 +1,4 @@
+
 package com.example.demo.repo;
 
 import com.example.demo.entity.Post;
@@ -104,4 +105,15 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     long countByUserAndPinnedTrue(User user);
     
     Optional<Post> findByUserAndOriginalPost(User user, Post originalPost);
+
+    // POST COUNT
+    @Query("""
+            SELECT COUNT(p) FROM Post p
+            WHERE p.user.username = :username
+            AND (p.scheduledAt IS NULL OR p.scheduledAt <= :now)
+    """)
+    long countPostsByUsername(
+            @Param("username") String username,
+            @Param("now") LocalDateTime now
+    );
 }

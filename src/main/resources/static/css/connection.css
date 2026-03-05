@@ -1,38 +1,112 @@
-.btn{
-    border:none;
-    padding:8px 16px;
-    border-radius:7px;
-    cursor:pointer;
-    margin-left:6px;
-    color:white;
+/* ================= GLOBAL ================= */
+html, body {
+    height: 100%;
+}
+
+
+body{
+    font-family:Segoe UI;
+    background:#f3f4f6;
+    margin:0;
+    padding:0;
+    display:flex;
+    flex-direction:column;
+} 
+
+/* ================= HEADER ================= */
+.header-band{
+    background:white;
+    padding:20px 0 12px;
+    margin-bottom:18px;
+    border-bottom:1px solid #e5e7eb;
+}
+
+.page-title{
+    font-size:30px;
+    font-weight:700;
+    color:#1f2937;
+    text-align:center;
+    margin:0;
+    letter-spacing:0.3px;
+}
+
+.page-title::after{
+    content:"";
+    display:block;
+    width:70px;
+    height:3px;
+    background:#a78bfa;
+    margin:8px auto 0;
+    border-radius:10px;
+}
+
+.page-header{
+    font-size:24px;
     font-weight:600;
-    transition:0.25s ease;
+    color:#1f2937;
+    margin-bottom:20px;
 }
 
-.accept{ background:#10b981; }
-.reject{ background:#ef4444; }
-.remove{ background:#ef4444; }
-
-.accept:hover{
-    background:#059669;
-    transform:translateY(-2px);
-    box-shadow:0 4px 10px rgba(16,185,129,0.4);
+/* ================= CONTAINER ================= */
+.container{
+    max-width:650px;
+    margin:30px auto;
+    padding:0 10px;
 }
 
-.reject:hover{
-    background:#dc2626;
-    transform:translateY(-2px);
-    box-shadow:0 4px 10px rgba(239,68,68,0.4);
+/* ================= BACK LINK ================= */
+.back-link{
+    display:inline-block;
+    margin-bottom:30px;
+    text-decoration:none;
+    font-size:14px;
+    color:#64748b;
+    font-weight:500;
+    transition:0.2s ease;
 }
 
-.remove:hover{
-    background:#dc2626;
-    transform:translateY(-2px);
-    box-shadow:0 4px 10px rgba(239,68,68,0.4);
+.back-link:hover{
+    color:#2563eb;
 }
 
-.btn:active{
-    transform:scale(0.95);
+.back{
+    text-align:center;
+    margin-top:35px;
+}
+
+.back a{
+    text-decoration:none !important;
+    color:#2563eb;
+    font-weight:600;
+}
+
+.back a:hover{
+    color:red;
+}
+
+/* ================= CARD ================= */
+.card{
+    background:white;
+    padding:18px;
+    margin-bottom:15px;
+    border-radius:12px;
+    box-shadow:0 4px 12px rgba(0,0,0,0.1);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    transition:all 0.25s ease;
+}
+
+.card:hover{
+    transform:translateY(-3px);
+    box-shadow:0 8px 20px rgba(0,0,0,0.15);
+}
+
+/* ================= LEFT SECTION ================= */
+.left{
+    display:flex;
+    align-items:center;
+    gap:12px;
 }
 
 .avatar{
@@ -45,4 +119,116 @@
     align-items:center;
     justify-content:center;
     font-weight:bold;
+    font-size:18px;
+}
+
+/* ================= USERNAME ================= */
+.name{
+    text-decoration:none;
+    font-weight:600;
+    color:#111827;
+    transition:0.2s ease;
+    cursor:pointer;
+}
+
+.name:hover{
+    color:#2563eb;
+}
+
+/* ================= BUTTON BASE ================= */
+.btn,
+.accept,
+.reject,
+.cancel,
+.remove{
+    border:none;
+    padding:8px 16px;
+    border-radius:7px;
+    cursor:pointer;
+    color:white;
+    font-weight:600;
+    transition:all 0.25s ease;
+}
+
+/* ================= BUTTON COLORS ================= */
+.accept{ background:#10b981; }
+.reject{ background:#ef4444; }
+.cancel{ background:#6b7280; }
+.remove{ background:#f43f5e; }
+
+/* ================= BUTTON HOVER ================= */
+.accept:hover{ background:#059669; }
+.reject:hover{ background:#dc2626; }
+.cancel:hover{ background:#4b5563; }
+.remove:hover{ background:#e11d48; }
+
+.btn:hover,
+.accept:hover,
+.reject:hover,
+.cancel:hover,
+.remove:hover{
+    transform:translateY(-2px);
+    box-shadow:0 6px 14px rgba(0,0,0,0.2);
+}
+
+/* ================= PAGE COUNT (Pending) ================= */
+.page-count{
+    font-size:14px;
+    color:#6b7280;
+    margin-bottom:25px;
+}
+
+/* ================= EMPTY STATE ================= */
+.empty-state{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    margin-top:40px;
+}
+
+.empty-box{
+    background:white;
+    padding:40px;
+    border-radius:16px;
+    box-shadow:0 8px 25px rgba(0,0,0,0.08);
+    text-align:center;
+    max-width:400px;
+}
+
+.empty-icon{
+    font-size:50px;
+    margin-bottom:15px;
+}
+
+/* ================= MODAL ================= */
+.modal{
+    display:none;
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.4);
+    justify-content:center;
+    align-items:center;
+    z-index:1000;
+}
+
+.modal-box{
+    background:white;
+    padding:25px 30px;
+    border-radius:12px;
+    text-align:center;
+    width:320px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.2);
+}
+
+.modal-buttons{
+    margin-top:15px;
+    display:flex;
+    justify-content:center;
+    gap:10px;
+}
+.page-wrapper{
+    flex:1;
 }

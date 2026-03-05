@@ -15,4 +15,6 @@ public interface FollowService {
     List<User> getFollowers(String username);
     
     List<User> getFollowing(String username);
+    
+    long getFollowersCount(String username);
 }

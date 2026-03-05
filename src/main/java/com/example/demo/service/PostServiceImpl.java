@@ -1,11 +1,15 @@
 package com.example.demo.service;
 
 import com.example.demo.dto.CommentDto;
+
 import com.example.demo.dto.PostDto;
 import com.example.demo.entity.*;
 import com.example.demo.exception.InvalidScheduleException;
 import com.example.demo.mapper.PostMapper;
 import com.example.demo.repo.*;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,12 +17,15 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+
 import java.util.regex.*;
 import java.util.stream.Collectors;
 
 @Service
 @Transactional
 public class PostServiceImpl implements PostService {
+
+    private static final Logger logger = LogManager.getLogger(PostServiceImpl.class);
 
     private final PostRepository postRepository;
     private final HashtagRepository hashtagRepository;
@@ -51,51 +58,57 @@ public class PostServiceImpl implements PostService {
         this.commentRepository = commentRepository;
         this.notificationService = notificationService;
         this.analyticsService = analyticsService;
-        this.postMapper=postMapper;
+        this.postMapper = postMapper;
     }
 
     // =========================================================
-    // CREATE POST (Controller Compatible)
+    // CREATE POST
     // =========================================================
-
     @Override
     public void createPost(String username,
                            String content,
                            String hashtags,
                            String scheduledAt,
-                           boolean promotional) {
+                           boolean promotional,
+                           String ctaType,
+                           String ctaUrl,
+                           String productTag) {
+
+        logger.info("Create post request received for user: {}", username);
 
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> {
+                    logger.error("User not found: {}", username);
+                    return new RuntimeException("User not found");
+                });
 
         Post post = new Post();
         post.setContent(content);
         post.setUser(user);
         post.setCreatedAt(LocalDateTime.now());
         post.setPinned(false);
-        post.setPinnedAt(null);
 
-        
-        // PROMOTIONAL LOGIC
-        // =========================
         if (promotional) {
+            logger.info("Promotional post attempt by user: {}", username);
 
             if (user.getRole() != Role.BUSINESS &&
                 user.getRole() != Role.CREATOR) {
 
+                logger.warn("Unauthorized promotional post attempt by {}", username);
                 throw new RuntimeException(
                         "Only Business or Creator can create promotional posts"
                 );
             }
 
             post.setIsPromotional(true);
+            post.setCtaType(ctaType);
+            post.setCtaUrl(ctaUrl);
+            post.setProductTag(productTag);
+
         } else {
             post.setIsPromotional(false);
         }
 
-        
-        // SCHEDULE LOGIC (FIXED)
-        // =========================
         if (scheduledAt != null && !scheduledAt.isBlank()) {
 
             DateTimeFormatter formatter =
@@ -105,81 +118,82 @@ public class PostServiceImpl implements PostService {
                     LocalDateTime.parse(scheduledAt, formatter);
 
             if (!scheduledDateTime.isAfter(LocalDateTime.now())) {
+                logger.error("Invalid schedule time provided by user: {}", username);
                 throw new InvalidScheduleException(
                         "Scheduled time must be in the future"
                 );
             }
 
             post.setScheduledAt(scheduledDateTime);
-
-        } else {
-            post.setScheduledAt(null);
         }
 
         Post savedPost = postRepository.save(post);
-
-       
-        // ANALYTICS
-        // =========================
         analyticsService.createPostAnalytics(savedPost);
-
-<<<<<<< HEAD
-        // parse hashtags from FIELD (NOT content)
-=======
         
         // HASHTAGS
         // =========================
->>>>>>> develop
         if (hashtags != null && !hashtags.isBlank()) {
             parseHashtags(savedPost, hashtags);
         }
+
+        logger.info("Post created successfully for user: {}", username);
     }
+
     // =========================================================
     // UPDATE POST
     // =========================================================
     @Override
-    @Transactional
     public void updatePost(Long postId,
                            String content,
                            String hashtags,
                            String username) {
 
+        logger.info("Update request for post {} by user {}", postId, username);
+
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new RuntimeException("Post not found"));
+                .orElseThrow(() -> {
+                    logger.error("Post not found for update: {}", postId);
+                    return new RuntimeException("Post not found");
+                });
 
         if (!post.getUser().getUsername().equals(username)) {
+            logger.warn("Unauthorized update attempt on post {} by {}", postId, username);
             throw new RuntimeException("You cannot edit this post");
         }
 
         post.setContent(content);
         postRepository.save(post);
 
-        // 🔥 DELETE OLD HASHTAGS
         postHashtagRepository.deleteByPost(post);
 
-        // 🔥 PARSE FROM HASHTAG FIELD
         if (hashtags != null && !hashtags.isBlank()) {
             parseHashtags(post, hashtags);
         }
+
+        logger.info("Post {} updated successfully", postId);
     }
 
     // =========================================================
     // DELETE POST
     // =========================================================
-
     @Override
-    @Transactional
     public void deletePost(Long postId, String username) {
 
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new RuntimeException("Post not found"));
+        logger.info("Delete request for post {} by user {}", postId, username);
 
-        // Security check: only owner can delete
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> {
+                    logger.error("Post not found for delete: {}", postId);
+                    return new RuntimeException("Post not found");
+                });
+
         if (!post.getUser().getUsername().equals(username)) {
+            logger.warn("Unauthorized delete attempt on post {} by {}", postId, username);
             throw new RuntimeException("You cannot delete this post");
         }
 
         postRepository.delete(post);
+        logger.info("Post {} deleted successfully", postId);
     }
     // =========================================================
     // LIKE / UNLIKE
@@ -273,75 +287,28 @@ public class PostServiceImpl implements PostService {
 
         List<Post> posts;
 
-        // ================= FILTER APPLIED =================
+        // ================= PERSONAL / CREATOR / BUSINESS =================
         if (roleFilter != null && !roleFilter.equalsIgnoreCase("ALL")) {
-<<<<<<< HEAD
 
             Role selectedRole = Role.valueOf(roleFilter.toUpperCase());
-
-            // show only selected role posts
             posts = postRepository.findPostsByAuthorRole(selectedRole, now);
-
         }
-        // ================= DEFAULT NORMAL FEED =================
+
+        // ================= ALL POSTS (GLOBAL) =================
         else {
 
-            List<User> followedUsers = followRepository.findByFollower(currentUser)
-                    .stream()
-                    .map(Follow::getFollowing)
-                    .toList();
-
-            List<User> feedUsers = new ArrayList<>(followedUsers);
-            feedUsers.add(currentUser);
-
-            posts = postRepository.findFeedPosts(feedUsers, now);
+            posts = postRepository
+                    .findAllByCreatedAtLessThanEqualOrderByCreatedAtDesc(now);
         }
 
         return posts.stream()
-=======
-
-            Role selectedRole = Role.valueOf(roleFilter.toUpperCase());
-
-            posts = postRepository.findPostsByAuthorRole(selectedRole, now);
-
-        }
-        // ================= DEFAULT NORMAL FEED =================
-        else {
-
-            List<User> followedUsers = followRepository.findByFollower(currentUser)
-                    .stream()
-                    .map(Follow::getFollowing)
-                    .toList();
-
-            List<User> feedUsers = new ArrayList<>(followedUsers);
-            feedUsers.add(currentUser);
-
-            posts = postRepository.findFeedPosts(feedUsers, now);
-        }
-
-        return posts.stream()
-
-                // 🔥 Hide original post if current user already reshared it
-                .filter(post -> {
-                    if (post.getOriginalPost() == null) {
-                        return postRepository
-                                .findByUserAndOriginalPost(currentUser, post)
-                                .isEmpty();
-                    }
-                    return true;
-                })
-
->>>>>>> develop
                 .map(post -> {
                     analyticsService.recordView(post.getId(), currentUser.getId());
                     return map(post, currentUser);
                 })
                 .toList();
     }
-<<<<<<< HEAD
-=======
-    
->>>>>>> develop
+
     // =========================================================
     // GET POST BY ID
     // =========================================================
@@ -358,7 +325,6 @@ public class PostServiceImpl implements PostService {
     // =========================================================
     // USER POSTS
     // =========================================================
-
 
     @Override
     public List<PostDto> getPostsByUsername(String profileUsername, String currentUsername) {
@@ -422,28 +388,33 @@ public class PostServiceImpl implements PostService {
     // =========================================================
     // PIN / UNPIN
     // =========================================================
-
+   
     @Override
     public void pinPost(Long postId, String username) {
 
+        logger.info("Pin request for post {} by {}", postId, username);
+
         User user = userRepository.findByUsername(username).orElseThrow();
 
-        long pinnedCount = postRepository
-                .countByUserAndPinnedTrue(user);
+        long pinnedCount = postRepository.countByUserAndPinnedTrue(user);
 
         if (pinnedCount >= 3) {
+            logger.warn("User {} attempted to exceed pin limit", username);
             throw new RuntimeException("Maximum 3 pinned posts allowed");
         }
 
         Post post = postRepository.findById(postId).orElseThrow();
 
-        if (!post.getUser().getUsername().equals(username))
+        if (!post.getUser().getUsername().equals(username)) {
+            logger.warn("Unauthorized pin attempt by {}", username);
             throw new RuntimeException("You cannot pin this post");
+        }
 
         post.setPinned(true);
         post.setPinnedAt(LocalDateTime.now());
-
         postRepository.save(post);
+
+        logger.info("Post {} pinned successfully", postId);
     }
 
     @Override
@@ -527,6 +498,9 @@ public class PostServiceImpl implements PostService {
         dto.setUsername(post.getUser().getUsername());
         dto.setPinned(post.getPinned());
         dto.setPromotional(Boolean.TRUE.equals(post.getIsPromotional()));
+        dto.setCtaType(post.getCtaType());
+        dto.setCtaUrl(post.getCtaUrl());
+        dto.setProductTag(post.getProductTag());
         dto.setHashtags(
         	    post.getPostHashtags()
         	        .stream()
@@ -585,15 +559,18 @@ public class PostServiceImpl implements PostService {
 
     private void parseHashtags(Post post, String hashtags) {
 
-        String[] tags = hashtags.split("\\s+");
+        if (hashtags == null || hashtags.isBlank()) return;
 
-        for (String rawTag : tags) {
+        // Split by comma OR space
+        String[] rawTags = hashtags.split("[,\\s]+");
 
-            String tag = rawTag.replace("#", "")
-                               .trim()
-                               .toLowerCase();
+        // Use Set to remove duplicates
+        Set<String> uniqueTags = Arrays.stream(rawTags)
+                .map(tag -> tag.replace("#", "").trim().toLowerCase())
+                .filter(tag -> !tag.isEmpty())
+                .collect(Collectors.toSet());
 
-            if (tag.isEmpty()) continue;
+        for (String tag : uniqueTags) {
 
             Hashtag hashtag = hashtagRepository
                     .findByName(tag)

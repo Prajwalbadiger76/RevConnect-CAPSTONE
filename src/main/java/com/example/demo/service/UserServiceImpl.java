@@ -32,8 +32,14 @@ public class UserServiceImpl implements UserService {
     @Override
     public void register(RegisterRequest request) {
 
-        if (userRepository.findByUsername(request.username()).isPresent()) {
+        // Check username
+        if (userRepository.existsByUsername(request.username())) {
             throw new CustomException("Username already exists");
+        }
+
+        // Check email
+        if (userRepository.existsByEmail(request.email())) {
+            throw new CustomException("Email already registered");
         }
 
         User user = new User(
@@ -63,6 +69,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<ProfileResponse> searchUsers(String keyword) {
         return Collections.emptyList();   
+    }
+
+    @Override
+    public User findByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new CustomException("User not found"));
     }
 
 }

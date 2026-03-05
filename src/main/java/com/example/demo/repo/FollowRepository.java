@@ -37,4 +37,6 @@ public interface FollowRepository extends JpaRepository<Follow, Long> {
     		""", nativeQuery = true)
     		List<Object[]> getFollowerGrowth(Long userId);
 
+    		
+    		long countByFollowing_Id(Long followingId);
 }
