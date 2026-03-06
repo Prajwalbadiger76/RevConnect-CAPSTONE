@@ -267,11 +267,6 @@
 					Posts
 				</a>
 
-			<!--	<a th:href="@{/profile/{username}(username=${profile.username}, tab='about')}"
-					th:classappend="${tab == 'about'} ? 'active-tab' : ''">
-					About
-				</a> -->
-
 				<a th:href="@{/profile/{username}(username=${profile.username}, tab='connections')}"
 					th:classappend="${tab == 'connections'} ? 'active-tab' : ''">
 					Connections
@@ -412,6 +407,52 @@
 						</div>
 
 					</div>
+				</div>
+				
+				
+				<div th:if="${tab == 'connections'}">
+
+				    <!-- Empty State -->
+				    <div th:if="${connections == null or #lists.isEmpty(connections)}" class="empty-state">
+				        <div class="empty-box">
+				            <div class="empty-icon">🌐</div>
+				            <h3>No Connections Yet</h3>
+				            <p>Start connecting with people to grow your network.</p>
+				        </div>
+				    </div>
+
+				    <!-- Connection Cards -->
+				    <div th:each="user : ${connections}" class="follower-card">
+
+				        <div class="left">
+
+				            <div class="avatar"
+				                 th:text="${#strings.substring(user.username,0,1).toUpperCase()}">
+				            </div>
+
+				            <a th:href="@{/profile/{username}(username=${user.username})}"
+				               th:text="${user.username}"
+				               class="follower-name">
+				            </a>
+
+				        </div>
+
+				        <!-- Remove Button -->
+				        <form th:if="${isOwner}"
+				              th:action="@{/connections/remove/{username}(username=${user.username})}"
+				              method="post"
+				              style="display:inline;">
+
+				            <button type="button"
+				                    class="btn reject"
+				                    onclick="openRemoveModal(this.closest('form'))">
+				                Remove
+				            </button>
+
+				        </form>
+
+				    </div>
+
 				</div>
 
 			</div>
