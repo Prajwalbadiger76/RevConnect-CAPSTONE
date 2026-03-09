@@ -38,8 +38,13 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     // ===============================
     // ALL POSTS
     // ===============================
-    List<Post> findAllByCreatedAtLessThanEqualOrderByCreatedAtDesc(LocalDateTime now);
-
+    @Query("""
+    		SELECT p FROM Post p
+    		WHERE p.createdAt <= :now
+    		AND (p.scheduledAt IS NULL OR p.scheduledAt <= :now)
+    		ORDER BY p.createdAt DESC
+    		""")
+    		List<Post> findAllVisiblePosts(@Param("now") LocalDateTime now);
 
     // ===============================
     // HASHTAG SEARCH

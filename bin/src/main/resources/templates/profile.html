@@ -1,606 +1,534 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <title>Profile</title>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
-    <link rel="stylesheet" th:href="@{/css/global.css}">
-    <link rel="stylesheet" th:href="@{/css/profile.css}">
-    <meta charset="UTF-8">
+<head>
+	<title>Profile</title>
+
+	<link rel="stylesheet" th:href="@{/css/global.css}">
+	<link rel="stylesheet" th:href="@{/css/profile.css}">
+	<meta charset="UTF-8">
 </head>
 
 <body>
 
-<div class="page-wrapper">
-    <div class="profile-container">
+	<div class="page-wrapper">
+		<div class="profile-container">
 
-        <!-- ================= BANNER ================= -->
-        <div class="banner-section">
+			<!-- ================= BANNER ================= -->
+			<div class="banner-section">
 
-            <div class="header-overlay">
-                <div th:replace="~{fragments/header_profile :: headerProfile}"></div>
-            </div>
+				<div class="header-overlay">
+					<div th:replace="~{fragments/header_profile :: headerProfile}"></div>
+				</div>
 
-            <img class="banner-img"
-                 th:if="${canView}"
-                 th:src="${profile.bannerImage != null and !profile.bannerImage.isEmpty() 
+				<img class="banner-img" th:if="${canView}" th:src="${profile.bannerImage != null and !profile.bannerImage.isEmpty() 
                             ? profile.bannerImage 
                             : 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e'}">
 
-            <div class="banner-camera"
-                 th:if="${isOwner}"
-                 onclick="document.getElementById('bannerFileInput').click();">
-                📷
-            </div>
+				<div class="banner-camera" th:if="${isOwner}"
+					onclick="document.getElementById('bannerFileInput').click();">
+					📷
+				</div>
 
-            <form id="bannerUploadForm"
-                  th:if="${isOwner}"
-                  th:action="@{/profile/edit}"
+				<form id="bannerUploadForm" th:if="${isOwner}" th:action="@{/profile/edit}" method="post"
+					enctype="multipart/form-data">
+			
 
-                  method="post"
-                  enctype="multipart/form-data">
+						<input type="file" id="bannerFileInput" name="bannerImageFile" accept="image/*"
+							style="display:none" onchange="document.getElementById('bannerUploadForm').submit();">
+					</form>
 
-                <input type="file"
-                       id="bannerFileInput"
-                       name="bannerImageFile"
-                       accept="image/*"
-                       style="display:none"
-                       onchange="document.getElementById('bannerUploadForm').submit();">
-            </form>
+			</div>
 
-        </div>
+			<!-- ================= PROFILE INFO ================= -->
+			<div class="profile-info-section">
 
-        <!-- ================= PROFILE INFO ================= -->
-        <div class="profile-info-section">
-
-            <div class="profile-image-wrapper">
-                <img class="profile-img"
-                     th:src="${profile.profilePicture != null and !profile.profilePicture.isEmpty() 
+				<div class="profile-image-wrapper">
+					<img class="profile-img" th:src="${profile.profilePicture != null and !profile.profilePicture.isEmpty() 
                                 ? profile.profilePicture 
                                 : 'https://i.pravatar.cc/150?img=3'}">
 
-                <div class="profile-camera"
-                     th:if="${isOwner}"
-                     onclick="document.getElementById('profileFileInput').click();">
-                    📷
-                </div>
+					<div class="profile-camera" th:if="${isOwner}"
+						onclick="document.getElementById('profileFileInput').click();">
+						📷
+					</div>
 
-                <form id="profileUploadForm"
-                      th:if="${isOwner}"
-                      th:action="@{/profile/edit}"
+						<form id="profileUploadForm" th:if="${isOwner}" th:action="@{/profile/edit}" method="post"
+							enctype="multipart/form-data">
 
-                      method="post"
-                      enctype="multipart/form-data">
-
-                    <input type="file"
-                           id="profileFileInput"
-                           name="profileImage"
-                           accept="image/*"
-                           style="display:none"
-                           onchange="document.getElementById('profileUploadForm').submit();">
-                </form>
-            </div>
-
-            <div class="profile-main-info">
-
-                <h2 th:text="${profile.fullName != null ? profile.fullName : profile.username}"></h2>
-
-                <p class="username">
-                    @<span th:text="${profile.username}"></span>
-                </p>
-
-				<!-- ================= FOLLOW & CONNECTION ACTIONS ================= -->
-				<div th:if="${!isOwner}" class="action-buttons">
-
-				    <!-- FOLLOW BUTTON -->
-				    <form th:if="${!profile.isFollowing}"
-				          th:action="@{/follow/{username}(username=${profile.username})}"
-				          method="post"
-				          style="display:inline;">
-				        <button class="btn-follow">➕ Follow</button>
-				    </form>
-
-				    <form th:if="${profile.isFollowing}"
-				          th:action="@{/follow/unfollow/{username}(username=${profile.username})}"
-				          method="post"
-				          style="display:inline;">
-				        <button class="btn-following">✓ Following</button>
-				    </form>
-
-				    <!-- CONNECTION LOGIC -->
-				    <div style="display:inline;">
-
-				        <!-- NO CONNECTION -->
-				        <form th:if="${connectionStatus == 'NONE'}"
-				              th:action="@{/connections/send/{username}(username=${profile.username})}"
-				              method="post"
-				              style="display:inline;">
-				            <button class="btn-connect">🤝 Connect</button>
-				        </form>
-
-				        <!-- PENDING -->
-				        <button th:if="${connectionStatus == 'PENDING'}"
-				                class="btn-pending"
-				                disabled>
-				            ⏳ Pending
-				        </button>
-
-				        <!-- CONNECTED -->
-				        <form th:if="${connectionStatus == 'CONNECTED'}"
-				              th:action="@{/connections/remove/{username}(username=${profile.username})}"
-				              method="post"
-				              style="display:inline;">
-				            <button class="btn-connected">✓ Connected</button>
-				        </form>
-
-				    </div>
-
+							<input type="file" id="profileFileInput" name="profileImage" accept="image/*"
+								style="display:none" onchange="document.getElementById('profileUploadForm').submit();">
+						</form>
 				</div>
 
-                <!-- PRIVATE MESSAGE -->
-                <div th:if="${!canView}"
-                     style="margin-top:15px;
+				<div class="profile-main-info">
+
+					<h2 th:text="${profile.fullName != null ? profile.fullName : profile.username}"></h2>
+
+					<p class="username">
+						@<span th:text="${profile.username}"></span>
+					</p>
+
+					<!-- PRIVATE MESSAGE -->
+					<div th:if="${!canView}" style="margin-top:15px;">
+					</div>
+
+					<div th:if="${!isOwner}" class="action-buttons">
+
+						<!-- FOLLOW BUTTON -->
+						<form th:if="${!profile.isFollowing}"
+							th:action="@{/follow/{username}(username=${profile.username})}" method="post"
+							style="display:inline;">
+							<button class="btn-follow">➕ Follow</button>
+						</form>
+
+						<form th:if="${profile.isFollowing}"
+							th:action="@{/follow/unfollow/{username}(username=${profile.username})}" method="post"
+							style="display:inline;">
+							<button class="btn-following">✓ Following</button>
+						</form>
+
+						<!-- CONNECTION LOGIC -->
+						<div style="display:inline;">
+
+							<!-- NO CONNECTION -->
+							<form th:if="${connectionStatus == 'NONE'}"
+								th:action="@{/connections/send/{username}(username=${profile.username})}" method="post"
+								style="display:inline;">
+								<button class="btn-connect">🤝 Connect</button>
+							</form>
+
+							<!-- PENDING -->
+							<button th:if="${connectionStatus == 'PENDING'}" class="btn-pending" disabled>
+								⏳ Pending
+							</button>
+
+							<!-- CONNECTED -->
+							<form th:if="${connectionStatus == 'CONNECTED'}"
+								th:action="@{/connections/remove/{username}(username=${profile.username})}"
+								method="post" style="display:inline;">
+								<button class="btn-connected">✓ Connected</button>
+							</form>
+
+						</div>
+
+					</div>
+
+					<!-- PRIVATE MESSAGE -->
+					<div th:if="${!canView}" style="margin-top:15px;
                             padding:12px;
                             background:#fff3f3;
                             border:1px solid #ffc9c9;
                             border-radius:8px;
                             color:#c92a2a;
                             font-weight:500;">
-                    🔒 This account is private.
-                </div>
-
-                <!-- ================= FULL PROFILE ================= -->
-                <div th:if="${canView}">
-
-                    <p class="bio"
-                       th:text="${profile.bio != null ? profile.bio : 'No bio added'}">
-                    </p>
-
-                    <div class="meta">
-
-                        <span th:if="${profile.location != null}">
-                            📍 <span th:text="${profile.location}"></span>
-                        </span>
-
-                        <span th:if="${profile.website != null}">
-                            🌐 
-                            <a th:href="${profile.website}"
-                               th:text="${profile.website}"
-                               target="_blank"></a>
-                        </span>
-
-                    </div>
-
-					
-					<!-- ================= PERSONAL SECTION ================= -->
-					<div th:if="${profile.role != null and profile.role.name() == 'PERSONAL'}"
-					     style="margin-top:18px; padding-top:10px; border-top:1px solid #eee;">
-
-					    <div>
-					        👤 <strong>Personal Account</strong>
-					    </div>
-
-					    <div th:if="${profile.bio != null}">
-					        📝 <span th:text="${profile.bio}"></span>
-					    </div>
-
-					</div>
-					
-					<!-- ================= CREATOR SECTION ================= -->
-					<div th:if="${profile.role != null and profile.role.name() == 'CREATOR'}"
-					     style="margin-top:18px; padding-top:10px; border-top:1px solid #eee;">
-
-					    <div>
-					        🎨 <strong>Creator Profile</strong>
-					    </div>
-
-					    <div th:if="${profile.industry != null}">
-					        🏷 <strong>Industry:</strong>
-					        <span th:text="${profile.industry}"></span>
-					    </div>
-
-					    <div th:if="${profile.skills != null}">
-					        💡 <strong>Skills:</strong>
-					        <span th:text="${profile.skills}"></span>
-					    </div>
-
-					    <div th:if="${profile.instagramLink != null}">
-					        📸 <a th:href="${profile.instagramLink}" target="_blank">Instagram</a>
-					    </div>
-
-					    <div th:if="${profile.youtubeLink != null}">
-					        ▶ <a th:href="${profile.youtubeLink}" target="_blank">YouTube</a>
-					    </div>
-
-					    <div th:if="${profile.portfolioLink != null}">
-					        🌐 <a th:href="${profile.portfolioLink}" target="_blank">Portfolio</a>
-					    </div>
-
-					</div>
-					
-					<!-- ================= BUSINESS SECTION ================= -->
-					<div th:if="${profile.role != null and profile.role.name() == 'BUSINESS'}"
-					     style="margin-top:18px; padding-top:10px; border-top:1px solid #eee;">
-
-					    <div>
-					        🏢 <strong>Business Profile</strong>
-					    </div>
-
-					    <div th:if="${profile.category != null}">
-					        🏷 <strong>Category:</strong>
-					        <span th:text="${profile.category}"></span>
-					    </div>
-
-					    <div th:if="${profile.contactInfo != null}">
-					        📞 <strong>Contact:</strong>
-					        <span th:text="${profile.contactInfo}"></span>
-					    </div>
-
-					    <div th:if="${profile.businessAddress != null}">
-					        📍 <strong>Business Address:</strong>
-					        <span th:text="${profile.businessAddress}"></span>
-					    </div>
-
-					    <div th:if="${profile.businessHours != null}">
-					        ⏰ <strong>Business Hours:</strong>
-					        <span th:text="${profile.businessHours}"></span>
-					    </div>
-
-					    <div th:if="${profile.servicesOffered != null}">
-					        🛠 <strong>Services:</strong>
-					        <span th:text="${profile.servicesOffered}"></span>
-					    </div>
-
+						🔒 This account is private.
 					</div>
 
-                    <!-- ================= STATS ================= -->
-                    <div class="profile-stats">
+					<!-- ================= FULL PROFILE ================= -->
+					<div th:if="${canView}">
 
-                        <a th:href="@{/profile/{username}/followers(username=${profile.username})}"
+						<p class="bio" th:text="${profile.bio != null ? profile.bio : 'No bio added'}">
+						</p>
 
-                           class="stat-item">
-                            <span class="stat-number"
-                                  th:text="${profile.followerCount}">0</span>
-                            <span class="stat-label">Followers</span>
-                        </a>
+						<div class="meta">
 
-                        <a th:href="@{/profile/{username}/following(username=${profile.username})}"
+							<span th:if="${profile.location != null}">
+								📍 <span th:text="${profile.location}"></span>
+							</span>
 
-                           class="stat-item">
-                            <span class="stat-number"
-                                  th:text="${profile.followingCount}">0</span>
-                            <span class="stat-label">Following</span>
-                        </a>
+							<span th:if="${profile.website != null}">
+								🌐
+								<a th:href="${profile.website}" th:text="${profile.website}" target="_blank"></a>
+							</span>
 
-                        <a class="stat-item">
-                            <span class="stat-number"
-                                  th:text="${profile.postCount}">0</span>
-                            <span class="stat-label">Posts</span>
-                        </a>
+						</div>
 
-                    </div>
 
-                </div>
+						<!-- ================= PERSONAL SECTION ================= -->
+						<div th:if="${profile.role != null and profile.role.name() == 'PERSONAL'}"
+							style="margin-top:18px; padding-top:10px; border-top:1px solid #eee;">
 
-                <!-- EDIT BUTTON -->
-                <div class="edit-btn-wrapper" th:if="${isOwner}">
-                    <a th:href="@{/profile/edit}" class="edit-btn">
+							<div>
+								👤 <strong>Personal Account</strong>
+							</div>
 
-                        ✏ Edit Profile
-                    </a>
-                </div>
+							
 
-            </div>
-        </div>
+						</div>
 
-        <!-- ================= TABS (NOW CORRECT POSITION) ================= -->
-        <div class="profile-tabs">
+						<!-- ================= CREATOR SECTION ================= -->
+						<div th:if="${profile.role != null and profile.role.name() == 'CREATOR'}"
+							style="margin-top:18px; padding-top:10px; border-top:1px solid #eee;">
 
-            <a th:href="@{/profile/{username}(username=${profile.username}, tab='posts')}"
+							<div>
+								🎨 <strong>Creator Profile</strong>
+							</div>
 
-               th:classappend="${tab == 'posts'} ? 'active-tab' : ''">
-                Posts
-            </a>
+							<div th:if="${profile.industry != null}">
+								🏷 <strong>Industry:</strong>
+								<span th:text="${profile.industry}"></span>
+							</div>
 
-            <a th:href="@{/profile/{username}(username=${profile.username}, tab='about')}"
+							<div th:if="${profile.skills != null}">
+								💡 <strong>Skills:</strong>
+								<span th:text="${profile.skills}"></span>
+							</div>
 
-               th:classappend="${tab == 'about'} ? 'active-tab' : ''">
-                About
-            </a>
+							<div th:if="${profile.instagramLink != null}">
+								📸 <a th:href="${profile.instagramLink}" target="_blank">Instagram</a>
+							</div>
 
-            <a th:href="@{/profile/{username}(username=${profile.username}, tab='connections')}"
+							<div th:if="${profile.youtubeLink != null}">
+								▶ <a th:href="${profile.youtubeLink}" target="_blank">YouTube</a>
+							</div>
 
-              th:classappend="${tab == 'connections'} ? 'active-tab' : ''">
-                Connections
-            </a>
+							<div th:if="${profile.portfolioLink != null}">
+								🌐 <a th:href="${profile.portfolioLink}" target="_blank">Portfolio</a>
+							</div>
 
-        </div>
+						</div>
 
-        <!-- ================= TAB CONTENT ================= -->
-		<div class="tab-content">
+						<!-- ================= BUSINESS SECTION ================= -->
+						<div th:if="${profile.role != null and profile.role.name() == 'BUSINESS'}"
+							style="margin-top:18px; padding-top:10px; border-top:1px solid #eee;">
 
-		    <div th:if="${error}" 
-		         style="color:red; margin-bottom:15px;">
-		        <span th:text="${error}"></span>
-		    </div>
+							<div>
+								🏢 <strong>Business Profile</strong>
+							</div>
 
-			<div th:if="${tab == 'posts'}">
+							<div th:if="${profile.category != null}">
+								🏷 <strong>Category:</strong>
+								<span th:text="${profile.category}"></span>
+							</div>
 
-			<div th:if="${posts == null or #lists.isEmpty(posts)}"
-			     class="empty-posts">
-			    No posts yet.
+							<div th:if="${profile.contactInfo != null}">
+								📞 <strong>Contact:</strong>
+								<span th:text="${profile.contactInfo}"></span>
+							</div>
+
+							<div th:if="${profile.businessAddress != null}">
+								📍 <strong>Business Address:</strong>
+								<span th:text="${profile.businessAddress}"></span>
+							</div>
+
+							<div th:if="${profile.businessHours != null}">
+								⏰ <strong>Business Hours:</strong>
+								<span th:text="${profile.businessHours}"></span>
+							</div>
+
+							<div th:if="${profile.servicesOffered != null}">
+								🛠 <strong>Services:</strong>
+								<span th:text="${profile.servicesOffered}"></span>
+							</div>
+
+						</div>
+
+						<!-- ================= STATS ================= -->
+						<div class="profile-stats">
+
+							<a th:href="@{/follow/followers/{username}(username=${profile.username})}"
+								class="stat-item">
+								<span class="stat-number" th:text="${profile.followerCount}">0</span>
+								<span class="stat-label">Followers</span>
+							</a>
+
+							<a th:href="@{/follow/following/{username}(username=${profile.username})}"
+								class="stat-item">
+								<span class="stat-number" th:text="${profile.followingCount}">0</span>
+								<span class="stat-label">Following</span>
+							</a>
+
+							<a class="stat-item">
+								<span class="stat-number" th:text="${profile.postCount}">0</span>
+								<span class="stat-label">Posts</span>
+							</a>
+
+						</div>
+
+					</div>
+
+					<!-- EDIT BUTTON -->
+					<div class="edit-btn-wrapper" th:if="${isOwner}">
+						<a th:href="@{/profile/edit}" class="edit-btn">
+							✏ Edit Profile
+						</a>
+					</div>
+
+				</div>
+			</div>
+		
+
+			<!-- ================= TABS (NOW CORRECT POSITION) ================= -->
+			<div class="profile-tabs">
+
+				<a th:href="@{/profile/{username}(username=${profile.username}, tab='posts')}"
+					th:classappend="${tab == 'posts'} ? 'active-tab' : ''">
+					Posts
+				</a>
+
+			<!--	<a th:href="@{/profile/{username}(username=${profile.username}, tab='about')}"
+					th:classappend="${tab == 'about'} ? 'active-tab' : ''">
+					About
+				</a> -->
+
+				<a th:href="@{/profile/{username}(username=${profile.username}, tab='connections')}"
+					th:classappend="${tab == 'connections'} ? 'active-tab' : ''">
+					Connections
+				</a>
+
+				<a sec:authorize="hasAnyRole('CREATOR','BUSINESS')"
+					th:href="@{/profile/{username}/analytics(username=${profile.username})}">
+					Followers Demographics
+				</a>
+				<a th:if="${isOwner}" th:href="@{/settings/notifications}" class="tab-link">
+					Notification Settings
+				</a>
+
 			</div>
 
-			<div th:each="post : ${posts}" 
-			     class="profile-post-card"
-			     style="position:relative;">
+			<!-- ================= TAB CONTENT ================= -->
+			<div class="tab-content">
 
-			    <!-- PIN BADGE -->
-			    <div th:if="${post.pinned}" class="pinned-badge">
-			        📌 
-			    </div>
+				<div th:if="${error}" style="color:red; margin-bottom:15px;">
+					<span th:text="${error}"></span>
+				</div>
 
-			    <!-- HEADER -->
-			    <div class="profile-post-header">
+				<div th:if="${tab == 'posts'}">
 
-			        <img class="profile-post-avatar"
-			             th:src="${profile.profilePicture != null && !profile.profilePicture.isEmpty()
+					<div th:if="${posts == null or #lists.isEmpty(posts)}" class="empty-posts">
+						No posts yet.
+					</div>
+
+					<div th:each="post : ${posts}" class="profile-post-card" style="position:relative;">
+
+						<!-- PIN BADGE -->
+						<div th:if="${post.pinned}" class="pinned-badge">
+							📌
+						</div>
+
+						<!-- HEADER -->
+						<div class="profile-post-header">
+
+							<img class="profile-post-avatar" th:src="${profile.profilePicture != null && !profile.profilePicture.isEmpty()
 			                      ? profile.profilePicture
 			                      : 'https://i.pravatar.cc/150?img=3'}">
 
-			        <div class="profile-post-user">
-			            <strong th:text="${post.username}"></strong>
+							<div class="profile-post-user">
+								<strong th:text="${post.username}"></strong>
 
-			            <div class="profile-post-time"
-			                 th:text="${#temporals.format(post.createdAt,'dd MMM yyyy HH:mm')}">
-			            </div>
-			        </div>
+								<div class="profile-post-time"
+									th:text="${#temporals.format(post.createdAt,'dd MMM yyyy HH:mm')}">
+								</div>
+							</div>
 
-			        <!-- 3 DOT MENU -->
-			        <div class="profile-post-menu" th:if="${isOwner}">
-			            <button onclick="togglePostMenu(this)">⋮</button>
+							<!-- 3 DOT MENU -->
+							<div class="profile-post-menu" th:if="${isOwner}">
+								<button onclick="togglePostMenu(this)">⋮</button>
 
-			            <div class="profile-post-dropdown">
+								<div class="profile-post-dropdown">
 
-			                <a th:href="@{/post/edit/{id}(id=${post.id})}">Edit</a>
+									<a th:href="@{/post/edit/{id}(id=${post.id})}">Edit</a>
 
-							<button type="button"
-							        th:attr="onclick=|openDeleteModal(${post.id})|">
-							    🗑 Delete
+									<button type="button" th:attr="onclick=|openDeleteModal(${post.id})|">
+										🗑 Delete
+									</button>
+									<form th:if="${!post.pinned}" th:action="@{/post/pin/{id}(id=${post.id})}"
+										method="post">
+										<button type="submit">📌 Pin</button>
+									</form>
+
+									<form th:if="${post.pinned}" th:action="@{/post/unpin/{id}(id=${post.id})}"
+										method="post">
+										<button type="submit">📍 Unpin</button>
+									</form>
+
+								</div>
+							</div>
+
+						</div>
+
+						<!-- CONTENT -->
+						<div class="profile-post-content" th:text="${post.content}">
+						</div>
+
+						<div class="profile-post-tags"
+							th:if="${post.hashtags != null and !#lists.isEmpty(post.hashtags)}">
+
+							<span th:each="tag : ${post.hashtags}">
+								<a th:href="@{/post/search(keyword=${'#' + tag})}"
+									style="color:#2563eb; text-decoration:none; font-weight:500;">
+									<span th:text="${'#' + tag}"></span>
+								</a>
+							</span>
+
+						</div>
+						<!-- ACTIONS -->
+						<div class="profile-post-actions">
+
+							<form th:action="@{/like/{postId}(postId=${post.id})}" method="post">
+								<button type="submit">🤍 Like</button>
+							</form>
+
+							<span th:text="${post.likeCount} + ' likes'"></span>
+
+							<form th:action="@{/post/share/{id}(id=${post.id})}" method="post">
+								<button type="submit">🔁 Share</button>
+							</form>
+
+							<!-- COMMENT TOGGLE -->
+							<button type="button" class="comment-toggle-btn"
+								th:attr="onclick=|toggleComments(${post.id})|">
+								💬 <span th:text="${#lists.size(post.comments)}"></span> Comments
 							</button>
-			                <form th:if="${!post.pinned}"
-			                      th:action="@{/post/pin/{id}(id=${post.id})}"
-			                      method="post">
-			                    <button type="submit">📌 Pin</button>
-			                </form>
 
-			                <form th:if="${post.pinned}"
-			                      th:action="@{/post/unpin/{id}(id=${post.id})}"
-			                      method="post">
-			                    <button type="submit">📍 Unpin</button>
-			                </form>
+						</div>
 
-			            </div>
-			        </div>
+						<!-- COMMENT SECTION -->
+						<div class="profile-post-comment-section" th:id="'comments-' + ${post.id}"
+							style="display:none; margin-top:10px;">
 
-			    </div>
+							<div th:each="comment : ${post.comments}" class="profile-comment"
+								style="margin-bottom:6px;">
 
-			    <!-- CONTENT -->
-			    <div class="profile-post-content"
-			         th:text="${post.content}">
-			    </div>
+								<strong th:text="${comment.username}"></strong>
+								<span th:text="${comment.content}"></span>
 
-				<div class="profile-post-tags"
-				     th:if="${post.hashtags != null and !#lists.isEmpty(post.hashtags)}">
+							</div>
 
-				    <span th:each="tag : ${post.hashtags}">
-				        <a th:href="@{/post/search(keyword=${'#' + tag})}"
-				           style="color:#2563eb; text-decoration:none; font-weight:500;">
-				            <span th:text="${'#' + tag}"></span>
-				        </a>
-				    </span>
+							<!-- ADD COMMENT -->
+							<form th:action="@{/comment/{postId}(postId=${post.id})}" method="post"
+								class="profile-comment-form" style="display:flex; gap:8px; margin-top:8px;">
 
+								<input type="text" name="content" placeholder="Write a comment..." required
+									style="flex:1; padding:6px; border-radius:6px; border:1px solid #ddd;">
+
+								<button type="submit"
+									style="padding:6px 12px; border:none; border-radius:6px; background:#2563eb; color:white;">
+									Post
+								</button>
+							</form>
+
+						</div>
+
+					</div>
 				</div>
-			    <!-- ACTIONS -->
-			    <div class="profile-post-actions">
-
-			        <form th:action="@{/like/{postId}(postId=${post.id})}"
-			              method="post">
-			            <button type="submit">🤍 Like</button>
-			        </form>
-
-			        <span th:text="${post.likeCount} + ' likes'"></span>
-
-			        <form th:action="@{/post/share/{id}(id=${post.id})}"
-			              method="post">
-			            <button type="submit">🔁 Share</button>
-			        </form>
-
-			        <!-- COMMENT TOGGLE -->
-			        <button type="button"
-			                class="comment-toggle-btn"
-			                th:attr="onclick=|toggleComments(${post.id})|">
-			            💬 <span th:text="${#lists.size(post.comments)}"></span> Comments
-			        </button>
-
-			    </div>
-
-			    <!-- COMMENT SECTION -->
-			    <div class="profile-post-comment-section"
-			         th:id="'comments-' + ${post.id}"
-			         style="display:none; margin-top:10px;">
-
-			        <div th:each="comment : ${post.comments}"
-			             class="profile-comment"
-			             style="margin-bottom:6px;">
-
-			            <strong th:text="${comment.username}"></strong>
-			            <span th:text="${comment.content}"></span>
-
-			        </div>
-
-			        <!-- ADD COMMENT -->
-			        <form th:action="@{/comment/{postId}(postId=${post.id})}"
-			              method="post"
-			              class="profile-comment-form"
-			              style="display:flex; gap:8px; margin-top:8px;">
-
-			            <input type="text"
-			                   name="content"
-			                   placeholder="Write a comment..."
-			                   required
-			                   style="flex:1; padding:6px; border-radius:6px; border:1px solid #ddd;">
-
-			            <button type="submit"
-			                    style="padding:6px 12px; border:none; border-radius:6px; background:#2563eb; color:white;">
-			                Post
-			            </button>
-			        </form>
-
-			    </div>
 
 			</div>
-       </div>
-		       
-</div>
 
-<!-- ================= DROPDOWN SCRIPT ================= -->
-<script>
 
-function toggleDropdown() {
-    var menu = document.getElementById("dropdownMenu");
-    if (!menu) return;
 
-    if (menu.style.display === "flex") {
-        menu.style.display = "none";
-    } else {
-        menu.style.display = "flex";
-    }
-}
+		</div>
 
-window.addEventListener("click", function(event) {
-    var avatar = document.querySelector(".header-avatar");
-    var dropdown = document.getElementById("dropdownMenu");
+	</div>
+	</div>
 
-    if (!dropdown || !avatar) return;
 
-    if (!avatar.contains(event.target) && !dropdown.contains(event.target)) {
-        dropdown.style.display = "none";
-    }
-});
+	<!-- ================= DROPDOWN SCRIPT ================= -->
+	<script>
 
-var searchForm = document.getElementById("searchForm");
+		function toggleDropdown() {
+			var menu = document.getElementById("dropdownMenu");
+			if (!menu) return;
 
-if (searchForm) {
-    searchForm.addEventListener("submit", function(e) {
-        e.preventDefault();
+			if (menu.style.display === "flex") {
+				menu.style.display = "none";
+			} else {
+				menu.style.display = "flex";
+			}
+		}
 
-        var keywordInput = document.getElementById("searchInput");
-        var errorBox = document.getElementById("searchError");
+		window.addEventListener("click", function (event) {
+			var avatar = document.querySelector(".header-avatar");
+			var dropdown = document.getElementById("dropdownMenu");
 
-        if (!keywordInput) return;
+			if (!dropdown || !avatar) return;
 
-        var keyword = keywordInput.value.trim();
-        if (!keyword) return;
+			if (!avatar.contains(event.target) && !dropdown.contains(event.target)) {
+				dropdown.style.display = "none";
+			}
+		});
+		
+		
 
-        fetch("/profile/search-api?keyword=" + encodeURIComponent(keyword))
-            .then(function(response) {
-                if (response.status === 200) {
-                    return response.text().then(function(username) {
-                        window.location.href = "/profile/" + username;
+		
 
-                    });
-                } else {
-                    return response.text().then(function(msg) {
-                        if (errorBox) {
-                            errorBox.innerText = "❌ " + msg;
-                            errorBox.style.display = "block";
-                        }
-                    });
-                }
-            })
-            .catch(function() {
-                if (errorBox) {
-                    errorBox.innerText = "❌ Something went wrong";
-                    errorBox.style.display = "block";
-                }
-            });
+		
+					
+					
 
-    });
-}
+	</script>
 
-</script>
+	<script>
+		function togglePostMenu(btn) {
+			const dropdown = btn.nextElementSibling;
+			const allDropdowns = document.querySelectorAll(".profile-post-dropdown");
 
-<script>
-function togglePostMenu(btn) {
-    const dropdown = btn.nextElementSibling;
-    const allDropdowns = document.querySelectorAll(".profile-post-dropdown");
+			allDropdowns.forEach(d => {
+				if (d !== dropdown) d.style.display = "none";
+			});
 
-    allDropdowns.forEach(d => {
-        if (d !== dropdown) d.style.display = "none";
-    });
-
-    dropdown.style.display =
-        dropdown.style.display === "flex" ? "none" : "flex";
-}
+			dropdown.style.display =
+				dropdown.style.display === "flex" ? "none" : "flex";
+		}
 
 
 
 
-window.addEventListener("click", function(e) {
-    if (!e.target.closest(".profile-post-menu")) {
-        document.querySelectorAll(".profile-post-dropdown")
-            .forEach(d => d.style.display = "none");
-    }
-});
-</script>
-<script>
-function toggleComments(postId) {
-    const section = document.getElementById("comments-" + postId);
-    if (!section) return;
+		window.addEventListener("click", function (e) {
+			if (!e.target.closest(".profile-post-menu")) {
+				document.querySelectorAll(".profile-post-dropdown")
+					.forEach(d => d.style.display = "none");
+			}
+		});
+	</script>
+	<script>
+		function toggleComments(postId) {
+			const section = document.getElementById("comments-" + postId);
+			if (!section) return;
 
-    section.style.display =
-        section.style.display === "block" ? "none" : "block";
-}
-</script>
+			section.style.display =
+				section.style.display === "block" ? "none" : "block";
+		}
+	</script>
 
-<!-- DELETE MODAL -->
-<div id="deleteModal" class="custom-modal" style="display:none;">
+	<!-- DELETE MODAL -->
+	<div id="deleteModal" class="custom-modal" style="display:none;">
 
-    <div class="modal-content">
+		<div class="modal-content">
 
-        <h3>Delete Post</h3>
-        <p>Are You sure</p>
+			<h3>Delete Post</h3>
+			<p>Are You sure</p>
 
-        <div class="modal-actions">
-            <button type="button"
-                    onclick="closeDeleteModal()"
-                    class="cancel-btn">
-                Cancel
-            </button>
+			<div class="modal-actions">
+				<button type="button" onclick="closeDeleteModal()" class="cancel-btn">
+					Cancel
+				</button>
 
-            <form id="deleteForm" method="post">
-                <button type="submit" class="delete-btn">
-                    Delete
-                </button>
-            </form>
-        </div>
+				<form id="deleteForm" method="post">
+					<button type="submit" class="delete-btn">
+						Delete
+					</button>
+				</form>
+			</div>
 
-    </div>
-</div>
+		</div>
+	</div>
 
-<script>
-function openDeleteModal(postId) {
-    const modal = document.getElementById("deleteModal");
-    const deleteForm = document.getElementById("deleteForm");
+	<script>
+		function openDeleteModal(postId) {
+			const modal = document.getElementById("deleteModal");
+			const deleteForm = document.getElementById("deleteForm");
 
-    deleteForm.action = "/post/delete/" + postId;
+			deleteForm.action = "/post/delete/" + postId;
 
-    modal.style.display = "flex";
-}
+			modal.style.display = "flex";
+		}
 
-function closeDeleteModal() {
-    document.getElementById("deleteModal").style.display = "none";
-}
-</script>
+		function closeDeleteModal() {
+			document.getElementById("deleteModal").style.display = "none";
+		}
+	</script>
 </body>
+
 </html>

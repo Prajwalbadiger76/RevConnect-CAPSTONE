@@ -2,17 +2,58 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Followers</title>
+    <link rel="stylesheet" th:href="@{/css/feed.css}">
 </head>
 <body>
 
-<h2>Followers</h2>
+<!-- HEADER -->
+<div th:replace="fragments/header :: header"></div>
 
-<div th:each="user : ${followers}">
-    <a th:href="@{/profile/{username}(username=${user.username})}"
-       th:text="${user.username}"></a>
+<!-- MAIN CONTENT AREA -->
+<div class="followers-wrapper">
+
+    <div class="followers-container">
+
+        <a th:href="@{/feed}" class="back-link">← Back to Feed</a>
+
+        <h2 class="followers-header">Followers</h2>
+
+        <div class="followers-count"
+             th:if="${!#lists.isEmpty(followers)}"
+             th:text="${#lists.size(followers)} + ' followers'">
+        </div>
+
+        <!-- Empty State -->
+        <div th:if="${#lists.isEmpty(followers)}" class="empty-state">
+            <div class="empty-box">
+                <div class="empty-icon">📢</div>
+                <h3>No Followers Yet</h3>
+                <p>When someone follows you, they’ll appear here.</p>
+            </div>
+        </div>
+
+        <!-- Followers List -->
+        <div th:each="user : ${followers}" class="follower-card">
+
+            <div class="follower-left">
+                <div class="avatar"
+                     th:text="${#strings.substring(user.username,0,1)}">
+                </div>
+
+                <a th:href="@{/profile/{username}(username=${user.username})}"
+                   th:text="${user.username}"
+                   class="follower-name">
+                </a>
+            </div>
+
+        </div>
+
+    </div>
+
 </div>
 
-<a th:href="@{/feed}">Back</a>
+<!-- FOOTER -->
+<div th:replace="fragments/footer :: footer"></div>
 
 </body>
 </html>

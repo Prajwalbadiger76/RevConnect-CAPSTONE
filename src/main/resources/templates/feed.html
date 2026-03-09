@@ -265,7 +265,7 @@
 
 			<!-- CREATE POST -->
 			<div class="create-post" th:if="${showCreateForm} ">
-				<form th:action="@{/post/create}" method="post">
+				<form th:action="@{/post/create}" method="post"onsubmit="return validateUrlBeforeSubmit()">
 
 					<!-- Row 1: Textarea -->
 					<div class="create-row">
@@ -762,26 +762,30 @@
 
 		function confirmSchedule() {
 
-			let dateTime = document.getElementById("schedulePicker").value;
+		    let dateTime = document.getElementById("schedulePicker").value;
 
+		    if (!dateTime) {
+		        showAppPopup("Please select date and time.");
+		        return;
+		    }
 
-			if (!dateTime) {
-				showAppPopup("Please select date and time.");
-				return;
-			}
+		    const selectedTime = new Date(dateTime);
+		    const currentTime = new Date();
 
-			// Set hidden input
-			document.getElementById("scheduledAtInput").value = dateTime;
+		    if (selectedTime <= currentTime) {
+		        showAppPopup("Scheduled time must be in the future.");
+		        return;
+		    }
 
-			closeSchedule();
+		    document.getElementById("scheduledAtInput").value = dateTime;
 
-			// Show success toast
-			showToast("Post scheduled successfully!");
+		    closeSchedule();
 
-			// Submit form after small delay (better UX)
-			setTimeout(() => {
-				document.querySelector(".create-post form").submit();
-			}, 800);
+		    showToast("Post scheduled successfully!");
+
+		    setTimeout(() => {
+		        document.querySelector(".create-post form").submit();
+		    }, 800);
 		}
 
 
@@ -893,6 +897,28 @@
 	    }
 	}
 	</script>
+	
+	<script>
+			function validateUrlBeforeSubmit() {
+
+				    const promoInput = document.getElementById("promoInput").value;
+				    const urlInput = document.querySelector("input[name='ctaUrl']");
+
+				    if (promoInput === "true") {
+
+				        const url = urlInput.value.trim();
+
+				        const pattern = /^(https?:\/\/)[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}.*$/;
+
+				        if (!pattern.test(url)) {
+				            showAppPopup("Please enter a valid URL (http:// or https://)");
+				            return false;
+				        }
+				    }
+
+				    return true;
+				}
+		</script>
 
 	<div th:replace="fragments/footer :: footer"></div>
 </body>
