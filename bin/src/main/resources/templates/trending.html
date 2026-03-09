@@ -4,7 +4,63 @@
     <meta charset="UTF-8">
     <title>Trending Hashtags</title>
     <link rel="stylesheet" th:href="@{/css/feed.css}">
+
+    <style>
+        .trending-page {
+            background: #f3f4f6;
+            min-height: 100vh;
+        }
+
+        .sub-header {
+            max-width: 900px;
+            margin: 100px auto 0 auto;
+            padding: 0 100px 0 p;
+        }
+
+        .back-btn {
+            text-decoration: none;
+            color: #2563eb;
+            font-weight: 500;
+        }
+
+        .feed-container {
+            max-width: 700px;
+            margin: 20px auto 40px auto;
+			padding-top: 50px;
+        }
+
+        /* ===== Trending Pills ===== */
+
+        .trending-tags-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .trend-pill {
+            padding: 6px 14px;
+            border-radius: 20px;
+            background: #f3f4f6;
+            text-decoration: none;
+            font-size: 14px;
+            color: #111827;
+            border: 1px solid #e5e7eb;
+            transition: 0.2s ease;
+        }
+
+        .trend-pill:hover {
+            background: #e5e7eb;
+        }
+
+        .active-tag {
+            background: #111827;
+            color: white;
+            border-color: #111827;
+        }
+    </style>
 </head>
+
 <body>
 
 <div class="trending-page">
@@ -14,53 +70,136 @@
         <h2>RevConnect</h2>
     </div>
 
-    <!-- BACK BUTTON -->
-    <div class="sub-header">
-        <a th:href="@{/feed}" class="back-btn">
-            ← Back to Feed
-        </a>
-    </div>
 
     <div class="feed-container">
+		
+		<!-- BACK BUTTON -->
+		<div class="sub-header">
+		    <a th:href="@{/feed}" class="back-btn">
+		        ← Back to Feed
+		    </a>
+		</div>
+		
+		<h2 class="followers-header">Trending Hashtags</h2>
 
         <!-- Trending Pills -->
-        <div class="trending-tags-row">
+		<div class="trending-tags-row">
 
-            <a th:each="tagItem : ${trendingHashtags}"
-               th:href="@{/post/trending(tag=${tagItem})}"
-               class="trend-pill"
-               th:classappend="${tagItem == selectedTag} ? ' active-tag' : ''"
-               th:text="${'#' + tagItem}">
-            </a>
+		    <a th:each="tagItem : ${trendingHashtags}"
+		       th:href="@{/post/trending(tag=${tagItem})}"
+		       class="trend-pill"
+		       th:classappend="${tagItem == selectedTag} ? ' active-tag' : ''"
+		       th:text="${'#' + tagItem}">
+		    </a>
 
-        </div>
+		</div>
 
         <!-- Posts -->
-        <div th:each="post : ${posts}" class="post-card">
+		<div th:each="post : ${posts}" class="post-card">
 
-            <div class="post-top">
+		    <!-- TOP -->
+		    <div class="post-top">
 
-                <div class="avatar small">
-                    <span th:text="${#strings.substring(post.username,0,1).toUpperCase()}"></span>
-                </div>
+		        <div class="avatar small">
+		            <span th:text="${#strings.substring(post.username,0,1).toUpperCase()}"></span>
+		        </div>
 
-                <div class="post-meta">
-                    <a th:text="${post.username}"></a>
-                    <span th:text="${#temporals.format(post.createdAt,'dd MMM yyyy HH:mm')}"></span>
-                </div>
+		        <div class="post-meta">
+		            <a th:href="@{/profile/{username}(username=${post.username})}"
+		               th:text="${post.username}"></a>
 
-            </div>
+		            <span th:text="${#temporals.format(post.createdAt,'dd MMM yyyy HH:mm')}"></span>
+		        </div>
 
-            <div class="post-content"
-                 th:text="${post.content}">
-            </div>
+		    </div>
 
-        </div>
+		    <!-- CONTENT -->
+		    <div class="post-body">
+		        <div class="post-content"
+		             th:text="${post.content}">
+		        </div>
+		    </div>
 
+		    <!-- HASHTAGS -->
+		    <div th:if="${post.hashtags != null}">
+		        <span th:each="tag : ${post.hashtags}">
+		            <a th:href="@{/post/trending(tag=${tag})}"
+		               style="color:#2563eb; margin-right:8px;">
+		                <span th:text="${'#' + tag}"></span>
+		            </a>
+		        </span>
+		    </div>
+
+		    <!-- ACTIONS -->
+		    <div class="post-actions">
+
+		        <!-- LIKE -->
+		        <form th:action="@{/like/{postId}(postId=${post.id})}" method="post">
+		            <button th:text="${post.likedByCurrentUser ? '❤️ Unlike' : '🤍 Like'}"></button>
+		        </form>
+
+		        <span th:text="${post.likeCount} + ' likes'"></span>
+
+		        <!-- COMMENT COUNT -->
+		        <span class="comment-toggle"
+		              th:attr="onclick=|toggleComments(${post.id})|">
+		            💬 <span th:text="${#lists.size(post.comments)}"></span> Comments
+		        </span>
+
+		        <!-- SHARE -->
+		        <form th:if="${!post.sharedByCurrentUser}"
+		              th:action="@{/post/share/{id}(id=${post.id})}"
+		              method="post">
+		            <button>🔁 Re-Share</button>
+		        </form>
+
+		        <span th:if="${post.sharedByCurrentUser}"
+		              style="color:gray; font-weight:500;">
+		            🔁 Re-Shared
+		        </span>
+
+		    </div>
+
+		    <!-- COMMENTS SECTION -->
+		    <div class="comment-section">
+
+		        <div class="comments-list"
+		             th:id="'comments-' + ${post.id}"
+		             style="display:none;">
+
+		            <div th:each="comment : ${post.comments}" class="comment">
+
+		                <div class="comment-left">
+		                    <strong>
+		                        <a th:href="@{/profile/{username}(username=${comment.username})}"
+		                           th:text="${comment.username}"></a>
+		                    </strong>
+		                    <span th:text="${comment.content}"></span>
+		                </div>
+
+		                <form th:if="${comment.ownedByCurrentUser}"
+		                      th:action="@{/comment/delete/{commentId}(commentId=${comment.id})}"
+		                      method="post">
+		                    <button class="delete-btn">Delete</button>
+		                </form>
+
+		            </div>
+
+		        </div>
+
+		        <!-- COMMENT FORM -->
+		        <div class="comment-form">
+		            <form th:action="@{/comment/{postId}(postId=${post.id})}" method="post">
+		                <input type="text" name="content" placeholder="Write a comment..." required>
+		                <button type="submit">Post</button>
+		            </form>
+		        </div>
+
+		    </div>
+
+		</div>
     </div>
 
 </div>
-
-
 </body>
 </html>

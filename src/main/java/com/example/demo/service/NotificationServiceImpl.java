@@ -7,6 +7,10 @@ import com.example.demo.entity.User;
 import com.example.demo.repo.NotificationPreferenceRepository;
 import com.example.demo.repo.NotificationRepository;
 import com.example.demo.repo.UserRepository;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +20,9 @@ import java.util.stream.Collectors;
 
 @Service
 public class NotificationServiceImpl implements NotificationService {
+
+    private static final Logger logger =
+            LoggerFactory.getLogger(NotificationServiceImpl.class);
 
     private final NotificationRepository notificationRepository;
     private final UserRepository userRepository;
@@ -41,15 +48,19 @@ public class NotificationServiceImpl implements NotificationService {
                                    String type,
                                    Long referenceId) {
 
+        logger.info("Creating notification -> sender: {}, recipient: {}, type: {}",
+                senderUsername, recipientUsername, type);
+
         if (recipientUsername.equals(senderUsername)) {
+            logger.debug("Skipping self-notification for user {}", senderUsername);
             return;
         }
 
         User recipient = userRepository.findByUsername(recipientUsername)
-                .orElseThrow();
+                .orElseThrow(() -> new RuntimeException("Recipient not found"));
 
         User sender = userRepository.findByUsername(senderUsername)
-                .orElseThrow();
+                .orElseThrow(() -> new RuntimeException("Sender not found"));
 
         NotificationPreference pref =
                 preferenceRepository.findByUser(recipient)
@@ -57,11 +68,20 @@ public class NotificationServiceImpl implements NotificationService {
 
         if (pref != null) {
 
-            if ("LIKE".equals(type) && !pref.isLikeEnabled()) return;
+            if ("LIKE".equals(type) && !pref.isLikeEnabled()) {
+                logger.info("LIKE notification disabled for user {}", recipientUsername);
+                return;
+            }
 
-            if ("COMMENT".equals(type) && !pref.isCommentEnabled()) return;
+            if ("COMMENT".equals(type) && !pref.isCommentEnabled()) {
+                logger.info("COMMENT notification disabled for user {}", recipientUsername);
+                return;
+            }
 
-            if ("FOLLOW".equals(type) && !pref.isFollowEnabled()) return;
+            if ("FOLLOW".equals(type) && !pref.isFollowEnabled()) {
+                logger.info("FOLLOW notification disabled for user {}", recipientUsername);
+                return;
+            }
         }
 
         Notification notification =
@@ -69,7 +89,7 @@ public class NotificationServiceImpl implements NotificationService {
 
         notificationRepository.save(notification);
 
-        System.out.println("NOTIFICATION SAVED INTO DATABASE");
+        logger.info("Notification saved successfully for recipient {}", recipientUsername);
     }
 
     // =====================================================
@@ -79,19 +99,27 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     public List<NotificationDto> getUserNotifications(String username) {
 
-        User user = userRepository.findByUsername(username).orElseThrow();
+        logger.info("Fetching notifications for user {}", username);
 
-        return notificationRepository
-                .findByRecipientOrderByCreatedAtDesc(user)
-                .stream()
-                .map(n -> new NotificationDto(
-                        n.getId(),
-                        buildMessage(n),
-                        n.isRead(),
-                        n.getReferenceId(),
-                        n.getCreatedAt()
-                ))
-                .collect(Collectors.toList());
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        List<NotificationDto> notifications =
+                notificationRepository
+                        .findByRecipientOrderByCreatedAtDesc(user)
+                        .stream()
+                        .map(n -> new NotificationDto(
+                                n.getId(),
+                                buildMessage(n),
+                                n.isRead(),
+                                n.getReferenceId(),
+                                n.getCreatedAt()
+                        ))
+                        .collect(Collectors.toList());
+
+        logger.info("Total notifications fetched for {}: {}", username, notifications.size());
+
+        return notifications;
     }
 
     // =====================================================
@@ -101,9 +129,16 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     public long getUnreadCount(String username) {
 
-        User user = userRepository.findByUsername(username).orElseThrow();
+        logger.debug("Fetching unread notification count for {}", username);
 
-        return notificationRepository.countByRecipientAndIsReadFalse(user);
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        long count = notificationRepository.countByRecipientAndIsReadFalse(user);
+
+        logger.debug("Unread notifications for {}: {}", username, count);
+
+        return count;
     }
 
     // =====================================================
@@ -114,11 +149,15 @@ public class NotificationServiceImpl implements NotificationService {
     @Transactional
     public void markAsRead(Long notificationId) {
 
+        logger.info("Marking notification {} as read", notificationId);
+
         Notification notification =
                 notificationRepository.findById(notificationId)
-                        .orElseThrow();
+                        .orElseThrow(() -> new RuntimeException("Notification not found"));
 
         notification.setRead(true);
+
+        logger.info("Notification {} marked as read", notificationId);
     }
 
     // =====================================================

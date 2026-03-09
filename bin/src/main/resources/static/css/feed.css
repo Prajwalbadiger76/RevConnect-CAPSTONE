@@ -1,29 +1,73 @@
 /* =====================================================
    GLOBAL RESET
 ===================================================== */
-* { box-sizing: border-box; }
+* {
+    box-sizing: border-box;
+}
 
 body {
     margin: 0;
     font-family: "Segoe UI", sans-serif;
-    background: #eef2f7;
+    background: #DFE9EB;
+    color: #1f2937;
 }
+
+/* =====================================================
+   GLOBAL VARIABLES
+===================================================== */
+:root {
+    --navbar-height: 80px;   /* adjust if navbar height changes */
+}
+
+/* =====================================================
+   STICKY SIDE BARS
+===================================================== */
+.filter-column,
+.notification-sidebar {
+    position: sticky;
+    top: var(--navbar-height);
+}
+/* =====================================================
+   MAIN 3 COLUMN LAYOUT
+===================================================== */
+.page-layout {
+    max-width: 1200px;
+	margin: calc(var(--navbar-height) + 10px) auto 30px auto;
+    padding: 0 20px;
+    display: grid;
+
+    grid-template-columns: 240px minmax(0, 1fr) 320px; /* important */
+    gap: 30px;
+
+    align-items: start;
+}
+
+.feed-container {
+    width: 100%;
+    min-width: 0;  /* VERY IMPORTANT */
+}
+
+
 
 /* =====================================================
    NAVBAR
 ===================================================== */
 .navbar {
-    position: sticky;
+    position: fixed;
     top: 0;
+    left: 0;
+    width: 100%;
+
     background: #0f172a;
     color: white;
-    padding: 14px 40px;
+    padding: 14px 30px;
+
     display: flex;
     justify-content: space-between;
     align-items: center;
-    z-index: 1000;
-}
 
+    z-index: 9999;
+}
 .navbar-left,
 .navbar-right {
     display: flex;
@@ -31,10 +75,25 @@ body {
     gap: 20px;
 }
 
+.navbar h2 {
+    margin: 0;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
 .navbar-right a {
     color: white;
     text-decoration: none;
     font-size: 14px;
+
+    display: flex;              /* Align text + icon */
+    align-items: center;        /* Perfect vertical alignment */
+    gap: 6px;                   /* Space between text & icon */
+}
+
+.navbar-right a svg {
+    width: 16px;
+    height: 16px;
 }
 
 /* Search */
@@ -49,18 +108,6 @@ body {
     border-radius: 20px;
     border: none;
     width: 220px;
-    flex-shrink: 0;   /* prevents resizing issue */
-}
-
-#dynamicTrendingBtn {
-    display: none;
-    padding: 6px 12px;
-    border-radius: 18px;
-    background: rgba(255,99,71,0.1);
-    color: #ff5722;
-    text-decoration: none;
-    font-size: 13px;
-    white-space: nowrap;  /* prevents wrapping */
 }
 
 .search-form button {
@@ -71,6 +118,101 @@ body {
     border-radius: 20px;
     cursor: pointer;
 }
+
+.search-form button {
+    display: flex;              /* Make text + icon align properly */
+    align-items: center;        /* Vertical center */
+    justify-content: center;    /* Center horizontally */
+    gap: 8px;                   /* Space between text and icon */
+
+    background: #2563eb;
+    color: white;
+    border: none;
+    padding: 10px 22px;
+    border-radius: 40px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.search-form button svg {
+    width: 18px;
+    height: 18px;
+}
+
+/* =====================================================
+   FILTER SIDEBAR
+===================================================== */
+
+
+/* =====================================================
+   FILTER SIDEBAR
+===================================================== */
+/*
+
+.filter-card {
+    background: #ffffff;
+    border-radius: 18px;
+    padding: 20px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+}
+
+.filter-heading {
+    font-weight: 600;
+    margin-bottom: 18px;
+    font-size: 16px;
+
+    display: flex;          /* Align text + icon */
+    align-items: center;    /* Perfect vertical center */
+    gap: 8px;               /* Space between text & icon */
+}
+
+
+.filter-heading svg {
+    width: 18px;
+    height: 18px;
+}
+
+.filter-btn {
+    width: 100%;
+    text-align: left;
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 14px;
+    margin-bottom: 8px;
+    transition: 0.2s ease;
+}
+
+.filter-btn:hover {
+    background: #f1f5f9;
+}
+
+.filter-btn.active {
+    background: #2563eb;
+    color: white;
+    font-weight: 600;
+}
+
+/* FILTER HEADER STYLE */
+
+		.filter-heading {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+
+			padding: 12px 16px;
+			border-radius: 12px;
+			margin-bottom: 15px;
+
+			background: linear-gradient(90deg, #00c6ff, #0072ff);
+
+			font-size: 18px;
+			font-weight: 600;
+			color: black;
+		}
 /* =====================================================
    PROFILE DROPDOWN
 ===================================================== */
@@ -95,8 +237,8 @@ body {
     right: 0;
     background: white;
     width: 160px;
-    border-radius: 8px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    border-radius: 10px;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.15);
     display: none;
 }
 
@@ -112,73 +254,53 @@ body {
 .dropdown a:hover { background: #f1f5f9; }
 
 /* =====================================================
-   FEED
-===================================================== */
-.feed-container {
-    max-width: 720px;
-    margin: 40px auto;
-}
-
-/* =====================================================
    CREATE POST
 ===================================================== */
 .create-post {
     background: white;
-    padding: 20px;
-    border-radius: 16px;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+    padding: 24px;
+    border-radius: 18px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.06);
     margin-bottom: 30px;
 }
 
-.create-row {
-    display: flex;
-    gap: 15px;
-    align-items: flex-start;
+.create-post textarea {
+    width: 100%;
+    padding: 16px;
+    border-radius: 14px;
+    border: 1px solid #e5e7eb;
+    resize: none;
+    min-height: 110px;
+    font-size: 15px;
 }
 
-.create-post textarea {
-    flex: 1;
-    padding: 14px;
-    border-radius: 14px;
-    border: 1px solid #d1d5db;
-    resize: none;
-    min-height: 90px;
+.create-post textarea:focus {
+    outline: none;
+    border: 1px solid #2563eb;
 }
 
 .create-actions {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    margin-top: 15px;
+    margin-top: 18px;
 }
 
 .create-actions button {
+    padding: 10px 22px;
+    border-radius: 24px;
+    border: none;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.create-actions button:first-child {
     background: #2563eb;
     color: white;
-    border: none;
-    padding: 8px 20px;
-    border-radius: 20px;
-    cursor: pointer;
 }
 
-/* =====================================================
-   AVATAR
-===================================================== */
-.avatar {
-    width: 46px;
-    height: 46px;
-    background: #6366f1;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.create-actions button:last-child {
+    background: #111827;
     color: white;
-    font-weight: 600;
-}
-
-.avatar.small {
-    width: 42px;
-    height: 42px;
 }
 
 /* =====================================================
@@ -186,16 +308,27 @@ body {
 ===================================================== */
 .post-card {
     background: white;
-    padding: 20px;
-    border-radius: 16px;
-    margin-bottom: 25px;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+    padding: 22px;
+    border-radius: 18px;
+    margin-bottom: 24px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.05);
+    transition: 0.2s ease;
+}
+
+.post-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(0,0,0,0.08);
 }
 
 .post-top {
     display: flex;
-    gap: 14px;
+    gap: 16px;
     align-items: center;
+	margin-bottom: 1.8rem;
+}
+
+.post-top .avatar {
+    flex-shrink: 0;
 }
 
 .post-meta a {
@@ -210,16 +343,27 @@ body {
     color: #6b7280;
 }
 
+
 .post-content {
-    margin: 15px 0;
     line-height: 1.6;
+    font-size: 15px;
+}
+
+.post-body {
+    background: #f8fafc;        /* very light blue-gray */
+    padding: 16px;
+    border-radius: 12px;
+    margin: 15px 0;
+    border: 1px solid #e2e8f0;
+    transition: background 0.2s ease;
 }
 
 .post-actions {
     display: flex;
-    gap: 15px;
     align-items: center;
-    margin-top: 10px;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-top: 1px solid #f1f5f9;
 }
 
 .post-actions button {
@@ -229,191 +373,67 @@ body {
     font-size: 14px;
 }
 
-/* =====================================================
-   TRENDING SECTION
-===================================================== */
-#trendingBox {
-    display: none;
-    position: absolute;
-    top: 45px;
-    left: 0;
-    width: 260px;
-    background: white;
-    border-radius: 14px;
-    box-shadow: 0 12px 30px rgba(0,0,0,0.18);
-    padding: 10px;
-    z-index: 2000;
-    animation: fadeIn 0.2s ease-in-out;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(6px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.trending-tags-row {
-    display: flex;
-    gap: 14px;
-    flex-wrap: wrap;
-    margin: 20px 0 30px 0;
-}
-
-.trend-pill {
-    padding: 8px 18px;
-    border-radius: 999px;
-    background: #f1f5f9;
-    text-decoration: none;
-    color: #1f2937;
-    font-size: 14px;
-    font-weight: 500;
-    transition: background 0.25s ease, color 0.25s ease, transform 0.15s ease;
-}
-
-.trend-pill:hover { background: #e2e8f0; }
-.trend-pill:active { transform: scale(0.96); }
-
-.active-tag {
-    background: #2563eb;
-    color: white;
-}
-
-/* =====================================================
-   SUB HEADER
-===================================================== */
-.sub-header {
-    max-width: 900px;
-    margin: 20px auto 10px auto;
-    padding: 0 20px;
-}
-
-.back-btn {
-    text-decoration: none;
-    background: #ffffff;
-    color: #111827;
-    padding: 8px 18px;
-    border-radius: 25px;
-    font-weight: 500;
-    display: inline-block;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    transition: all 0.25s ease;
-}
-
-.back-btn:hover {
-    background: #f3f4f6;
-    transform: translateY(-2px);
-}
-
-/* =====================================================
-   HASHTAG SUGGESTIONS
-===================================================== */
-#hashtagSuggestions {
-    display: none;
-    background: white;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 8px;
-    margin-top: 5px;
+.post-actions > * {
+    flex: unset;
     text-align: left;
 }
 
-#hashtagSuggestions div:hover {
-    background: #f3f4f6;
+/* Add small spacing between items */
+.post-actions {
+    gap: 20px;
+}
+
+.post-actions form {
+    margin: 0;                   /* Remove default form margin */
 }
 
 /* =====================================================
-   SCHEDULE OVERLAY
+   AVATAR (RESTORED)
 ===================================================== */
-.schedule-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.4);
-    justify-content: center;
-    align-items: flex-end;
-    z-index: 2000;
-}
-
-.schedule-sheet {
-    background: white;
-    width: 100%;
-    max-width: 480px;
-    padding: 25px;
-    border-radius: 20px 20px 0 0;
-    box-shadow: 0 -5px 25px rgba(0,0,0,0.2);
-    animation: slideUp 0.3s ease;
-}
-
-@keyframes slideUp {
-    from { transform: translateY(100%); }
-    to { transform: translateY(0); }
-}
-
-.schedule-input {
-    width: 100%;
-    padding: 10px;
-    margin: 15px 0;
-    border-radius: 10px;
-    border: 1px solid #d1d5db;
-}
-
-.schedule-buttons {
+.avatar {
+    width: 46px;
+    height: 46px;
+    min-width: 46px;
+    background: linear-gradient(135deg, #6366f1, #4f46e5);
+    border-radius: 50%;
     display: flex;
-    justify-content: space-between;
-}
-
-.ok-btn {
-    background: #2563eb;
+    align-items: center;
+    justify-content: center;
     color: white;
-    border: none;
-    padding: 8px 20px;
-    border-radius: 8px;
-    cursor: pointer;
+    font-weight: 600;
+    font-size: 18px;
+    text-transform: uppercase;
 }
 
-.cancel-btn {
-    background: #e5e7eb;
-    border: none;
-    padding: 8px 20px;
-    border-radius: 8px;
-    cursor: pointer;
+.avatar.small {
+    width: 42px;
+    height: 42px;
+    min-width: 42px;
+    font-size: 16px;
 }
 
 /* =====================================================
-   APP POPUP
+   SHARE HEADER (RESTORED & IMPROVED)
 ===================================================== */
-.app-popup-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.4);
-    display: none;
-    justify-content: center;
+
+.share-header {
+    display: flex;
     align-items: center;
-    z-index: 5000;
+    gap: 6px;
+    font-size: 14px;
+    margin: 12px 0 8px 0;
+    color: #64748b;   /* soft grey */
+    font-weight: 500;
 }
 
-.app-popup {
-    background: white;
-    padding: 25px;
-    width: 320px;
-    border-radius: 16px;
-    text-align: center;
-    box-shadow: 0 15px 40px rgba(0,0,0,0.2);
-    animation: popupFade 0.2s ease;
+.share-header a {
+    color: #2563eb;
+    text-decoration: none;
+    font-weight: 600;
 }
 
-@keyframes popupFade {
-    from { transform: scale(0.9); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
-}
-
-.app-popup button {
-    margin-top: 15px;
-    padding: 8px 20px;
-    border: none;
-    border-radius: 20px;
-    background: #2563eb;
-    color: white;
-    cursor: pointer;
+.share-header a:hover {
+    text-decoration: underline;
 }
 
 /* =====================================================
@@ -438,21 +458,23 @@ body {
     padding: 6px 0;
 }
 
-.comment-left {
-    display: flex;
-    gap: 6px;
-    align-items: center;
-}
-
 .comment-form {
     display: flex;
+    width: 100%;          /* ADD THIS */
     gap: 10px;
     margin-top: 10px;
 }
 
+.comment-form form {
+    display: flex;        /* ADD THIS */
+    width: 100%;          /* ADD THIS */
+    gap: 10px;
+}
+
 .comment-form input {
     flex: 1;
-    padding: 8px;
+    width: 100%;          /* ADD THIS */
+    padding: 10px;        /* slightly bigger for better UI */
     border-radius: 8px;
     border: 1px solid #d1d5db;
 }
@@ -461,8 +483,9 @@ body {
     background: #10b981;
     color: white;
     border: none;
-    padding: 8px 14px;
+    padding: 8px 18px;    /* slightly balanced */
     border-radius: 8px;
+    white-space: nowrap;  /* prevents button shrinking */
 }
 
 .delete-btn {
@@ -472,85 +495,822 @@ body {
     padding: 4px 10px;
     border-radius: 6px;
     font-size: 12px;
-    cursor: pointer;
 }
 
 /* =====================================================
-   NOTIFICATIONS
+   NOTIFICATION SIDEBAR
 ===================================================== */
-.notif-bell {
-    position: relative;
-    cursor: pointer;
-    font-size: 18px;
-}
+/* =====================================================
+   NOTIFICATION SIDEBAR (LinkedIn Style)
+===================================================== */
 
-.notif-count {
-    position: absolute;
-    top: -6px;
-    right: -8px;
-    background: #ef4444;
-    color: white;
-    font-size: 12px;
-    padding: 2px 6px;
-    border-radius: 50%;
-    display: none;
-}
+.notification-sidebar {
+   
 
-.overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.4);
-    display: none;
-    z-index: 998;
-}
-
-.overlay.active { display: block; }
-
-.notif-panel {
-    position: fixed;
-    top: 0;
-    right: -350px;
-    width: 320px;
-    height: 100vh;
-    background: white;
-    box-shadow: -4px 0 15px rgba(0,0,0,0.2);
-    transition: 0.3s ease;
-    z-index: 999;
-    display: flex;
-    flex-direction: column;
-}
-
-.notif-panel.active { right: 0; }
-
-.notif-header {
-    padding: 15px;
-    border-bottom: 1px solid #e5e7eb;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.close-btn { cursor: pointer; }
-
-.notif-list {
-    padding: 10px;
+    height: calc(100vh - 100px);
     overflow-y: auto;
-    flex: 1;
+
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 20px;
+
+    border: 1px solid #e5e7eb;
+    box-shadow: none;
+}
+
+.sidebar-header {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 15px;
 }
 
 .notif-item {
-    padding: 10px;
-    border-radius: 8px;
+    padding: 12px;
+    border-radius: 10px;
     margin-bottom: 8px;
     cursor: pointer;
     font-size: 14px;
+    transition: 0.2s ease;
 }
 
 .notif-item.unread {
-    background: #eef2ff;
+    background: #eef3ff;
     font-weight: 600;
+}
+
+.notif-item.read {
+    background: #fafafa;
 }
 
 .notif-item:hover {
     background: #f1f5f9;
+}
+
+.notif-text {
+    font-size: 14px;
+}
+
+.empty-text {
+    font-size: 13px;
+    color: #888;
+    text-align: center;
+}
+
+.sidebar-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 12px 16px;
+			border-radius: 12px;
+			margin-bottom: 15px;
+
+			/* Attractive soft gradient */
+			background: linear-gradient(90deg, #00c6ff, #0072ff);
+			font-size: 18px;
+			font-weight: 600;
+		}
+
+		.sidebar-title {
+			color: #111827;
+		}
+
+		.sidebar-bell {
+			position: relative;
+			font-size: 22px;
+		}
+
+		.sidebar-badge {
+			position: absolute;
+			top: -6px;
+			right: -10px;
+			background: #ef4444;
+			color: white;
+			font-size: 11px;
+			font-weight: 600;
+			padding: 2px 6px;
+			border-radius: 50px;
+			display: none;
+			min-width: 18px;
+			text-align: center;
+		}
+/* =====================================================
+   POST HASHTAGS (NEW STYLING)
+===================================================== */
+
+.post-hashtags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 10px 0 5px 0;
+}
+
+.post-hashtags a {
+    font-size: 13px;
+    text-decoration: none;
+    padding: 6px 12px;
+    border-radius: 20px;
+    background: #eef2ff;
+    color: #4338ca;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.post-hashtags a:hover {
+    background: #4338ca;
+    color: white;
+    transform: translateY(-1px);
+}
+
+/* =====================================================
+   RESPONSIVE DESIGN
+===================================================== */
+@media (max-width: 1100px) {
+    .page-layout {
+        grid-template-columns: 220px 1fr;
+    }
+
+    .notification-sidebar {
+        display: none;
+    }
+}
+
+@media (max-width: 850px) {
+    .page-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .filter-column {
+        display: none;
+    }
+
+    .navbar {
+        flex-direction: column;
+        gap: 10px;
+        align-items: flex-start;
+    }
+
+    .search-form input {
+        width: 100%;
+    }
+}
+
+/* =====================================================
+   POOST BODY BLOCK
+===================================================== */
+.post-body {
+    background: #f8fafc;        /* very light blue-gray */
+    padding: 16px;
+    border-radius: 12px;
+    margin: 15px 0;
+    border: 1px solid #e2e8f0;
+    transition: background 0.2s ease;
+}
+
+.post-body:hover {
+    background: #f1f5f9;        /* slight hover effect */
+}
+
+.post-content {
+    line-height: 1.6;
+    font-size: 15px;
+    color: #1f2937;
+}
+
+/* Shared post slightly different tone */
+.shared-post {
+    background: #eef2ff;
+    border: 1px solid #c7d2fe;
+}
+
+/* =====================================================
+   SHARE HEADER (LinkedIn Style)
+===================================================== */
+.share-header {
+    font-size: 14px;
+    margin: 10px 0 6px 0;
+    color: #64748b;
+}
+
+.share-header a {
+    color: #2563eb;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.share-header a:hover {
+    text-decoration: underline;
+}
+
+/* ===== SCHEDULE MODAL ===== */
+
+.schedule-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 5000;
+}
+
+.schedule-sheet {
+    background: white;
+    padding: 25px;
+    border-radius: 16px;
+    width: 350px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+}
+
+.schedule-input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+    margin-top: 15px;
+}
+
+.schedule-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.ok-btn {
+    background: #2563eb;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.cancel-btn {
+    background: #e5e7eb;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+/* ===== APP POPUP MODAL ===== */
+
+.app-popup-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 6000;
+}
+
+.app-popup {
+    background: white;
+    padding: 25px 30px;
+    border-radius: 16px;
+    width: 350px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    animation: popupFade 0.2s ease;
+}
+
+.app-popup button {
+    margin-top: 18px;
+    background: #2563eb;
+    color: white;
+    border: none;
+    padding: 8px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+@keyframes popupFade {
+    from {
+        transform: scale(0.95);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* =====================================================
+   PROMOTIONAL TOGGLE (MODERN APP STYLE)
+===================================================== */
+
+.promo-toggle-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-top: 18px;
+}
+
+/* Toggle container */
+.toggle-switch {
+    position: relative;
+    width: 50px;
+    height: 26px;
+}
+
+/* Hide checkbox */
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+/* Slider background */
+.slider {
+    position: absolute;
+    inset: 0;
+    background: #d1d5db;
+    border-radius: 30px;
+    transition: all 0.3s ease;
+}
+
+/* Toggle circle */
+.slider:before {
+    content: "";
+    position: absolute;
+    height: 20px;
+    width: 20px;
+    left: 3px;
+    top: 3px;
+    background: white;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+/* Active state */
+.toggle-switch input:checked + .slider {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    box-shadow: 0 0 8px rgba(37,99,235,0.5);
+}
+
+.toggle-switch input:checked + .slider:before {
+    transform: translateX(24px);
+}
+
+/* Label text */
+.toggle-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+}
+
+/* =====================================================
+   PROMOTIONAL FIELDS
+===================================================== */
+
+.promo-fields {
+    display: none;
+    margin-top: 18px;
+    padding: 16px;
+    background: #f8fafc;
+    border-radius: 14px;
+    border: 1px solid #e5e7eb;
+    animation: fadeSlide 0.25s ease;
+
+    width: 100%;
+    box-sizing: border-box;   /* add this */
+}
+
+.promo-input {
+    width: 100%;
+    max-width: 100%;          /* add this */
+    padding: 11px 12px;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    margin-bottom: 12px;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    box-sizing: border-box;   /* add this */
+}
+
+.promo-input:focus {
+    outline: none;
+    border: 1px solid #2563eb;
+    box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
+}
+
+/* Smooth animation */
+@keyframes fadeSlide {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* =====================================================
+   LINKEDIN STYLE CTA BUTTON
+===================================================== */
+.promo-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    background: #0a66c2;
+    color: white;
+    border-radius: 6px;
+    text-decoration: none;
+    border: 1px solid #0a66c2;
+    transition: all 0.15s ease;
+    white-space: nowrap;   /* add this line */
+}
+
+/* Hover */
+.promo-btn:hover {
+    background: #004182;        /* darker blue */
+    border-color: #004182;
+}
+
+.promo-section {
+    margin-top: 14px;
+    padding: 14px 16px;
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    width: 100%;
+    box-sizing: border-box;
+}
+
+
+
+.product-tag {
+    font-size: 14px;
+    font-weight: 600;
+    color: #111827;
+}
+/* =====================================================
+   FOOTER
+===================================================== */
+
+.main-footer {
+    background: #0f172a;
+    color: #cbd5e1;
+    margin-top: 60px;
+    padding: 40px 20px 20px 20px;
+}
+
+.footer-content {
+    max-width: 1200px;
+    margin: auto;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.footer-left h3 {
+    margin: 0;
+    color: white;
+}
+
+.footer-left p {
+    margin-top: 8px;
+    font-size: 14px;
+    color: #94a3b8;
+}
+
+.footer-links {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.footer-links a {
+    color: #cbd5e1;
+    text-decoration: none;
+    font-size: 14px;
+    transition: 0.2s ease;
+}
+
+.footer-links a:hover {
+    color: white;
+}
+
+.footer-bottom {
+    text-align: center;
+    margin-top: 25px;
+    font-size: 13px;
+    color: #94a3b8;
+}
+
+/* =====================================================
+   FOLLOWING PAGE
+===================================================== */
+
+.following-container {
+    max-width: 650px;
+    margin: 100px auto 60px auto;  /* space below navbar */
+    padding: 0 20px;
+}
+
+.back-link {
+    display: inline-block;
+    margin-bottom: 25px;
+    text-decoration: none;
+    font-size: 14px;
+    color: #64748b;
+    font-weight: 500;
+    transition: 0.2s ease;
+}
+
+.back-link:hover {
+    color: #2563eb;
+}
+
+.following-header {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.following-count {
+    font-size: 14px;
+    color: #6b7280;
+    margin-bottom: 25px;
+}
+
+.following-card {
+    background: white;
+    padding: 16px 20px;
+    border-radius: 16px;
+    margin-bottom: 14px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.05);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: 0.25s ease;
+}
+
+.following-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 28px rgba(0,0,0,0.10);
+    background: #fafbff;
+}
+
+.following-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.following-name {
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 600;
+    color: #111827;
+}
+.follower-name {
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 600;
+    color: #111827;
+}
+
+.following-name:hover {
+    color: #2563eb;
+}
+
+.empty-state {
+    display: flex;
+    justify-content: center;
+    margin-top: 40px;
+}
+
+.empty-box {
+    background: white;
+    padding: 40px;
+    border-radius: 18px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+    text-align: center;
+    max-width: 400px;
+}
+
+.empty-icon {
+    font-size: 50px;
+    margin-bottom: 15px;
+}
+
+/* =====================================================
+   FOLLOWING PAGE STRUCTURE FIX
+===================================================== */
+
+.following-page {
+    min-height: calc(100vh - var(--navbar-height));
+    display: flex;
+    flex-direction: column;
+}
+
+.following-content {
+    flex: 1;
+	margin-top:10px;
+}
+
+/* =====================================================
+   FOLLOWERS PAGE CLEAN LAYOUT
+===================================================== */
+
+.followers-wrapper {
+    padding-top: 100px;   /* space below navbar */
+    padding-bottom: 200px; /* space above footer */
+}
+
+.followers-container {
+    max-width: 650px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.followers-header {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.followers-count {
+    font-size: 14px;
+    color: #6b7280;
+    margin-bottom: 25px;
+}
+
+.follower-card {
+    background: white;
+    padding: 16px 20px;
+    border-radius: 16px;
+    margin-bottom: 14px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.05);
+    display: flex;
+    align-items: center;
+    transition: 0.25s ease;
+}
+
+.follower-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 28px rgba(0,0,0,0.10);
+    background: #fafbff;
+}
+
+.follower-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+/* =====================================================
+   FINAL RESPONSIVE FIXES (SAFE FOR PRESENTATION)
+===================================================== */
+
+/* Prevent horizontal scroll */
+html, body {
+    overflow-x: hidden;
+}
+
+/* ================= TABLET ================= */
+@media (max-width: 1024px) {
+
+    .page-layout {
+        grid-template-columns: 200px 1fr;
+        gap: 20px;
+    }
+
+    .notification-sidebar {
+        display: none;
+    }
+
+    .search-form input {
+        width: 180px;
+    }
+}
+
+/* ================= MOBILE LARGE ================= */
+@media (max-width: 768px) {
+
+    .page-layout {
+        grid-template-columns: 1fr;
+        padding: 0 15px;
+    }
+
+    .filter-column {
+        display: none;
+    }
+
+    .notification-sidebar {
+        display: none;
+    }
+
+    /* Navbar stacking */
+    .navbar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+        padding: 12px 16px;
+    }
+
+    .navbar-right {
+        width: 100%;
+        justify-content: space-between;
+        flex-wrap: wrap;
+    }
+
+    .search-form {
+        width: 100%;
+    }
+
+    .search-form input {
+        width: 100%;
+    }
+
+    .search-form button {
+        white-space: nowrap;
+    }
+
+    /* Create Post */
+    .create-post {
+        padding: 18px;
+    }
+
+    .create-actions {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .create-actions button {
+        width: 100%;
+    }
+
+    /* Post actions wrap */
+    .post-actions {
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    /* Promo section stack */
+    .promo-section {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .promo-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    /* Comment form stack */
+    .comment-form {
+        flex-direction: column;
+    }
+
+    .comment-form button {
+        width: 100%;
+    }
+
+    /* Schedule modal full width */
+    .schedule-sheet,
+    .app-popup {
+        width: 90%;
+        max-width: 400px;
+    }
+}
+
+/* ================= SMALL MOBILE ================= */
+@media (max-width: 480px) {
+
+    .navbar h2 {
+        font-size: 18px;
+    }
+
+    .post-card {
+        padding: 16px;
+    }
+
+    .post-content {
+        font-size: 14px;
+    }
+
+    .avatar {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+    }
+
+    .create-post textarea {
+        font-size: 14px;
+    }
 }

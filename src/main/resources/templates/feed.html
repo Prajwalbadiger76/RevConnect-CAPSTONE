@@ -95,6 +95,42 @@
 		#trendingBox a:hover {
 		    background: #f9fafb;
 		}
+		.filter-card {
+				    background: #ffffff;
+				    border-radius: 18px;
+				    padding: 20px;
+				    box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+				}
+
+
+				.filter-heading svg {
+				    width: 18px;
+				    height: 18px;
+				}
+
+				.filter-btn {
+				    width: 100%;
+				    text-align: left;
+				    padding: 10px 14px;
+				    border-radius: 10px;
+				    border: none;
+				    background: transparent;
+				    cursor: pointer;
+				    font-size: 14px;
+				    margin-bottom: 8px;
+				    transition: 0.2s ease;
+				}
+
+				.filter-btn:hover {
+				    background: #f1f5f9;
+				}
+
+				.filter-btn.active {
+				    background: #2563eb;
+				    color: white;
+				    font-weight: 600;
+				}
+				
 	</style>
 </head>
 <body>
@@ -111,8 +147,6 @@
 
 
 		<div class="navbar-right">
-			<!--<a th:href="@{/connections}">Pending</a>
-			<a th:href="@{/connections/accepted}">Connections</a>-->
 
 
 			<h2>RevConnect</h2>
@@ -129,7 +163,11 @@
 				           autocomplete="off"
 				           required>
 
-				    <button type="submit">Search</button>
+				    <button type="submit">Search
+						<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+						  <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
+						</svg>
+					</button>
 
 				    <a id="dynamicTrendingBtn"
 				       th:href="@{/post/trending}"
@@ -150,10 +188,23 @@
 		<div class="navbar-right">
 
 
-			<a th:href="@{/connections}">Pending</a>
-			<a th:href="@{/connections}">Pending Requests</a>
-			<a th:href="@{/connections/sent}">Sent Requests</a>
-			<a th:href="@{/connections/accepted}">Connections</a>
+			<a th:href="@{/connections}">Pending Requests
+				<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-fill-exclamation" viewBox="0 0 16 16">
+				  <path d="M11 5a3 3 0 1 1-6 0 3 3 0 0 1 6 0m-9 8c0 1 1 1 1 1h5.256A4.5 4.5 0 0 1 8 12.5a4.5 4.5 0 0 1 1.544-3.393Q8.844 9.002 8 9c-5 0-6 3-6 4"/>
+				  <path d="M16 12.5a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0m-3.5-2a.5.5 0 0 0-.5.5v1.5a.5.5 0 0 0 1 0V11a.5.5 0 0 0-.5-.5m0 4a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1"/>
+				</svg>
+			</a>
+			<a th:href="@{/connections/sent}">Sent Requests
+				<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-fill-check" viewBox="0 0 16 16">
+				  <path d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7m1.679-4.493-1.335 2.226a.75.75 0 0 1-1.174.144l-.774-.773a.5.5 0 0 1 .708-.708l.547.548 1.17-1.951a.5.5 0 1 1 .858.514M11 5a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
+				  <path d="M2 13c0 1 1 1 1 1h5.256A4.5 4.5 0 0 1 8 12.5a4.5 4.5 0 0 1 1.544-3.393Q8.844 9.002 8 9c-5 0-6 3-6 4"/>
+				</svg>
+			</a>
+			<a th:href="@{/connections/accepted}">Connections
+				<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-people-fill" viewBox="0 0 16 16">
+				  <path d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6m-5.784 6A2.24 2.24 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.3 6.3 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1zM4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5"/>
+				</svg>
+			</a>
 
 			<div class="profile-menu">
 				<div class="profile-circle" onclick="toggleProfileMenu()"
@@ -177,12 +228,28 @@
 		<div class="filter-column">
 
 			<div class="filter-card">
-				<div class="filter-heading">Filter Post</div>
+				<div class="filter-heading">
+					Filter Post
+					<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-filter" viewBox="0 0 16 16">
+						<path d="M6 10.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5m-2-3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5m-2-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5"/>
+					</svg>
+				</div>
 
-				<button class="filter-btn" onclick="changeRoleFilter('ALL')">All Posts</button>
-				<button class="filter-btn" onclick="changeRoleFilter('PERSONAL')">Personal</button>
-				<button class="filter-btn" onclick="changeRoleFilter('CREATOR')">Creators</button>
-				<button class="filter-btn" onclick="changeRoleFilter('BUSINESS')">Businesses</button>
+				<button class="filter-btn" data-role="ALL" onclick="changeRoleFilter('ALL')">
+								    All Posts
+								</button>
+
+								<button class="filter-btn" data-role="PERSONAL" onclick="changeRoleFilter('PERSONAL')">
+								    Personal
+								</button>
+
+								<button class="filter-btn" data-role="CREATOR" onclick="changeRoleFilter('CREATOR')">
+								    Creators
+								</button>
+
+								<button class="filter-btn" data-role="BUSINESS" onclick="changeRoleFilter('BUSINESS')">
+								    Businesses
+								</button>
 
 			</div>
 
@@ -198,7 +265,7 @@
 
 			<!-- CREATE POST -->
 			<div class="create-post" th:if="${showCreateForm} ">
-				<form th:action="@{/post/create}" method="post">
+				<form th:action="@{/post/create}" method="post"onsubmit="return validateUrlBeforeSubmit()">
 
 					<!-- Row 1: Textarea -->
 					<div class="create-row">
@@ -308,7 +375,7 @@
 
 				<!-- SHARE HEADER -->
 				<div th:if="${post.sharedFromUsername != null}" class="share-header">
-				    🔁 Shared from 
+				    🔁 Reposted from 
 				    <a th:href="@{/profile/{username}(username=${post.sharedFromUsername})}"
 				       th:text="'@' + ${post.sharedFromUsername}">
 				    </a>
@@ -368,13 +435,13 @@
 					<form th:if="${!post.sharedByCurrentUser}"
 					      th:action="@{/post/share/{id}(id=${post.id})}"
 					      method="post">
-					    <button>🔁 Share</button>
+					    <button>🔁 Re-Share</button>
 					</form>
 
 					<!-- If already shared -->
 					<span th:if="${post.sharedByCurrentUser}"
 					      style="color:gray; font-weight:500;">
-					    ✔ Shared
+					    🔁 Reposted
 					</span>
 
 
@@ -439,12 +506,23 @@
 		<!-- ================= NOTIFICATION SIDEBAR ================= -->
 
 		<div class="notification-sidebar">
-			<div class="sidebar-header">Notifications</div>
-			<div class="notif-title">Unread</div>
-			<div id="notifUnread"></div>
-			<div class="notif-title">Read</div>
-			<div id="notifRead"></div>
-		</div>
+					<div class="sidebar-header">
+
+						<span class="sidebar-title">Notifications</span>
+
+						<div class="sidebar-bell">
+							🔔
+							<sup id="sidebarNotifCount" class="sidebar-badge"></sup>
+						</div>
+
+					</div>
+					<div class="notif-title">Unread</div>
+					<div id="notifUnread"></div>
+					<div class="notif-title">History</div>
+					<div id="notifRead"></div>
+				</div>
+
+			</div>
 
 	</div>
 
@@ -455,44 +533,60 @@
 		}
 
 		function fetchNotifications() {
-			fetch('/notifications')
-				.then(res => res.json())
-				.then(data => {
-					let unread = data.filter(n => !n.read);
-					let read = data.filter(n => n.read);
-					renderNotifications(unread, read);
-				});
-		}
+							fetch('/notifications')
+								.then(res => res.json())
+								.then(data => {
 
-		function renderNotifications(unread, read) {
+									let unread = data.filter(n => !n.read);
+									let read = data.filter(n => n.read);
 
-			const unreadBox = document.getElementById("notifUnread");
-			const readBox = document.getElementById("notifRead");
+									renderNotifications(unread, read);
 
-			unreadBox.innerHTML = "";
-			readBox.innerHTML = "";
+									updateSidebarNotificationCount(unread.length);
+								});
+						}
+						
+						function updateSidebarNotificationCount(count) {
 
-			unread.forEach(n => unreadBox.appendChild(createItem(n, true)));
-			read.forEach(n => readBox.appendChild(createItem(n, false)));
-		}
+									const badge = document.getElementById("sidebarNotifCount");
 
-		function createItem(n, unread) {
+									if (count > 0) {
+										badge.innerText = count;
+										badge.style.display = "inline-block";
+									} else {
+										badge.style.display = "none";
+									}
+								}
 
-			let div = document.createElement("div");
-			div.className = "notif-item " + (unread ? "unread" : "read");
+				function renderNotifications(unread, read) {
 
-			div.innerHTML = `<div class="notif-text">${n.message}</div>`;
+					const unreadBox = document.getElementById("notifUnread");
+					const readBox = document.getElementById("notifRead");
 
-			div.onclick = function () {
-				fetch('/notifications/read/' + n.id, {method: 'POST'})
-					.then(() => fetchNotifications());
-			};
+					unreadBox.innerHTML = "";
+					readBox.innerHTML = "";
 
-			return div;
-		}
+					unread.forEach(n => unreadBox.appendChild(createItem(n, true)));
+					read.forEach(n => readBox.appendChild(createItem(n, false)));
+				}
 
-		setInterval(fetchNotifications, 5000);
-		fetchNotifications();
+				function createItem(n, unread) {
+
+					let div = document.createElement("div");
+					div.className = "notif-item " + (unread ? "unread" : "read");
+
+					div.innerHTML = `<div class="notif-text">${n.message}</div>`;
+
+					div.onclick = function () {
+						fetch('/notifications/read/' + n.id, {method: 'POST'})
+							.then(() => fetchNotifications());
+					};
+
+					return div;
+				}
+
+				setInterval(fetchNotifications, 5000);
+				fetchNotifications();
 
 		function toggleComments(postId) {
 			let section = document.getElementById("comments-" + postId);
@@ -668,26 +762,30 @@
 
 		function confirmSchedule() {
 
-			let dateTime = document.getElementById("schedulePicker").value;
+		    let dateTime = document.getElementById("schedulePicker").value;
 
+		    if (!dateTime) {
+		        showAppPopup("Please select date and time.");
+		        return;
+		    }
 
-			if (!dateTime) {
-				showAppPopup("Please select date and time.");
-				return;
-			}
+		    const selectedTime = new Date(dateTime);
+		    const currentTime = new Date();
 
-			// Set hidden input
-			document.getElementById("scheduledAtInput").value = dateTime;
+		    if (selectedTime <= currentTime) {
+		        showAppPopup("Scheduled time must be in the future.");
+		        return;
+		    }
 
-			closeSchedule();
+		    document.getElementById("scheduledAtInput").value = dateTime;
 
-			// Show success toast
-			showToast("Post scheduled successfully!");
+		    closeSchedule();
 
-			// Submit form after small delay (better UX)
-			setTimeout(() => {
-				document.querySelector(".create-post form").submit();
-			}, 800);
+		    showToast("Post scheduled successfully!");
+
+		    setTimeout(() => {
+		        document.querySelector(".create-post form").submit();
+		    }, 800);
 		}
 
 
@@ -744,23 +842,30 @@
 	<!--this is the filter type post-->
 
 	<script>
-		function changeRoleFilter(role) {
-			if (role === "ALL")
-				window.location.href = "/feed";
-			else
-				window.location.href = "/feed?role=" + role;
-		}
-	</script>
+		    function changeRoleFilter(role) {
+		        if (role === "ALL")
+		            window.location.href = "/feed";
+		        else
+		            window.location.href = "/feed?role=" + role;
+		    }
 
-	<script th:inline="javascript">
-		let selected = "[[${selectedRole}]]";
-		if (!selected) selected = "ALL";
+		    document.addEventListener("DOMContentLoaded", function () {
 
-		document.querySelectorAll(".filter-btn").forEach(btn => {
-			if (btn.innerText.toUpperCase().includes(selected))
-				btn.classList.add("active");
-		});
-	</script>
+		        const params = new URLSearchParams(window.location.search);
+		        let role = params.get("role");
+
+		        if (!role) role = "ALL";
+
+		        document.querySelectorAll(".filter-btn").forEach(btn => {
+		            if (btn.dataset.role === role) {
+		                btn.classList.add("active");
+		            } else {
+		                btn.classList.remove("active");
+		            }
+		        });
+
+		    });
+		</script>
 	
 	<script>
 	function togglePromotional(el) {
@@ -792,7 +897,30 @@
 	    }
 	}
 	</script>
+	
+	<script>
+			function validateUrlBeforeSubmit() {
 
+				    const promoInput = document.getElementById("promoInput").value;
+				    const urlInput = document.querySelector("input[name='ctaUrl']");
+
+				    if (promoInput === "true") {
+
+				        const url = urlInput.value.trim();
+
+				        const pattern = /^(https?:\/\/)[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}.*$/;
+
+				        if (!pattern.test(url)) {
+				            showAppPopup("Please enter a valid URL (http:// or https://)");
+				            return false;
+				        }
+				    }
+
+				    return true;
+				}
+		</script>
+
+	<div th:replace="fragments/footer :: footer"></div>
 </body>
 
 </html>

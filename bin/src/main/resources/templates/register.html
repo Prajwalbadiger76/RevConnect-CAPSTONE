@@ -16,28 +16,60 @@
         <div class="auth-card">
 
             <h2>Create Account</h2>
+			<div th:if="${error}" class="register-error">
+			    <p th:text="${error}"></p>
+			</div>
 
-            <form th:action="@{/api/auth/register}" method="post">
+            <!-- IMPORTANT: th:object added -->
+            <form th:action="@{/api/auth/register}"
+                  th:object="${registerRequest}"
+                  method="post">
 
+                <!-- USERNAME -->
                 <div class="form-group">
-                    <input type="text" name="username" placeholder="Username" required/>
+                    <input type="text"
+                           th:field="*{username}"
+                           placeholder="Username"/>
+                    <small style="color:red"
+                           th:if="${#fields.hasErrors('username')}"
+                           th:errors="*{username}">
+                    </small>
                 </div>
 
+                <!-- EMAIL -->
                 <div class="form-group">
-                    <input type="email" name="email" placeholder="Email" required/>
+                    <input type="email"
+                           th:field="*{email}"
+                           placeholder="Email"/>
+                    <small style="color:red"
+                           th:if="${#fields.hasErrors('email')}"
+                           th:errors="*{email}">
+                    </small>
                 </div>
 
+                <!-- PASSWORD -->
                 <div class="form-group">
-                    <input type="password" name="password" placeholder="Password" required/>
+                    <input type="password"
+                           th:field="*{password}"
+                           placeholder="Password"/>
+                    <small style="color:red"
+                           th:if="${#fields.hasErrors('password')}"
+                           th:errors="*{password}">
+                    </small>
                 </div>
 
+                <!-- ROLE -->
                 <div class="form-group">
-                    <select name="role" required>
+                    <select th:field="*{role}">
                         <option value="">Select Role</option>
                         <option value="PERSONAL">Personal</option>
                         <option value="CREATOR">Creator</option>
                         <option value="BUSINESS">Business</option>
                     </select>
+                    <small style="color:red"
+                           th:if="${#fields.hasErrors('role')}"
+                           th:errors="*{role}">
+                    </small>
                 </div>
 
                 <button type="submit" class="auth-btn">Register</button>

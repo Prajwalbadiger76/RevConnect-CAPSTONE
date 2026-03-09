@@ -3,156 +3,272 @@
 <head>
 <title>My Connections</title>
 
+<link rel="stylesheet" th:href="@{/css/feed.css}">
+
 <style>
-body{
-font-family:Segoe UI;
-background:#f3f4f6;
-margin:0;
-padding:40px;
+
+/* ===== PAGE WRAPPER ===== */
+.followers-wrapper{
+    margin-top:0px;
+    margin-bottom:280px;
+    padding-bottom:80px;
 }
 
-.container{
-width:55%;
-margin:auto;
+/* ===== CONTAINER ===== */
+.followers-container{
+    max-width:650px;
+    margin:0 auto;
+    padding:0 20px;
 }
 
-h2{
-text-align:center;
-margin-bottom:25px;
+/* ===== BACK LINK ===== */
+.back-link{
+    display:inline-block;
+    margin-bottom:25px;
+    font-size:14px;
+    color:#64748b;
+    text-decoration:none;
+    font-weight:500;
 }
 
-.card{
-background:white;
-padding:18px;
-margin-bottom:15px;
-border-radius:12px;
-box-shadow:0 4px 12px rgba(0,0,0,0.1);
-display:flex;
-justify-content:space-between;
-align-items:center;
-transition:0.2s;
+.back-link:hover{
+    color:#2563eb;
 }
 
-.card:hover{
-transform:translateY(-2px);
+/* ===== HEADER ===== */
+.followers-header{
+    font-size:24px;
+    font-weight:600;
+    color:#1f2937;
+    margin-bottom:6px;
 }
 
+.followers-count{
+    font-size:14px;
+    color:#6b7280;
+    margin-bottom:25px;
+}
+
+/* ===== CARD ===== */
+.follower-card{
+    background:white;
+    padding:18px 20px;
+    border-radius:16px;
+    margin-bottom:15px;
+    box-shadow:0 4px 14px rgba(0,0,0,0.08);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:15px;
+    transition:all 0.25s ease;
+}
+
+.follower-card:hover{
+    transform:translateY(-3px);
+    box-shadow:0 10px 25px rgba(0,0,0,0.12);
+}
+
+/* LEFT SECTION */
 .left{
-display:flex;
-align-items:center;
-gap:12px;
+    display:flex;
+    align-items:center;
+    gap:15px;
 }
 
+/* ===== AVATAR ===== */
 .avatar{
-width:42px;
-height:42px;
-border-radius:50%;
-background:#6366f1;
-color:white;
-display:flex;
-align-items:center;
-justify-content:center;
-font-weight:bold;
-font-size:18px;
+    width:45px;
+    height:45px;
+    border-radius:50%;
+    background:linear-gradient(135deg,#6366f1,#4f46e5);
+    color:white;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:600;
+    font-size:18px;
 }
 
-.name{
-text-decoration:none;
-font-weight:600;
-color:#2563eb;
+/* ===== NAME ===== */
+.follower-name{
+    text-decoration:none;
+    font-weight:600;
+    color:#111827;
+    font-size:16px;
 }
 
-.name:hover{
-text-decoration:underline;
+.follower-name:hover{
+    color:#2563eb;
 }
 
-.remove{
-border:none;
-padding:8px 16px;
-border-radius:7px;
-cursor:pointer;
-background:#ef4444;
-color:white;
-transition:0.25s;
+/* ===== BUTTON ===== */
+.btn{
+    border:none;
+    padding:7px 14px;
+    border-radius:8px;
+    font-size:13px;
+    font-weight:500;
+    cursor:pointer;
 }
 
-/* hover */
-.remove:hover{
-background:#dc2626;
-transform:scale(1.05);
+.reject{
+    background:#fee2e2;
+    color:#dc2626;
 }
 
-/* click animation */
-.remove:active{
-transform:scale(0.95);
+.reject:hover{
+    background:#fecaca;
 }
 
-.back{
-text-align:center;
-margin-top:25px;
+/* ===== EMPTY STATE ===== */
+.empty-state{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    margin-top:40px;
 }
 
-.back a{
-text-decoration:none;
-color:#2563eb;
-font-weight:600;
+.empty-box{
+    background:white;
+    padding:40px;
+    border-radius:18px;
+    box-shadow:0 8px 25px rgba(0,0,0,0.08);
+    text-align:center;
+    max-width:400px;
 }
+
+.empty-icon{
+    font-size:50px;
+    margin-bottom:15px;
+}
+
+/* ===== MODAL ===== */
+.modal{
+    display:none;
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.4);
+    justify-content:center;
+    align-items:center;
+}
+
+.modal-box{
+    background:white;
+    padding:30px;
+    border-radius:12px;
+    text-align:center;
+    width:300px;
+}
+
+.modal-buttons{
+    margin-top:20px;
+    display:flex;
+    justify-content:center;
+    gap:15px;
+}
+
+.cancel{
+    background:#e5e7eb;
+}
+
 </style>
+
 </head>
 
 <body>
 
-<div class="container">
+<!-- HEADER -->
+<div th:replace="fragments/header :: header"></div>
 
-<h2>My Connections</h2>
+<div class="followers-wrapper">
+<div class="followers-container">
 
-<div th:if="${#lists.isEmpty(connections)}">
-<p style="text-align:center;">No connections yet.</p>
+    <a th:href="@{/feed}" class="back-link">← Back to Feed</a>
+
+    <div class="followers-header">
+        My Connections
+    </div>
+
+    <div class="followers-count"
+         th:if="${!#lists.isEmpty(connections)}"
+         th:text="${#lists.size(connections)} + ' connections'">
+    </div>
+
+    <!-- Empty State -->
+    <div th:if="${#lists.isEmpty(connections)}" class="empty-state">
+        <div class="empty-box">
+            <div class="empty-icon">🌐</div>
+            <h3>No Connections Yet</h3>
+            <p>Start connecting with people to grow your network.</p>
+        </div>
+    </div>
+
+    <!-- Cards -->
+    <div th:each="user : ${connections}" class="follower-card">
+
+        <div class="left">
+            <div class="avatar"
+                 th:text="${#strings.substring(user.username,0,1).toUpperCase()}">
+            </div>
+
+            <a th:href="@{/profile/{username}(username=${user.username})}"
+               th:text="${user.username}"
+               class="follower-name">
+            </a>
+        </div>
+
+        <form th:action="@{/connections/remove/{username}(username=${user.username})}"
+              method="post"
+              style="display:inline;">
+            <button type="button"
+                    class="btn reject"
+                    onclick="openRemoveModal(this.closest('form'))">
+                Remove
+            </button>
+        </form>
+
+    </div>
+
+</div>
 </div>
 
-<div th:each="user : ${connections}" class="card">
+<!-- REMOVE CONFIRMATION MODAL -->
+<div id="removeModal" class="modal">
+    <div class="modal-box">
+        <p>Are you sure you want to remove this connection?</p>
 
-<div class="left">
-<div class="avatar"
-th:text="${#strings.substring(user.username,0,1).toUpperCase()}"></div>
-
-<a class="name"
-th:href="@{/profile/{username}(username=${user.username})}"
-th:text="${user.username}"></a>
+        <div class="modal-buttons">
+            <button class="btn reject" onclick="confirmRemove()">Yes</button>
+            <button class="btn cancel" onclick="closeRemoveModal()">No</button>
+        </div>
+    </div>
 </div>
 
-<form th:action="@{/connections/remove/{username}(username=${user.username})}"
-method="post"
-onsubmit="changeRemove(this,event)">
-<button class="remove">Remove</button>
-</form>
-
-</div>
-
-<div class="back">
-<a th:href="@{/feed}">← Back to Feed</a>
-</div>
-
-</div>
+<!-- FOOTER -->
+<div th:replace="fragments/footer :: footer"></div>
 
 <script>
-function changeRemove(form,event){
 
-event.preventDefault();
+let removeForm = null;
 
-if(!confirm("Remove connection?")) return;
-
-let btn=form.querySelector("button");
-
-btn.innerText="Removed";
-btn.style.background="#9ca3af";
-btn.style.transform="scale(0.95)";
-btn.disabled=true;
-
-setTimeout(()=>{
-form.submit();
-},300);
+function openRemoveModal(form){
+    removeForm = form;
+    document.getElementById("removeModal").style.display = "flex";
 }
+
+function closeRemoveModal(){
+    document.getElementById("removeModal").style.display = "none";
+}
+
+function confirmRemove(){
+    if(removeForm){
+        removeForm.submit();
+    }
+}
+
 </script>
 
 </body>

@@ -7,76 +7,8 @@
 	<link rel="stylesheet" th:href="@{/css/feed.css}">
 
 	<style>
-		/* ====== PAGE LAYOUT ====== */
-		.page-layout {
-			display: flex;
-			justify-content: center;
-			gap: 40px;
-			padding-top: 20px;
-		}
-
-		.feed-container {
-			width: 650px;
-		}
-
-		/* ===== RIGHT SIDEBAR ===== */
-		.notification-sidebar {
-			width: 320px;
-			height: calc(100vh - 80px);
-			position: sticky;
-			top: 70px;
-			background: #ffffff;
-			border-radius: 12px;
-			box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-			padding: 15px;
-			overflow-y: auto;
-		}
-
-		.sidebar-header {
-			font-size: 20px;
-			font-weight: 600;
-			margin-bottom: 10px;
-		}
-
-		.notif-title {
-			font-size: 14px;
-			color: #666;
-			margin: 15px 0 8px 0;
-			font-weight: 600;
-		}
-
-		.notif-item {
-			padding: 12px;
-			border-radius: 10px;
-			margin-bottom: 8px;
-			cursor: pointer;
-			transition: 0.2s;
-		}
-
-		.notif-item:hover {
-			background: #f5f7fb;
-		}
-
-		.notif-item.unread {
-			background: #eef3ff;
-		}
-
-		.notif-item.read {
-			background: #fafafa;
-		}
-
-		.notif-text {
-			font-size: 14px;
-		}
-
-		.empty-text {
-			font-size: 13px;
-			color: #888;
-			text-align: center;
-		}
 
 		/* ===== ANALYTICS BAR ===== */
-
 		.analytics-bar {
 			display: flex;
 			justify-content: space-around;
@@ -104,13 +36,103 @@
 			font-size: 11px;
 			color: #777;
 		}
+
+		
+
+		.filter-btn:hover {
+			background: #eef3ff;
+		}
+
+		.filter-btn.active {
+			background: #e0e7ff;
+			font-weight: 600;
+		}
+
+		/* ===== TRENDING BUTTON ===== */
+		.trending-badge {
+		    display: none;
+		    margin-left: 10px;
+		    padding: 8px 18px;
+		    border-radius: 25px;
+		    background: linear-gradient(45deg, #ff6a00, #ff3c00);
+		    color: white;
+		    font-size: 14px;
+		    font-weight: 600;
+		    text-decoration: none;
+		    border: none;
+		    box-shadow: 0 6px 15px rgba(255, 80, 0, 0.4);
+		    transition: 0.2s ease;
+		}
+
+		.trending-badge:hover {
+		    transform: scale(1.05);
+		}
+
+		/* ===== SIMPLE TRENDING DROPDOWN ===== */
+		#trendingBox {
+		    position: absolute;
+		    top: 45px;
+		    left: 0;
+		    width: 260px;
+		    background: white;
+		    border-radius: 12px;
+		    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+		    display: none;
+		    z-index: 3000;
+		    overflow: hidden;
+		    border: 1px solid #e5e7eb;
+		}
+
+		#trendingBox a {
+		    display: block;
+		    padding: 10px 14px;
+		    text-decoration: none;
+		    color: #111827;
+		    font-size: 14px;
+		    transition: background 0.2s ease;
+		}
+
+		#trendingBox a:hover {
+		    background: #f9fafb;
+		}
+		.filter-card {
+				    background: #ffffff;
+				    border-radius: 18px;
+				    padding: 20px;
+				    box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+				}
+
+
+				.filter-heading svg {
+				    width: 18px;
+				    height: 18px;
+				}
+
+				.filter-btn {
+				    width: 100%;
+				    text-align: left;
+				    padding: 10px 14px;
+				    border-radius: 10px;
+				    border: none;
+				    background: transparent;
+				    cursor: pointer;
+				    font-size: 14px;
+				    margin-bottom: 8px;
+				    transition: 0.2s ease;
+				}
+
+				.filter-btn:hover {
+				    background: #f1f5f9;
+				}
+
+				.filter-btn.active {
+				    background: #2563eb;
+				    color: white;
+				    font-weight: 600;
+				}
+				
 	</style>
-
-	<meta charset="UTF-8">
-	<title>RevConnect - Feed</title>
-	<link rel="stylesheet" th:href="@{/css/feed.css}">
 </head>
-
 <body>
 
 	<!-- ================= NAVBAR ================= -->
@@ -122,11 +144,9 @@
 	<div class="navbar">
 
 		<!-- LEFT -->
-		
+
 
 		<div class="navbar-right">
-		<!--<a th:href="@{/connections}">Pending</a>
-			<a th:href="@{/connections/accepted}">Connections</a>-->
 
 
 			<h2>RevConnect</h2>
@@ -135,23 +155,31 @@
 
 				<form th:action="@{/post/search}" method="get" class="search-form">
 
-					<input type="text" name="keyword" id="searchInput" placeholder="Search users or hashtags..."
-						oninput="handleSearchInput()" autocomplete="off" required>
-					<a id="dynamicTrendingBtn" href="/post/trending" style="
-						        display:none;
-						        margin-left:10px;
-						        padding:5px 12px;
-						        border-radius:15px;
-						        background:rgba(255,99,71,0.1);
-						        color:#ff5722;
-						        text-decoration:none;
-						        font-size:13px;">
-						🔥 Trending Hashtag
-					</a>
-					<div id="trendingBox"></div>
+				    <input type="text"
+				           name="keyword"
+				           id="searchInput"
+				           placeholder="Search users or hashtags..."
+				           oninput="handleSearchInput()"
+				           autocomplete="off"
+				           required>
 
-					<button type="submit">Search</button>
+				    <button type="submit">Search
+						<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+						  <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
+						</svg>
+					</button>
+
+				    <a id="dynamicTrendingBtn"
+				       th:href="@{/post/trending}"
+				       class="trending-badge">
+				        🔥 Trending Hashtag
+				    </a>
+
+				    <div id="trendingBox"></div>
+
 				</form>
+
+
 
 			</div>
 		</div>
@@ -159,51 +187,84 @@
 		<!-- RIGHT -->
 		<div class="navbar-right">
 
-					<div class="notif-bell" onclick="toggleNotifications()">
-						🔔
-						<span id="notifCount" class="notif-count"></span>
-					</div>
 
-					<a th:href="@{/connections}">Pending Requests</a>
-					<a th:href="@{/connections/sent}">Sent Requests</a>
-					<a th:href="@{/connections/accepted}">Connections</a>
+			<a th:href="@{/connections}">Pending Requests
+				<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-fill-exclamation" viewBox="0 0 16 16">
+				  <path d="M11 5a3 3 0 1 1-6 0 3 3 0 0 1 6 0m-9 8c0 1 1 1 1 1h5.256A4.5 4.5 0 0 1 8 12.5a4.5 4.5 0 0 1 1.544-3.393Q8.844 9.002 8 9c-5 0-6 3-6 4"/>
+				  <path d="M16 12.5a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0m-3.5-2a.5.5 0 0 0-.5.5v1.5a.5.5 0 0 0 1 0V11a.5.5 0 0 0-.5-.5m0 4a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1"/>
+				</svg>
+			</a>
+			<a th:href="@{/connections/sent}">Sent Requests
+				<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-fill-check" viewBox="0 0 16 16">
+				  <path d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7m1.679-4.493-1.335 2.226a.75.75 0 0 1-1.174.144l-.774-.773a.5.5 0 0 1 .708-.708l.547.548 1.17-1.951a.5.5 0 1 1 .858.514M11 5a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
+				  <path d="M2 13c0 1 1 1 1 1h5.256A4.5 4.5 0 0 1 8 12.5a4.5 4.5 0 0 1 1.544-3.393Q8.844 9.002 8 9c-5 0-6 3-6 4"/>
+				</svg>
+			</a>
+			<a th:href="@{/connections/accepted}">Connections
+				<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-people-fill" viewBox="0 0 16 16">
+				  <path d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6m-5.784 6A2.24 2.24 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.3 6.3 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1zM4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5"/>
+				</svg>
+			</a>
 
-					<div class="profile-menu">
-						<div class="profile-circle" onclick="toggleProfileMenu()"
-							th:text="${#strings.substring(currentUsername,0,1).toUpperCase()}">
-						</div>
-
-						<div id="profileDropdown" class="dropdown">
-							<a th:href="@{/profile}">My Profile</a>
-							<a th:href="@{/logout}">Logout</a>
-						</div>
-					</div>
+			<div class="profile-menu">
+				<div class="profile-circle" onclick="toggleProfileMenu()"
+					th:text="${#strings.substring(currentUsername,0,1).toUpperCase()}">
 				</div>
-		
+
+				<div id="profileDropdown" class="dropdown">
+					<a th:href="@{/profile}">My Profile</a>
+					<a th:href="@{/api/auth/logout}">Logout</a>
+				</div>
+			</div>
+		</div>
+
 	</div>
 
 	<!-- ================= MAIN LAYOUT ================= -->
 
 	<div class="page-layout">
 
-		
+		<!-- FILTER COLUMN -->
+		<div class="filter-column">
 
-		<!-- NOTIFICATIONS PANEL (UNCHANGED) -->
-		<div id="notifPanel" class="notif-panel">
-			<div class="notif-header">
-				</br></br></br>
-				<h3>Notifications</h3>
-				<span class="close-btn" onclick="toggleNotifications()">✖</span>
+			<div class="filter-card">
+				<div class="filter-heading">
+					Filter Post
+					<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-filter" viewBox="0 0 16 16">
+						<path d="M6 10.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5m-2-3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5m-2-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5"/>
+					</svg>
+				</div>
+
+				<button class="filter-btn" data-role="ALL" onclick="changeRoleFilter('ALL')">
+								    All Posts
+								</button>
+
+								<button class="filter-btn" data-role="PERSONAL" onclick="changeRoleFilter('PERSONAL')">
+								    Personal
+								</button>
+
+								<button class="filter-btn" data-role="CREATOR" onclick="changeRoleFilter('CREATOR')">
+								    Creators
+								</button>
+
+								<button class="filter-btn" data-role="BUSINESS" onclick="changeRoleFilter('BUSINESS')">
+								    Businesses
+								</button>
+
 			</div>
-			<div id="notifList" class="notif-list"></div>
+
 		</div>
 
+
+
+
 		<!-- FEED -->
-		<div class="feed-container">
+		<div style="margin-top: 6px;" class="feed-container">
+
 
 
 			<!-- CREATE POST -->
-			<div class="create-post" th:if="${showCreateForm}">
+			<div class="create-post" th:if="${showCreateForm} ">
 				<form th:action="@{/post/create}" method="post">
 
 					<!-- Row 1: Textarea -->
@@ -212,7 +273,51 @@
 
 						<textarea name="content" id="postContent" placeholder="What's on your mind?"
 							required></textarea>
+							
+							
+							
+							<div th:if="${currentUserRole == 'CREATOR' or currentUserRole == 'BUSINESS'}">
 
+							    <!-- 🔥 Promotional Toggle -->
+							    <div class="promo-toggle-wrapper">
+
+							        <!-- Hidden field for backend -->
+							        <input type="hidden" name="promotional" id="promoInput" value="false">
+
+							        <label class="toggle-switch">
+							            <input type="checkbox"
+							                   id="promoToggle"
+							                   onchange="togglePromotional(this)">
+							            <span class="slider"></span>
+							        </label>
+
+							        <span class="toggle-label">Promotional Post</span>
+
+							    </div>
+
+							    <!-- 🔥 Promotional Fields -->
+							    <div id="promoFields" class="promo-fields">
+
+							        <select name="ctaType" class="promo-input">
+							            <option value="">Select CTA</option>
+							            <option value="Learn More">Learn More</option>
+							            <option value="Shop Now">Shop Now</option>
+							            <option value="Sign Up">Sign Up</option>
+							        </select>
+
+							        <input type="text"
+							               name="ctaUrl"
+							               placeholder="CTA URL"
+							               class="promo-input">
+
+							        <input type="text"
+							               name="productTag"
+							               placeholder="Tag product/service"
+							               class="promo-input">
+
+							    </div>
+
+							</div>
 					</div>
 
 					<!-- Hashtag Suggestions (outside flex row) -->
@@ -226,6 +331,8 @@
 
 					<!-- Hidden field -->
 					<input type="hidden" name="scheduledAt" id="scheduledAtInput">
+					
+					<div class="create-divider"></div>
 
 					<!-- Row 3: Buttons -->
 					<div class="create-actions">
@@ -245,7 +352,8 @@
 
 
 			<!-- POSTS -->
-			<div th:each="post : ${posts}" class="post-card">
+			<div th:each="post : ${posts}"
+			     th:class="'post-card ' + (${post.promotional} ? 'promo-highlight' : '')">
 
 				<div class="post-top">
 
@@ -257,25 +365,58 @@
 						<a th:href="@{/profile/{username}(username=${post.username})}" th:text="${post.username}"></a>
 
 						<span th:text="${#temporals.format(post.createdAt,'dd MMM yyyy HH:mm')}"></span>
+						
+						<span th:if="${post.promotional}" class="sponsored-inline">
+						    • Sponsored
+						</span>
 					</div>
 
 				</div>
 
-				<div th:if="${!#strings.startsWith(post.content,'🔁 Shared from')}" class="post-content"
-					th:text="${post.content}">
-				</div>
-				<div th:if="${post.hashtags != null}">
-					<span th:each="tag : ${post.hashtags}">
-						<a th:href="@{/post/search(keyword=${'#' + tag})}"
-							style="color:#2563eb; text-decoration:none; margin-right:8px;">
-							<span th:text="${'#' + tag}"></span>
-						</a>
-					</span>
+				<!-- SHARE HEADER -->
+				<div th:if="${post.sharedFromUsername != null}" class="share-header">
+				    🔁 Reposted from 
+				    <a th:href="@{/profile/{username}(username=${post.sharedFromUsername})}"
+				       th:text="'@' + ${post.sharedFromUsername}">
+				    </a>
 				</div>
 
-				<div th:if="${#strings.startsWith(post.content,'🔁 Shared from')}" class="shared-box"
-					th:text="${post.content}">
+				<!-- POST CONTENT BLOCK -->
+				<div class="post-body">
+				    <div class="post-content"
+				         th:text="${post.content}">
+				    </div>
+					<div th:if="${post.promotional}" class="promo-section">
+
+					    <div class="product-tag"
+					         th:text="${post.productTag}">
+					    </div>
+
+						<a th:if="${post.ctaUrl}" 
+						   th:href="${post.ctaUrl}" 
+						   target="_blank" 
+						   class="promo-btn">
+
+						    <!-- Icon based on CTA -->
+						    <span th:if="${post.ctaType == 'Learn More'}">🔗</span>
+						    <span th:if="${post.ctaType == 'Shop Now'}">🛒</span>
+						    <span th:if="${post.ctaType == 'Sign Up'}">✍️</span>
+
+						    <span th:text="${post.ctaType}"></span>
+
+						</a>
+
+					</div>
 				</div>
+				
+				<div th:if="${post.hashtags != null}">
+									<span th:each="tag : ${post.hashtags}">
+										<a th:href="@{/post/search(keyword=${'#' + tag})}"
+											style="color:#2563eb; text-decoration:none; margin-right:8px;">
+											<span th:text="${'#' + tag}"></span>
+										</a>
+									</span>
+				</div>				
 
 				<div class="post-actions">
 
@@ -290,9 +431,18 @@
 						💬 <span th:text="${#lists.size(post.comments)}"></span> Comments
 					</span>
 
-					<form th:action="@{/post/share/{id}(id=${post.id})}" method="post">
-						<button>🔁 Share</button>
+					<!-- If NOT shared -->
+					<form th:if="${!post.sharedByCurrentUser}"
+					      th:action="@{/post/share/{id}(id=${post.id})}"
+					      method="post">
+					    <button>🔁 Re-Share</button>
 					</form>
+
+					<!-- If already shared -->
+					<span th:if="${post.sharedByCurrentUser}"
+					      style="color:gray; font-weight:500;">
+					    🔁 Reposted
+					</span>
 
 
 				</div>
@@ -330,26 +480,25 @@
 					</div>
 
 				</div>
-				
-				<div th:if="${currentUserRole == 'CREATOR' or currentUserRole == 'BUSINESS'}"
-							     class="analytics-bar">
-								 
-				                <div class="analytics-item">
-				                    👁 <span th:text="${post.reachCount}">0</span>
-				                    <small>Reach</small>
-				                </div>
 
-				                <div class="analytics-item">
-				                    🔁 <span th:text="${post.totalShares}">0</span>
-				                    <small>Shares</small>
-				                </div>
+				<div th:if="${currentUserRole == 'CREATOR' or currentUserRole == 'BUSINESS'}" class="analytics-bar">
 
-				                <div class="analytics-item">
-				                    📊 <span th:text="${#numbers.formatDecimal(post.engagementRate,1,2)}">0</span>%
-				                    <small>Engagement</small>
-				                </div>
+					<div class="analytics-item">
+						👁 <span th:text="${post.reachCount}">0</span>
+						<small>Reach</small>
+					</div>
 
-				            </div>
+					<div class="analytics-item">
+						🔁 <span th:text="${post.totalShares}">0</span>
+						<small>Shares</small>
+					</div>
+
+					<div class="analytics-item">
+						📊 <span th:text="${#numbers.formatDecimal(post.engagementRate,1,2)}">0</span>%
+						<small>Engagement</small>
+					</div>
+
+				</div>
 
 			</div>
 		</div>
@@ -357,12 +506,23 @@
 		<!-- ================= NOTIFICATION SIDEBAR ================= -->
 
 		<div class="notification-sidebar">
-			<div class="sidebar-header">Notifications</div>
-			<div class="notif-title">Unread</div>
-			<div id="notifUnread"></div>
-			<div class="notif-title">Read</div>
-			<div id="notifRead"></div>
-		</div>
+					<div class="sidebar-header">
+
+						<span class="sidebar-title">Notifications</span>
+
+						<div class="sidebar-bell">
+							🔔
+							<sup id="sidebarNotifCount" class="sidebar-badge"></sup>
+						</div>
+
+					</div>
+					<div class="notif-title">Unread</div>
+					<div id="notifUnread"></div>
+					<div class="notif-title">History</div>
+					<div id="notifRead"></div>
+				</div>
+
+			</div>
 
 	</div>
 
@@ -373,44 +533,60 @@
 		}
 
 		function fetchNotifications() {
-			fetch('/notifications')
-				.then(res => res.json())
-				.then(data => {
-					let unread = data.filter(n => !n.read);
-					let read = data.filter(n => n.read);
-					renderNotifications(unread, read);
-				});
-		}
+							fetch('/notifications')
+								.then(res => res.json())
+								.then(data => {
 
-		function renderNotifications(unread, read) {
+									let unread = data.filter(n => !n.read);
+									let read = data.filter(n => n.read);
 
-			const unreadBox = document.getElementById("notifUnread");
-			const readBox = document.getElementById("notifRead");
+									renderNotifications(unread, read);
 
-			unreadBox.innerHTML = "";
-			readBox.innerHTML = "";
+									updateSidebarNotificationCount(unread.length);
+								});
+						}
+						
+						function updateSidebarNotificationCount(count) {
 
-			unread.forEach(n => unreadBox.appendChild(createItem(n, true)));
-			read.forEach(n => readBox.appendChild(createItem(n, false)));
-		}
+									const badge = document.getElementById("sidebarNotifCount");
 
-		function createItem(n, unread) {
+									if (count > 0) {
+										badge.innerText = count;
+										badge.style.display = "inline-block";
+									} else {
+										badge.style.display = "none";
+									}
+								}
 
-			let div = document.createElement("div");
-			div.className = "notif-item " + (unread ? "unread" : "read");
+				function renderNotifications(unread, read) {
 
-			div.innerHTML = `<div class="notif-text">${n.message}</div>`;
+					const unreadBox = document.getElementById("notifUnread");
+					const readBox = document.getElementById("notifRead");
 
-			div.onclick = function () {
-				fetch('/notifications/read/' + n.id, {method: 'POST'})
-					.then(() => fetchNotifications());
-			};
+					unreadBox.innerHTML = "";
+					readBox.innerHTML = "";
 
-			return div;
-		}
+					unread.forEach(n => unreadBox.appendChild(createItem(n, true)));
+					read.forEach(n => readBox.appendChild(createItem(n, false)));
+				}
 
-		setInterval(fetchNotifications, 5000);
-		fetchNotifications();
+				function createItem(n, unread) {
+
+					let div = document.createElement("div");
+					div.className = "notif-item " + (unread ? "unread" : "read");
+
+					div.innerHTML = `<div class="notif-text">${n.message}</div>`;
+
+					div.onclick = function () {
+						fetch('/notifications/read/' + n.id, {method: 'POST'})
+							.then(() => fetchNotifications());
+					};
+
+					return div;
+				}
+
+				setInterval(fetchNotifications, 5000);
+				fetchNotifications();
 
 		function toggleComments(postId) {
 			let section = document.getElementById("comments-" + postId);
@@ -452,74 +628,6 @@
 	</div>
 
 
-	<!-- SCRIPT (UNCHANGED) -->
-	<script>
-		function toggleNotifications() {
-			let panel = document.getElementById("notifPanel");
-			let overlay = document.getElementById("overlay");
-			panel.classList.toggle("active");
-			overlay.classList.toggle("active");
-		}
-
-		function toggleProfileMenu() {
-			let dropdown = document.getElementById("profileDropdown");
-			dropdown.classList.toggle("show");
-		}
-
-		window.onclick = function (e) {
-			if (!e.target.closest('.profile-menu')) {
-				let dropdown = document.getElementById("profileDropdown");
-				if (dropdown) dropdown.classList.remove("show");
-			}
-		}
-
-		function loadNotifications() {
-			fetch('/notifications')
-				.then(res => res.json())
-				.then(data => {
-					let list = document.getElementById("notifList");
-					list.innerHTML = "";
-					let unread = data.filter(n => !n.read);
-
-					data.forEach(n => {
-						let div = document.createElement("div");
-						div.className = "notif-item " + (!n.read ? "unread" : "");
-						div.innerText = n.message;
-						div.onclick = function () {
-							fetch('/notifications/read/' + n.id, {method: 'POST'})
-								.then(() => {
-									loadNotifications();
-									if (n.type === "FOLLOW") {
-										window.location.href = "/profile/" + n.senderUsername;
-									} else {
-										window.location.href = "/feed";
-									}
-								});
-						};
-						list.appendChild(div);
-					});
-
-					let badge = document.getElementById("notifCount");
-					if (unread.length > 0) {
-						badge.style.display = "inline";
-						badge.innerText = unread.length;
-					} else {
-						badge.style.display = "none";
-					}
-				});
-		}
-		setInterval(loadNotifications, 5000);
-		loadNotifications();
-
-		function toggleComments(postId) {
-			let section = document.getElementById("comments-" + postId);
-			if (section.style.display === "none") {
-				section.style.display = "block";
-			} else {
-				section.style.display = "none";
-			}
-		}
-	</script>
 
 	<script th:inline="javascript">
 
@@ -528,61 +636,50 @@
 			trendingTags = [];
 		}
 
-
 		function handleSearchInput() {
 
-			let input = document.getElementById("searchInput").value.trim();
-			let box = document.getElementById("trendingBox");
+		    let input = document.getElementById("searchInput").value.trim();
+		    let box = document.getElementById("trendingBox");
+		    let trendingBtn = document.getElementById("dynamicTrendingBtn");
 
-			let trendingBtn = document.getElementById("dynamicTrendingBtn");
+		    if (!input.startsWith("#")) {
+		        trendingBtn.style.display = "none";
+		        box.style.display = "none";
+		        return;
+		    }
 
-			if (input.startsWith("#")) {
+		    trendingBtn.style.display = "inline-block";
 
-				trendingBtn.style.display = "inline-block";
+		    let keyword = input.substring(1).toLowerCase();
 
-			} else {
+		    let filtered = trendingTags.filter(tag =>
+		        tag.toLowerCase().startsWith(keyword)
+		    );
 
-				trendingBtn.style.display = "none";
-			}
+		    if (filtered.length === 0) {
+		        box.style.display = "none";
+		        return;
+		    }
 
-			// If not starting with #
-			if (!input.startsWith("#")) {
-				box.style.display = "none";
-				return;
-			}
+		    box.innerHTML = "";
 
-			let keyword = input.substring(1).toLowerCase();
+		    filtered.forEach(tag => {
+		        let a = document.createElement("a");
 
-			let filtered = trendingTags.filter(tag =>
-				tag.toLowerCase().startsWith(keyword)
-			);
+		        // ✅ FIXED HERE
+		        a.href = "/post/search?keyword=%23" + tag;
 
-			if (filtered.length === 0) {
-				box.style.display = "none";
-				return;
-			}
+		        a.innerText = "#" + tag;
+		        a.style.display = "block";
+		        a.style.padding = "8px";
+		        a.style.textDecoration = "none";
+		        a.style.color = "#111827";
 
-			box.innerHTML = "";
+		        box.appendChild(a);
+		    });
 
-			filtered.forEach(tag => {
-
-				let a = document.createElement("a");
-				a.href = "/post/trending?tag=" + tag;
-				a.innerText = "#" + tag;
-				a.style.display = "block";
-				a.style.padding = "8px";
-				a.style.textDecoration = "none";
-				a.style.color = "#111827";
-
-				a.onmouseover = () => a.style.background = "#f3f4f6";
-				a.onmouseout = () => a.style.background = "transparent";
-
-				box.appendChild(a);
-			});
-
-			box.style.display = "block";
+		    box.style.display = "block";
 		}
-
 		document.addEventListener("click", function (event) {
 
 			let searchInput = document.getElementById("searchInput");
@@ -735,8 +832,69 @@
 			}, 2000);
 		}
 
+
 	</script>
 
+	<!--this is the filter type post-->
+
+	<script>
+		    function changeRoleFilter(role) {
+		        if (role === "ALL")
+		            window.location.href = "/feed";
+		        else
+		            window.location.href = "/feed?role=" + role;
+		    }
+
+		    document.addEventListener("DOMContentLoaded", function () {
+
+		        const params = new URLSearchParams(window.location.search);
+		        let role = params.get("role");
+
+		        if (!role) role = "ALL";
+
+		        document.querySelectorAll(".filter-btn").forEach(btn => {
+		            if (btn.dataset.role === role) {
+		                btn.classList.add("active");
+		            } else {
+		                btn.classList.remove("active");
+		            }
+		        });
+
+		    });
+		</script>
+	
+	<script>
+	function togglePromotional(el) {
+
+	    const hiddenInput = document.getElementById("promoInput");
+	    const promoFields = document.getElementById("promoFields");
+
+	    const ctaType = document.querySelector("select[name='ctaType']");
+	    const ctaUrl = document.querySelector("input[name='ctaUrl']");
+	    const productTag = document.querySelector("input[name='productTag']");
+
+	    if (el.checked) {
+	        hiddenInput.value = "true";
+	        promoFields.style.display = "block";
+
+	        // Make fields required
+	        ctaType.required = true;
+	        ctaUrl.required = true;
+	        productTag.required = true;
+
+	    } else {
+	        hiddenInput.value = "false";
+	        promoFields.style.display = "none";
+
+	        // Remove required validation
+	        ctaType.required = false;
+	        ctaUrl.required = false;
+	        productTag.required = false;
+	    }
+	}
+	</script>
+
+	<div th:replace="fragments/footer :: footer"></div>
 </body>
 
 </html>

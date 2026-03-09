@@ -153,9 +153,7 @@
 								👤 <strong>Personal Account</strong>
 							</div>
 
-							<div th:if="${profile.bio != null}">
-								📝 <span th:text="${profile.bio}"></span>
-							</div>
+							
 
 						</div>
 
@@ -259,11 +257,7 @@
 
 				</div>
 			</div>
-
-			<!-- ================= TABS (NOW CORRECT POSITION) ================= -->
-			
-
-			<!-- ================= TAB CONTENT ================= -->
+		
 
 			<!-- ================= TABS (NOW CORRECT POSITION) ================= -->
 			<div class="profile-tabs">
@@ -273,10 +267,10 @@
 					Posts
 				</a>
 
-				<a th:href="@{/profile/{username}(username=${profile.username}, tab='about')}"
+			<!--	<a th:href="@{/profile/{username}(username=${profile.username}, tab='about')}"
 					th:classappend="${tab == 'about'} ? 'active-tab' : ''">
 					About
-				</a>
+				</a> -->
 
 				<a th:href="@{/profile/{username}(username=${profile.username}, tab='connections')}"
 					th:classappend="${tab == 'connections'} ? 'active-tab' : ''">
@@ -454,67 +448,14 @@
 				dropdown.style.display = "none";
 			}
 		});
+		
+		
 
-		var searchForm = document.getElementById("searchForm");
-		fetch("/profile/search-api?keyword=" + encodeURIComponent(keyword))
-			.then(function (response) {
-				if (response.status === 200) {
-					return response.text().then(function (username) {
-						window.location.href = "/profile/" + username;
+		
 
-					});
-				} else {
-					return response.text().then(function (msg) {
-						if (errorBox) {
-							errorBox.innerText = "❌ " + msg;
-							errorBox.style.display = "block";
-						}
-					});
-				}
-			})
-			.catch(function () {
-				if (errorBox) {
-					errorBox.innerText = "❌ Something went wrong";
-					errorBox.style.display = "block";
-				}
-			});
-
-		if (searchForm) {
-			searchForm.addEventListener("submit", function (e) {
-				e.preventDefault();
-
-				var keywordInput = document.getElementById("searchInput");
-				var errorBox = document.getElementById("searchError");
-
-				if (!keywordInput) return;
-
-				var keyword = keywordInput.value.trim();
-				if (!keyword) return;
-
-				fetch("/api/profile/search-api?keyword=" + encodeURIComponent(keyword))
-					.then(function (response) {
-						if (response.status === 200) {
-							return response.text().then(function (username) {
-								window.location.href = "/api/profile/" + username;
-							});
-						} else {
-							return response.text().then(function (msg) {
-								if (errorBox) {
-									errorBox.innerText = "❌ " + msg;
-									errorBox.style.display = "block";
-								}
-							});
-						}
-					})
-					.catch(function () {
-						if (errorBox) {
-							errorBox.innerText = "❌ Something went wrong";
-							errorBox.style.display = "block";
-						}
-					});
-
-			});
-		}
+		
+					
+					
 
 	</script>
 

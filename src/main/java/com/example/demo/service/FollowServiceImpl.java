@@ -102,4 +102,13 @@ public class FollowServiceImpl implements FollowService {
 
         return following;
     }
+    
+    @Override
+    public long getFollowersCount(String username) {
+
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        return followRepository.countByFollowing_Id(user.getId());
+    }
 }
