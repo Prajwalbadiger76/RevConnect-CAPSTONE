@@ -5,6 +5,7 @@ import com.example.demo.dto.PostDto;
 import com.example.demo.dto.ProfileResponse;
 import com.example.demo.dto.ProfileWithFollowResponse;
 import com.example.demo.dto.UpdateProfileRequest;
+import com.example.demo.entity.User;
 import com.example.demo.service.AnalyticsService;
 import com.example.demo.service.ConnectionService;
 import com.example.demo.service.PostService;
@@ -149,8 +150,18 @@ this.postService = postService;
         if (canView) {
             posts = postService.getPostsByUsername(username, currentUsername);
         }
+        
 
         model.addAttribute("posts", posts);
+        
+     // LOAD CONNECTIONS WHEN TAB IS CONNECTIONS
+        if (tab.equals("connections")) {
+
+            List<User> connections =
+                    connectionService.getAcceptedConnections(username);
+
+            model.addAttribute("connections", connections);
+        }
 
         return "profile";
     }

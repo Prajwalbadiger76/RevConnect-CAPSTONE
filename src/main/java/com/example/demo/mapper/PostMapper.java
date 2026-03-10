@@ -25,6 +25,8 @@ public class PostMapper {
         dto.setUsername(post.getUser().getUsername());
         dto.setCreatedAt(post.getCreatedAt());
         dto.setPinned(Boolean.TRUE.equals(post.getPinned()));
+        
+        
 
         dto.setLikeCount(likeCount);
         dto.setLikedByCurrentUser(liked);

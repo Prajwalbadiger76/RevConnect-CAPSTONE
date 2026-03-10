@@ -265,14 +265,14 @@
 
 			<!-- CREATE POST -->
 			<div class="create-post" th:if="${showCreateForm} ">
-				<form th:action="@{/post/create}" method="post"onsubmit="return validateUrlBeforeSubmit()">
+				<form th:action="@{/post/create}" method="post" onsubmit="return validatePostForm()">
 
 					<!-- Row 1: Textarea -->
 					<div class="create-row">
 
 
 						<textarea name="content" id="postContent" placeholder="What's on your mind?"
-							required></textarea>
+							></textarea>
 							
 							
 							
@@ -899,25 +899,32 @@
 	</script>
 	
 	<script>
-			function validateUrlBeforeSubmit() {
+		function validatePostForm() {
 
-				    const promoInput = document.getElementById("promoInput").value;
-				    const urlInput = document.querySelector("input[name='ctaUrl']");
+		    const content = document.getElementById("postContent").value.trim();
 
-				    if (promoInput === "true") {
+		    if(content === ""){
+		        showAppPopup("Content is required to create a post.");
+		        return false;
+		    }
 
-				        const url = urlInput.value.trim();
+		    const promoInput = document.getElementById("promoInput").value;
+		    const urlInput = document.querySelector("input[name='ctaUrl']");
 
-				        const pattern = /^(https?:\/\/)[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}.*$/;
+		    if (promoInput === "true") {
 
-				        if (!pattern.test(url)) {
-				            showAppPopup("Please enter a valid URL (http:// or https://)");
-				            return false;
-				        }
-				    }
+		        const url = urlInput.value.trim();
 
-				    return true;
-				}
+		        const pattern = /^(https?:\/\/)[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}.*$/;
+
+		        if (!pattern.test(url)) {
+		            showAppPopup("Please enter a valid URL (http:// or https://)");
+		            return false;
+		        }
+		    }
+
+		    return true;
+		}
 		</script>
 
 	<div th:replace="fragments/footer :: footer"></div>

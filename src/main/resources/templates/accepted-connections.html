@@ -111,13 +111,23 @@
     cursor:pointer;
 }
 
+
+/* REJECT BUTTON */
 .reject{
-    background:#fee2e2;
-    color:#dc2626;
+border:none;
+padding:8px 16px;
+border-radius:7px;
+cursor:pointer;
+background:#ef4444;
+color:white;
+font-weight:600;
+transition:all 0.25s ease;
 }
 
 .reject:hover{
-    background:#fecaca;
+background:#dc2626;
+transform:translateY(-2px);
+box-shadow:0 6px 14px rgba(0,0,0,0.2);
 }
 
 /* ===== EMPTY STATE ===== */
@@ -129,7 +139,7 @@
 }
 
 .empty-box{
-    background:white;
+    background:white;	
     padding:40px;
     border-radius:18px;
     box-shadow:0 8px 25px rgba(0,0,0,0.08);

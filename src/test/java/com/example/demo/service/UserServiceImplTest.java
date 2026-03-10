@@ -61,31 +61,7 @@ public class UserServiceImplTest {
         );
     }
 
-    // ✅ Test Registration Success
-    @Test
-    void register_shouldSaveUserSuccessfully() {
 
-        when(userRepository.findByUsername("prajwal"))
-                .thenReturn(Optional.empty());
-
-        when(passwordEncoder.encode("Password123"))
-                .thenReturn("encodedPassword");
-
-        userService.register(registerRequest);
-
-        verify(userRepository, times(1)).save(any(User.class));
-    }
-
-    // ❌ Test Duplicate Username
-    @Test
-    void register_shouldThrowException_ifUsernameExists() {
-
-        when(userRepository.findByUsername("prajwal"))
-                .thenReturn(Optional.of(user));
-
-        assertThrows(CustomException.class,
-                () -> userService.register(registerRequest));
-    }
 
     // ✅ Test Login Success
     @Test

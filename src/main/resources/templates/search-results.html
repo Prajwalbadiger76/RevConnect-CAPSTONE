@@ -165,9 +165,9 @@
 
             <div class="user-left">
 
-                <div class="avatar"
-                     th:text="${#strings.substring(user.username,0,1)}">
-                </div>
+				<div class="avatar"
+				     th:text="${#strings.substring(user.username,0,1)}">
+			    </div>
 
                 <div class="user-info">
                     <a th:href="@{/profile/{username}(username=${user.username})}"
@@ -187,51 +187,135 @@
         </div>
 
         <!-- ================= HASHTAG SEARCH ================= -->
+		<div th:if="${searchType == 'hashtag'}">
 
-        <div th:if="${searchType == 'hashtag'}">
+		    <div style="margin-bottom:20px; font-weight:600; font-size:16px;">
+		        Showing results for
+		        <span th:text="${searchedKeyword}" style="color:#2563eb;"></span>
+		    </div>
 
-            <div style="margin-bottom:20px; font-weight:600; font-size:16px;">
-                Showing results for
-                <span th:text="${searchedKeyword}" style="color:#2563eb;"></span>
-            </div>
+		    <div th:if="${#lists.isEmpty(posts)}">
+		        No posts found for this hashtag.
+		    </div>
 
-            <div th:if="${#lists.isEmpty(posts)}">
-                No posts found for this hashtag.
-            </div>
+		    <div th:each="post : ${posts}" class="post-card">
 
-            <div th:each="post : ${posts}" class="post-card">
+		        <!-- HEADER -->
+				<div class="post-header">
 
-                <div class="post-header">
-                    <div class="avatar"
-                         th:text="${#strings.substring(post.username,0,1)}">
-                    </div>
+				    <div class="avatar"
+				         th:text="${#strings.substring(post.username,0,1)}">
+				    </div>
 
-                    <div>
-                        <strong th:text="${post.username}"></strong>
-                        <div th:text="${#temporals.format(post.createdAt,'dd MMM yyyy HH:mm')}"></div>
-                    </div>
-                </div>
+				    <div>
+				        <strong th:text="${post.username}"></strong>
 
-                <div class="post-content"
-                     th:text="${post.content}">
-                </div>
+				        <div th:text="${#temporals.format(post.createdAt,'dd MMM yyyy HH:mm')}">
+				        </div>
+				    </div>
 
-                <div class="post-actions">
+				</div>
 
-                    <form th:action="@{/like/{postId}(postId=${post.id})}" method="post">
-                        <button th:text="${post.likedByCurrentUser ? '❤️ Unlike' : '🤍 Like'}"></button>
-                    </form>
 
-                    <span th:text="${post.likeCount} + ' likes'"></span>
+		        <!-- POST CONTENT -->
+		        <div class="post-content"
+		             th:text="${post.content}">
+		        </div>
 
-                </div>
 
-            </div>
+		        <!-- HASHTAGS -->
+		        <div class="post-tags"
+		             th:if="${post.hashtags != null and !#lists.isEmpty(post.hashtags)}">
 
-        </div>
+		            <span th:each="tag : ${post.hashtags}">
+		                <a th:href="@{/post/search(keyword=${'#' + tag})}"
+		                   style="color:#2563eb; text-decoration:none; font-weight:500;">
+		                    <span th:text="${'#' + tag}"></span>
+		                </a>
+		            </span>
 
-    </div>
+		        </div>
+
+
+		        <!-- ACTIONS -->
+		        <div class="post-actions">
+
+		            <!-- LIKE -->
+		            <form th:action="@{/like/{postId}(postId=${post.id})}" method="post">
+		                <button th:text="${post.likedByCurrentUser ? '❤️ Unlike' : '🤍 Like'}"></button>
+		            </form>
+
+		            <span th:text="${post.likeCount} + ' likes'"></span>
+
+
+		            <!-- SHARE -->
+		            <form th:action="@{/post/share/{id}(id=${post.id})}" method="post">
+		                <button type="submit">🔁 Share</button>
+		            </form>
+
+
+		            <!-- COMMENT TOGGLE -->
+		            <button type="button"
+		                    class="comment-toggle-btn"
+		                    th:attr="onclick=|toggleComments(${post.id})|">
+
+		                💬 <span th:text="${#lists.size(post.comments)}"></span> Comments
+
+		            </button>
+
+		        </div>
+
+
+		        <!-- COMMENT SECTION -->
+		        <div th:id="'comments-' + ${post.id}"
+		             style="display:none; margin-top:10px;">
+
+		            <div th:each="comment : ${post.comments}"
+		                 style="margin-bottom:6px;">
+
+		                <strong th:text="${comment.username}"></strong>
+		                <span th:text="${comment.content}"></span>
+
+		            </div>
+
+
+		            <!-- ADD COMMENT -->
+		            <form th:action="@{/comment/{postId}(postId=${post.id})}"
+		                  method="post"
+		                  style="display:flex; gap:8px; margin-top:8px;">
+
+		                <input type="text"
+		                       name="content"
+		                       placeholder="Write a comment..."
+		                       required
+		                       style="flex:1; padding:6px; border-radius:6px; border:1px solid #ddd;">
+
+		                <button type="submit"
+		                        style="padding:6px 12px; border:none; border-radius:6px; background:#2563eb; color:white;">
+		                    Post
+		                </button>
+
+		            </form>
+
+		        </div>
+
+		    </div>
+
+		</div>
+        
 </div>
+
+<script>
+function toggleComments(postId) {
+
+    const section = document.getElementById("comments-" + postId);
+
+    if(!section) return;
+
+    section.style.display =
+        section.style.display === "block" ? "none" : "block";
+}
+</script>
 
 <!-- FOOTER -->
 <div th:replace="fragments/footer :: footer"></div>

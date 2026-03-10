@@ -9,6 +9,9 @@ public class PostDto {
     private Long id;
     private String content;
     private String username;
+   
+
+    
     private LocalDateTime createdAt;
 
     private long likeCount;
@@ -17,6 +20,7 @@ public class PostDto {
     private String ctaType;
     private String ctaUrl;
     private String productTag;
+    
 
  
 
@@ -69,6 +73,8 @@ public class PostDto {
         this.username = username;
     }
 
+    
+    
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }

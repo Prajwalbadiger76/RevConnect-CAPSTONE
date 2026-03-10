@@ -100,9 +100,9 @@
 		    <!-- TOP -->
 		    <div class="post-top">
 
-		        <div class="avatar small">
-		            <span th:text="${#strings.substring(post.username,0,1).toUpperCase()}"></span>
-		        </div>
+				<div class="avatar small">
+					 <span th:text="${#strings.substring(post.username,0,1).toUpperCase()}"></span>
+					 </div>
 
 		        <div class="post-meta">
 		            <a th:href="@{/profile/{username}(username=${post.username})}"
