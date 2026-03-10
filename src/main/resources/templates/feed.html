@@ -265,7 +265,7 @@
 
 			<!-- CREATE POST -->
 			<div class="create-post" th:if="${showCreateForm} ">
-				<form th:action="@{/post/create}" method="post">
+				<form th:action="@{/post/create}" method="post"onsubmit="return validateUrlBeforeSubmit()">
 
 					<!-- Row 1: Textarea -->
 					<div class="create-row">
@@ -893,6 +893,28 @@
 	    }
 	}
 	</script>
+	
+	<script>
+			function validateUrlBeforeSubmit() {
+
+				    const promoInput = document.getElementById("promoInput").value;
+				    const urlInput = document.querySelector("input[name='ctaUrl']");
+
+				    if (promoInput === "true") {
+
+				        const url = urlInput.value.trim();
+
+				        const pattern = /^(https?:\/\/)[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}.*$/;
+
+				        if (!pattern.test(url)) {
+				            showAppPopup("Please enter a valid URL (http:// or https://)");
+				            return false;
+				        }
+				    }
+
+				    return true;
+				}
+		</script>
 
 	<div th:replace="fragments/footer :: footer"></div>
 </body>

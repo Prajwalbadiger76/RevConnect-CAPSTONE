@@ -5,6 +5,7 @@ import com.example.demo.dto.PostDto;
 import com.example.demo.dto.ProfileResponse;
 import com.example.demo.dto.ProfileWithFollowResponse;
 import com.example.demo.dto.UpdateProfileRequest;
+import com.example.demo.entity.User;
 import com.example.demo.service.AnalyticsService;
 import com.example.demo.service.ConnectionService;
 import com.example.demo.service.PostService;
@@ -86,6 +87,7 @@ this.postService = postService;
 
 	    model.addAttribute("connectionCount",
 	            connectionService.getConnectionCount(currentUsername));
+	    model.addAttribute("connectionStatus", "NONE");
 
 	    if (error != null) {
 	        model.addAttribute("searchError", "No users found.");
@@ -97,63 +99,76 @@ this.postService = postService;
     // ============================================================
     // ================= VIEW OTHER PROFILE =======================
     // ============================================================
-    @GetMapping("/{username}")
-    public String viewProfile(@PathVariable String username,
-                              @RequestParam(defaultValue = "posts") String tab,
-                              Authentication authentication,
-                              Model model) {
+ // ============================================================
+ // ================= VIEW OTHER PROFILE =======================
+ // ============================================================
+ @GetMapping("/{username}")
+ public String viewProfile(@PathVariable String username,
+                           @RequestParam(defaultValue = "posts") String tab,
+                           Authentication authentication,
+                           Model model) {
 
-        String currentUsername = authentication.getName();
+     String currentUsername = authentication.getName();
 
-        ProfileResponse profile =
-                profileService.getProfileWithFollowInfo(
-                        currentUsername,
-                        username
-                );
+     ProfileResponse profile =
+             profileService.getProfileWithFollowInfo(
+                     currentUsername,
+                     username
+             );
 
-        boolean isOwner = currentUsername.equals(username);
+     boolean isOwner = currentUsername.equals(username);
 
-        model.addAttribute("profile", profile);
-        model.addAttribute("isOwner", isOwner);
+     model.addAttribute("profile", profile);
+     model.addAttribute("isOwner", isOwner);
 
-        boolean canView =
-                Boolean.FALSE.equals(profile.isPrivate())
-                || profile.isFollowing()
-                || profile.isOwn();
+     boolean canView =
+             Boolean.FALSE.equals(profile.isPrivate())
+             || profile.isFollowing()
+             || profile.isOwn();
 
-        model.addAttribute("canView", canView);
+     model.addAttribute("canView", canView);
 
-        // ✅ NOW tab exists
-        model.addAttribute("tab", tab);
+     model.addAttribute("tab", tab);
 
-        model.addAttribute("connectionStatus",
-                connectionService.getConnectionStatus(
-                        currentUsername,
-                        username
-                ));
+     model.addAttribute("connectionStatus",
+             connectionService.getConnectionStatus(
+                     currentUsername,
+                     username
+             ));
 
-        model.addAttribute("connectionCount",
-                connectionService.getConnectionCount(username));
+     model.addAttribute("connectionCount",
+             connectionService.getConnectionCount(username));
 
-        Long pendingRequestId =
-                connectionService.getPendingRequestId(
-                        currentUsername,
-                        username
-                );
+     Long pendingRequestId =
+             connectionService.getPendingRequestId(
+                     currentUsername,
+                     username
+             );
 
-        model.addAttribute("pendingRequestId", pendingRequestId);
+     model.addAttribute("pendingRequestId", pendingRequestId);
 
-        // 🔥 LOAD POSTS
-        List<PostDto> posts = Collections.emptyList();
+     // ================= TAB LOGIC =================
 
-        if (canView) {
-            posts = postService.getPostsByUsername(username, currentUsername);
-        }
+     if (tab.equals("connections")) {
 
-        model.addAttribute("posts", posts);
+         List<User> connections =
+                 connectionService.getAcceptedConnections(username);
 
-        return "profile";
-    }
+         model.addAttribute("connections", connections);
+
+     } else {
+
+         List<PostDto> posts = Collections.emptyList();
+
+         if (canView) {
+             posts = postService.getPostsByUsername(username, currentUsername);
+         }
+
+         model.addAttribute("posts", posts);
+     }
+
+     return "profile"; // 🔴 THIS WAS MISSING
+ }
 
     // ============================================================
     // ================= EDIT PROFILE PAGE ========================
