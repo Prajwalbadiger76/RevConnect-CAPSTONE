@@ -73,16 +73,16 @@
 					<div th:if="${!canView}" style="margin-top:15px;">
 					</div>
 
-					<div th:if="${!isOwner}" class="action-buttons">
+					<div th:if="${!isOwner and canView}" class="action-buttons">
 
 						<!-- FOLLOW BUTTON -->
-						<form th:if="${!profile.isFollowing}"
+						<form th:if="${profile != null and !profile.isFollowing}"
 							th:action="@{/follow/{username}(username=${profile.username})}" method="post"
 							style="display:inline;">
 							<button class="btn-follow">➕ Follow</button>
 						</form>
 
-						<form th:if="${profile.isFollowing}"
+						<form th:if="${profile != null and profile.isFollowing}"
 							th:action="@{/follow/unfollow/{username}(username=${profile.username})}" method="post"
 							style="display:inline;">
 							<button class="btn-following">✓ Following</button>
@@ -249,10 +249,10 @@
 					</div>
 
 					<!-- EDIT BUTTON -->
-					<div class="edit-btn-wrapper" th:if="${isOwner}">
-						<a th:href="@{/profile/edit}" class="edit-btn">
-							✏ Edit Profile
-						</a>
+					<div class="edit-btn-wrapper" th:if="${isOwner == true}">
+					    <a th:href="@{/profile/edit}" class="edit-btn">
+					        ✏ Edit Profile
+					    </a>
 					</div>
 
 				</div>

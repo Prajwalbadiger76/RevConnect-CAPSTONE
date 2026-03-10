@@ -87,6 +87,7 @@ this.postService = postService;
 
 	    model.addAttribute("connectionCount",
 	            connectionService.getConnectionCount(currentUsername));
+	    model.addAttribute("connectionStatus", "NONE");
 
 	    if (error != null) {
 	        model.addAttribute("searchError", "No users found.");
