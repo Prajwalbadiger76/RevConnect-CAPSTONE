@@ -28,4 +28,6 @@ public interface ConnectionService {
     void cancelRequest(String currentUsername, String targetUsername);
     
     List<Connection> getSentRequests(String username);
+    
+    
 }

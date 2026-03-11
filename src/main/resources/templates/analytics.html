@@ -1,19 +1,10 @@
 <!DOCTYPE html>
-<<<<<<< HEAD
-
-=======
->>>>>>> develop
 <html xmlns:th="http://www.thymeleaf.org">
 
 <head>
 	<meta charset="UTF-8">
 	<title>Followers Demographics</title>
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-
-=======
->>>>>>> 07f8d80a29b6540271bbca3e411d6735d811f510
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -155,10 +146,6 @@
 	}
 </style>
 
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 07f8d80a29b6540271bbca3e411d6735d811f510
 	<!-- Chart.js -->
 	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -261,121 +248,10 @@
 		}
 		
 	</style>
->>>>>>> develop
 </head>
 
 <body>
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-
-<!-- HEADER -->
-<div class="header">
-	<h2 th:text="${username} + ' - Followers Analytics'"></h2>
-
-	<a th:href="@{/profile/{username}(username=${username})}" class="back-btn">
-		← Back to Profile
-	</a>
-</div>
-
-<div class="container">
-
-	<div class="card">
-
-		<!-- STATISTICS -->
-		<div class="stats">
-			<div class="stat-box">
-				<h4>Total Followers</h4>
-				<p id="totalFollowers">0</p>
-			</div>
-
-			<div class="stat-box">
-				<h4>Followers Gained (Latest Day)</h4>
-				<p id="latestGain">0</p>
-			</div>
-		</div>
-
-		<h3>Follower Growth Over Time</h3>
-
-		<div class="chart-container">
-			<canvas id="growthChart" height="120"></canvas>
-		</div>
-
-		<div id="noData" class="no-data" style="display:none;">
-			No follower activity yet.
-		</div>
-
-	</div>
-</div>
-
-<script th:inline="javascript">
-
-	let growthData = /*[[${growthData}]]*/[];
-
-	if (!growthData || growthData.length === 0) {
-
-		document.getElementById("noData").style.display = "block";
-		document.getElementById("growthChart").style.display = "none";
-
-	} else {
-
-		const labels = growthData.map(g => g.date);
-		const values = growthData.map(g => g.totalFollowers);
-
-		document.getElementById("totalFollowers").innerText =
-			values[values.length - 1];
-
-		let gained = values.length > 1
-			? values[values.length - 1] - values[values.length - 2]
-			: values[0];
-
-		document.getElementById("latestGain").innerText = gained;
-
-		new Chart(document.getElementById("growthChart"), {
-			type: 'line',
-			data: {
-				labels: labels,
-				datasets: [{
-					label: 'Total Followers',
-					data: values,
-					borderColor: '#4f46e5',
-					backgroundColor: 'rgba(79,70,229,0.12)',
-					borderWidth: 3,
-					fill: true,
-					tension: 0.35,
-					pointRadius: 4,
-					pointHoverRadius: 6
-				}]
-			},
-			options: {
-				responsive: true,
-				plugins: {
-					legend: {
-						display: true
-					}
-				},
-				scales: {
-					y: {
-						beginAtZero: true,
-						ticks: {
-							precision: 0
-						}
-					}
-				}
-			}
-		});
-	}
-
-</script>
-
-</body>
-</html>
-=======
-	<!-- Header -->
-	<div class="header">
-		<h2 th:text="${username} + ' - Followers Demographics'"></h2>
-=======
->>>>>>> 07f8d80a29b6540271bbca3e411d6735d811f510
 
 <!-- HEADER -->
 <div class="header">
@@ -479,10 +355,4 @@
 
 
 </body>
-<<<<<<< HEAD
-
 </html>
->>>>>>> develop
-=======
-</html>
->>>>>>> 07f8d80a29b6540271bbca3e411d6735d811f510

@@ -13,6 +13,7 @@ import org.apache.logging.log4j.Logger;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.net.URI;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -89,6 +90,7 @@ public class PostServiceImpl implements PostService {
         post.setPinned(false);
 
         if (promotional) {
+
             logger.info("Promotional post attempt by user: {}", username);
 
             if (user.getRole() != Role.BUSINESS &&
@@ -100,14 +102,52 @@ public class PostServiceImpl implements PostService {
                 );
             }
 
+            
+            if (ctaUrl != null && !ctaUrl.isBlank()) {
+
+                try {
+
+                    URI uri = new URI(ctaUrl);
+
+                    String scheme = uri.getScheme();
+                    String host = uri.getHost();
+
+                    // 1️⃣ Scheme validation
+                    if (scheme == null ||
+                        (!scheme.equalsIgnoreCase("http") &&
+                         !scheme.equalsIgnoreCase("https"))) {
+
+                        throw new RuntimeException(
+                                "URL must use a protocol"
+                        );
+                    }
+
+                    // 2️⃣ Host validation
+                    if (host == null || host.isBlank()) {
+                        throw new RuntimeException("Invalid domain in URL");
+                    }
+
+                    // 3️⃣ Domain validation
+                    if (!host.matches("^[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")) {
+                        throw new RuntimeException("Invalid domain format");
+                    }
+
+                } catch (Exception e) {
+                    throw new RuntimeException("Invalid URL format");
+                }
+            }
+
+            // ✅ Set promotional fields
             post.setIsPromotional(true);
             post.setCtaType(ctaType);
             post.setCtaUrl(ctaUrl);
             post.setProductTag(productTag);
 
         } else {
+
             post.setIsPromotional(false);
         }
+    
 
         if (scheduledAt != null && !scheduledAt.isBlank()) {
 
@@ -138,7 +178,6 @@ public class PostServiceImpl implements PostService {
 
         logger.info("Post created successfully for user: {}", username);
     }
-
     // =========================================================
     // UPDATE POST
     // =========================================================
